@@ -702,19 +702,19 @@
           </div>
         {%- endif -%}
  
-        {%- if settings.enable_cart_upsel -%}
         <div class="cart__widget cart__widget--products"
           data-animation="{{ animation_name }}"
           data-animation-duration="{{ animation_duration }}"
           data-animation-delay="{{ animation_delay }}"
           {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+
+          {%- unless settings.enable_cart_upsel -%}style="display:none"{%endunless%}
         >
           <p class="cart__widget__title">{{ 'cart.general.pair_products' | t }}</p>
           <div class="cart__widget__products" data-upsell-products>
             {{- upsell_products -}}
           </div>
         </div>
-        {%endif%}
       </div>
     </div>
   </form>
