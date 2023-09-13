@@ -1,0 +1,219 @@
+{
+  "sections": {
+    "main": {
+      "type": "product",
+      "blocks": {
+        "price_and_title": {
+          "type": "price_and_title",
+          "settings": {
+            "subheading_option": "none",
+            "show_rating": false,
+            "enable_star_rating": false,
+            "show_rating_count": false
+          }
+        },
+        "ff706bf2-539d-48e0-b2ed-a1443b81d954": {
+          "type": "text",
+          "settings": {
+            "title": "<p><em>{{ product.metafields.my_fields.short_description | metafield_tag }}<\/em><em> <\/em><\/p>"
+          }
+        },
+        "form": {
+          "type": "form",
+          "settings": {
+            "info_page": "",
+            "show_labels": false,
+            "show_quantity": true,
+            "show_payment_button": false,
+            "afterpay_zip": true,
+            "subscriptions_enable_selectors": true
+          }
+        },
+        "pickup": {
+          "type": "pickup",
+          "disabled": true,
+          "settings": {
+          }
+        },
+        "tabs": {
+          "type": "tab_richtext",
+          "settings": {
+            "show_read_more": false,
+            "show_read_more_ingredients": false,
+            "style": "accordions",
+            "title_1": "{{ product.metafields.my_fields.added_benefits_title.value }}",
+            "raw_content_1": "<p>{{ product.metafields.my_fields.added_benefits | metafield_tag }}<\/p>",
+            "title_2": "{{ product.metafields.my_fields.feature_heading.value }}",
+            "raw_content_2": "<p>{{ product.metafields.my_fields.feature | metafield_tag }}<\/p>",
+            "title_3": "{{ product.metafields.my_fields.ingredients_title.value }}",
+            "raw_content_3": "<p>{{ product.metafields.my_fields.ingredients | metafield_tag }}<\/p>",
+            "title_4": "",
+            "raw_content_4": "",
+            "title_5": "",
+            "raw_content_5": ""
+          }
+        }
+      },
+      "block_order": [
+        "price_and_title",
+        "ff706bf2-539d-48e0-b2ed-a1443b81d954",
+        "form",
+        "pickup",
+        "tabs"
+      ],
+      "settings": {
+        "product_sticky_enable": true,
+        "image_layout": "stacked",
+        "image_size": "normal",
+        "show_cart_bar": true,
+        "enable_zoom": true,
+        "enable_video_looping": false
+      }
+    },
+    "reviews": {
+      "type": "reviews",
+      "disabled": true,
+      "settings": {
+        "enable_product_reviews": false,
+        "enable_accordion": false
+      }
+    },
+    "1646827592be17f83a": {
+      "type": "section-video",
+      "disabled": true,
+      "settings": {
+        "video_link_bg": "",
+        "video_link": "",
+        "image": "shopify:\/\/shop_images\/TGP_5152_Edit.jpg",
+        "bg_position": "center-center",
+        "height": "screen-height-three-quarters",
+        "overlay_opacity": 0,
+        "overlay_color": "#000000",
+        "title": "How to Use",
+        "description": "",
+        "flex_align": "align--middle-center",
+        "text_color": "text-light",
+        "transparent": true,
+        "link_text": "Watch",
+        "link": "",
+        "button_color": "btn--white",
+        "button_style": "hero__btn btn btn--large btn--outline caps"
+      }
+    },
+    "shipping": {
+      "type": "section-accordion",
+      "disabled": true,
+      "blocks": {
+        "shipping-0": {
+          "type": "icon",
+          "settings": {
+            "icon_name": "icon-shipment",
+            "icon_color": "#b5bde3",
+            "title": "Fast shipping",
+            "text": "<p>Use this to answer some common questions you hear from your customers. You could discuss product details, size fit, shipping policies, or anything you think would help merchants make an informed decision about your products. This section will appear across all products.<\/p>"
+          }
+        },
+        "shipping-1": {
+          "type": "icon",
+          "settings": {
+            "icon_name": "icon-truck",
+            "icon_color": "#b5bde3",
+            "title": "Order tracking",
+            "text": "<p>Use this to answer some common questions you hear from your customers. You could discuss product details, size fit, shipping policies, or anything you think would help merchants make an informed decision about your products. This section will appear across all products.<\/p>"
+          }
+        },
+        "shipping-2": {
+          "type": "icon",
+          "settings": {
+            "icon_name": "icon-chat",
+            "icon_color": "#b5bde3",
+            "title": "Get in touch",
+            "text": "<p>Use this to answer some common questions you hear from your customers. You could discuss product details, size fit, shipping policies, or anything you think would help merchants make an informed decision about your products. This section will appear across all products.<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "shipping-0",
+        "shipping-1",
+        "shipping-2"
+      ],
+      "settings": {
+        "title": "Shipping"
+      }
+    },
+    "aaa415eb-c25e-48e3-8656-a39b535d9481": {
+      "type": "section-logo-list",
+      "blocks": {
+        "template--16314218676476__aaa415eb-c25e-48e3-8656-a39b535d9481-16675471921588853f-0": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/2_658fbf30-33bf-4afa-bc91-7f7578e4740b.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "template--16314218676476__aaa415eb-c25e-48e3-8656-a39b535d9481-16675471921588853f-1": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/4_41abaed2-84bb-4a0d-bd9e-2a0950e620f9.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "template--16314218676476__aaa415eb-c25e-48e3-8656-a39b535d9481-16675471921588853f-2": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/1_ace75741-d3e7-44fe-b962-1143ff646f18.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "cabdc832-0f75-4518-9376-bdeaa209eaa8": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/3_7eb83b9b-2846-48b5-9888-7386a07e0f05.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "template--16314218676476__aaa415eb-c25e-48e3-8656-a39b535d9481-16675471921588853f-0",
+        "template--16314218676476__aaa415eb-c25e-48e3-8656-a39b535d9481-16675471921588853f-1",
+        "template--16314218676476__aaa415eb-c25e-48e3-8656-a39b535d9481-16675471921588853f-2",
+        "cabdc832-0f75-4518-9376-bdeaa209eaa8"
+      ],
+      "settings": {
+        "title": "AS SEEN IN...",
+        "text_color": "text-dark",
+        "bg_color": "#ffffff"
+      }
+    },
+    "related": {
+      "type": "related",
+      "settings": {
+        "related_products_enable": true,
+        "limit": 4,
+        "product_recommendations_heading": "Related products",
+        "show_recently_viewed": true,
+        "product_recently_limit": 4,
+        "product_recently_heading": "Recently viewed"
+      }
+    },
+    "16484450245432b8f0": {
+      "type": "section-liquid",
+      "settings": {
+        "custom_liquid": "<script type=\"text\/javascript\">\n  var _learnq = _learnq || [];\n  var item = {\n    Name: {{ product.title|json }},\n    ProductID: {{ product.id|json }},\n    Categories: {{ product.collections|map:'title'|json }},\n    ImageURL: \"https:{{ product.featured_image.src|img_url:'grande' }}\",\n    URL: \"{{ shop.secure_url }}{{ product.url }}\",\n    Brand: {{ product.vendor|json }},\n    Price: {{ product.price|money|json }},\n    CompareAtPrice: {{ product.compare_at_price_max|money|json }}\n  };\n  _learnq.push(['track', 'Viewed Product', item]);\n  _learnq.push(['trackViewedItem', {\n    Title: item.Name,\n    ItemId: item.ProductID,\n    Categories: item.Categories,\n    ImageUrl: item.ImageURL,\n    Url: item.URL,\n    Metadata: {\n      Brand: item.Brand,\n      Price: item.Price,\n      CompareAtPrice: item.CompareAtPrice\n    }\n  }]);\n<\/script>"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "reviews",
+    "1646827592be17f83a",
+    "shipping",
+    "aaa415eb-c25e-48e3-8656-a39b535d9481",
+    "related",
+    "16484450245432b8f0"
+  ]
+}

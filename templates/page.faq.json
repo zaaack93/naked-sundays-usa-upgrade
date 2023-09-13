@@ -1,0 +1,272 @@
+{
+  "sections": {
+    "164775096591ec9a61": {
+      "type": "section-slideshow",
+      "blocks": {
+        "1647750965fa3828db-0": {
+          "type": "image",
+          "settings": {
+            "bg_position": "center-center",
+            "image": "shopify:\/\/shop_images\/TGP_6173_Edit_0436345d-b323-403c-8c28-d5a13aff6324.jpg",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "title": "Frequently Asked Questions",
+            "description": "",
+            "flex_align": "align--middle-center",
+            "text_color": "text-light",
+            "transparent": true,
+            "link_text": "",
+            "link": "",
+            "button_color": "btn--white",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        },
+        "1647750965fa3828db-1": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "bg_position": "center-center",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "title": "Image slide",
+            "description": "Tell your brand's story through images.",
+            "flex_align": "align--middle-center",
+            "text_color": "text-light",
+            "transparent": true,
+            "link_text": "View products",
+            "link": "",
+            "button_color": "btn--white",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        }
+      },
+      "block_order": [
+        "1647750965fa3828db-0",
+        "1647750965fa3828db-1"
+      ],
+      "settings": {
+        "height": "screen-height-two-thirds",
+        "transition": "slide",
+        "arrows_style": true,
+        "dots_style": "hidden",
+        "autoplay": false,
+        "autoplay_speed": 8
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "subheading": "",
+        "show_title": true,
+        "show_content": true,
+        "text_size": 2,
+        "align_text": "text-center",
+        "height": "margin--small",
+        "width": "wrapper",
+        "text_color": "text-dark",
+        "bg_color": "#f7f7f7"
+      }
+    },
+    "faq-first": {
+      "type": "page-faq",
+      "blocks": {
+        "faq-heading": {
+          "type": "heading",
+          "settings": {
+            "title": "General Questions"
+          }
+        },
+        "faq-0": {
+          "type": "question",
+          "settings": {
+            "title": "What is Naked Sundays?",
+            "content": "<p>Hello gorgeous! We are an SPF-first Aussie skincare brand dedicated to changing the conversation around SPF by creating game-changing skin-loving, multi-purpose products all with SPF 50.<\/p><p>We are designed to be worn specifically over or under your makeup strictly without whitecast, stickiness or that harsh sunscreen smell. We are created an Australian TGA labs to ensure that we are regulated by the strictest standards on the planet when it comes to high performance SPF.<\/p><p>We’ve also worked our butts off to formulate our products without the use of oxybenzone, parabens, mineral oils, sulfates (SLS\/SLES), GMOs, petrolatum or synthetic colours. Our serums & lotions are fragrance free too.<\/p>"
+          }
+        },
+        "faq-1": {
+          "type": "question",
+          "settings": {
+            "title": "Are your products vegan?",
+            "content": "<p>We’ve fought hard to formulate ALL our products to be vegan friendly and of course, we do not test <em>any<\/em> Naked Sundays products on animals. <\/p>"
+          }
+        },
+        "e3b85714-47cc-4d60-b195-d4a66acc1d5e": {
+          "type": "heading",
+          "settings": {
+            "title": "Usage"
+          }
+        },
+        "faq-2": {
+          "type": "question",
+          "settings": {
+            "title": "How do I use your serums, creams and mist?",
+            "content": "<p>Our <strong>Mineral and Serum <\/strong>can be used with our BFF Brush for hands-free application (we hate fingers all over our skin!) and you should use up to half a teaspoon for your face and neck. Keep clear of your eyes and apply your makeup afterwards with a different brush. <br\/><\/p><p>Our<strong> SPF50+ Hydrating Glow Mist and Our SPF0+ Body Glow Mist<\/strong> can be used OVER your make-up (or on your Body) as an SPF top-up throughout the day. Make sure you're wearing SPF before you leave the house and use our mist as a top up as SPF needs to be reapplied every 90 minutes (as per TGA regulations in Australia) when you're outdoors! <\/p><p>Be sure to close your eyes and hold your breath. Spray in a circular motion up to 7 times for best results. Use as many times throughout the day as possible! DO NOT GET IN YOUR EYES, see drug facts for more details. <br\/><\/p><p>Our mists and serums are not formulated to be water resistant. Be sure to follow the provided directions and reapply accordingly after swimming, excessive sweating, or towel drying and reaply immediately. <em><strong>Wear water resistant SPF when swimming. <\/strong><\/em><\/p>"
+          }
+        },
+        "3cc20c0b-1e72-455e-9a5b-9debd3863c4e": {
+          "type": "question",
+          "settings": {
+            "title": "Are your sunscreens pregnancy safe?",
+            "content": "<p>We are formulated without oxybenzone or parabens, but we suggest you talk to your doctor about what sunscreen is best for you during your pregnancy. <\/p>"
+          }
+        },
+        "b9142251-a9e9-4597-9c0d-93a974e83ff8": {
+          "type": "heading",
+          "settings": {
+            "title": "Product and Ingredients"
+          }
+        },
+        "635a316d-d142-477e-91e2-cdfcb5b44736": {
+          "type": "question",
+          "settings": {
+            "title": "What’s in your sunscreens?",
+            "content": "<p>We’ve made it our mission to make sure we have no parabens, mineral oils or oxybenzone. We’ve also made sure that we’ve maintained the highest performing SPF ratings which are TGA & FDA listed. You can find all of our ingredients on each product page and packaging.  <\/p>"
+          }
+        },
+        "0e697b3b-071f-4826-b92e-18d2d6383a41": {
+          "type": "question",
+          "settings": {
+            "title": "Chemical Vs Mineral",
+            "content": "<p>Our mists, lip oils and serums are chemical sunscreens, which means they contain filters that absorb UV light to prevent sun damage. Using chemical filters means we are able to provide you with lightweight, non-white formulas that offer SPF 50+ protection and will help prevent premature ageing.  In addition, we now offer a mineral sunscreen, which physically block ultraviolet radiation with ingredients like zinc oxide. <\/p>"
+          }
+        },
+        "1f64e989-59b6-4681-9a67-a6af419074ac": {
+          "type": "question",
+          "settings": {
+            "title": "But what is vegan collagen and how does it work?",
+            "content": "<p>Collagen is typically animal-derived but we’ve searched high and low to source the highest-grade vegan collagen which has been specifically & scientifically formulated to have comparable amino acid composition and sensory profile of hydrolysed animal collagen.<\/p><p>But while animal-derived collagen isn't usually able to effectively penetrate the skin due its large molecular structure, our vegan collagen is structured to have smaller molecules to improve absorption and efficacy. <\/p><p>Plus it's undergone extensive in-vivo clinical studies and sensory tests that show immediate & long-term results when it comes to an increase in moisture, hydration & the appearance of smoother skin. <em>Yep, we thought it was too good to be true too! <\/em><\/p>"
+          }
+        },
+        "f397c1fe-e059-4763-828a-6179dfe81d35": {
+          "type": "question",
+          "settings": {
+            "title": "Concern about benzene",
+            "content": "<p>You may have heard about some SPFs being recalled in the US due to high levels of Benzene. Sunscreens are considered medicines in Australia. As part of the regulation process, the ingredients used to make our sunscreens must comply with tight specifications and regulations that don’t allow benzene traces. Fragrances that are known to contain carcinogens like benzene that are used in room deodorants and surface sprays, are not allowed to be used in Australian sunscreens. <\/p>"
+          }
+        },
+        "14a17c14-a4a6-4eb4-bf06-c1aeaafa30a6": {
+          "type": "question",
+          "settings": {
+            "title": "Concerns about benzophenone",
+            "content": "<p>All of our products that contain octocrylene - which the TGA does not consider poses a safety risk when the sunscreens are used as directed - are screened for benzophenone at the point of manufacture and there is none present at the point of release. While the appearance of benzophenone happens over a long period of time, our sunscreens have strict shelf life expiry dates and like any product with an expiry date, should not be used beyond that date. <\/p>"
+          }
+        },
+        "5e9d94c8-be8f-4187-b24a-c8d82ef4a682": {
+          "type": "heading",
+          "settings": {
+            "title": "Shipping & Packaging"
+          }
+        },
+        "072fb648-d323-49ba-9fef-0203abe6bb95": {
+          "type": "question",
+          "settings": {
+            "title": "Is everything recyclable?",
+            "content": "<p>Our tubes and bottles can be sent back to us free of charge to be repurposed for future use (DM for details), our mailing boxes are 100% recyclable and our brushes and purses are yours to keep, reuse & re-love! <\/p>"
+          }
+        },
+        "27f491c0-8a59-4a5c-a243-916faf5d8665": {
+          "type": "heading",
+          "disabled": true,
+          "settings": {
+            "title": "What about Reef Safety?"
+          }
+        },
+        "900a0bb0-6372-42d9-9340-b19bffe88d7e": {
+          "type": "question",
+          "settings": {
+            "title": "What about Reef Safety?",
+            "content": "<p>We avoid formulating our products with ingredients that are thought to cause damage to reefs and continue to monitor the state of scientific findings around sunscreen ingredients so we can continue to make sure we strive towards formulating our products with reef friendly alternatives.<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "faq-heading",
+        "faq-0",
+        "faq-1",
+        "e3b85714-47cc-4d60-b195-d4a66acc1d5e",
+        "faq-2",
+        "3cc20c0b-1e72-455e-9a5b-9debd3863c4e",
+        "b9142251-a9e9-4597-9c0d-93a974e83ff8",
+        "635a316d-d142-477e-91e2-cdfcb5b44736",
+        "0e697b3b-071f-4826-b92e-18d2d6383a41",
+        "1f64e989-59b6-4681-9a67-a6af419074ac",
+        "f397c1fe-e059-4763-828a-6179dfe81d35",
+        "14a17c14-a4a6-4eb4-bf06-c1aeaafa30a6",
+        "5e9d94c8-be8f-4187-b24a-c8d82ef4a682",
+        "072fb648-d323-49ba-9fef-0203abe6bb95",
+        "27f491c0-8a59-4a5c-a243-916faf5d8665",
+        "900a0bb0-6372-42d9-9340-b19bffe88d7e"
+      ],
+      "settings": {
+        "width": "wrapper--narrow",
+        "height": "margin--small",
+        "text_color": "text-dark",
+        "bg_color": "#ffffff"
+      }
+    },
+    "icons": {
+      "type": "section-text-row",
+      "blocks": {
+        "icon-0": {
+          "type": "text-item",
+          "disabled": true,
+          "settings": {
+            "icon_name": "icon-lock-card",
+            "icon_color": "#545454",
+            "title": "Secure transactions",
+            "text": "Transactions are handled with bank-grade security."
+          }
+        },
+        "icon-1": {
+          "type": "text-item",
+          "disabled": true,
+          "settings": {
+            "icon_name": "icon-basket-like",
+            "icon_color": "#545454",
+            "title": "Simple checkout",
+            "text": "Our secure checkout is quick and easy to use."
+          }
+        },
+        "icon-2": {
+          "type": "text-item",
+          "settings": {
+            "icon_name": "icon-chat",
+            "icon_color": "#545454",
+            "title": "Get in touch",
+            "text": "Reach out with any questions info@nakedsundays.com and our lovely Customer Service team will get back to you as soon as possible."
+          }
+        }
+      },
+      "block_order": [
+        "icon-0",
+        "icon-1",
+        "icon-2"
+      ],
+      "settings": {
+        "text_alignment": "left",
+        "icon_size": "icon--small",
+        "icon_alignment": "icon--top",
+        "text_color": "text-dark",
+        "heading_size": "h6",
+        "height": "margin--medium",
+        "bg_color": "#fafafa"
+      }
+    },
+    "1655263323a0c82cc7": {
+      "type": "section-recent-products",
+      "settings": {
+        "product_recently_heading": "Recently viewed",
+        "product_recently_limit": 6,
+        "product_recently_minimum": 4
+      }
+    }
+  },
+  "order": [
+    "164775096591ec9a61",
+    "main",
+    "faq-first",
+    "icons",
+    "1655263323a0c82cc7"
+  ]
+}

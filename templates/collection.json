@@ -1,0 +1,65 @@
+{
+  "sections": {
+    "hero": {
+      "type": "collection-image-with-title",
+      "settings": {
+        "show_title": true,
+        "show_description": true,
+        "text_color": "text-dark",
+        "flex_align": "align--middle-center",
+        "transparent": false,
+        "show_image": false,
+        "banner_layout": "overlay",
+        "height": "screen-height-one-half",
+        "overlay_opacity": 0,
+        "overlay_color": "#000000"
+      }
+    },
+    "30845340-b486-4192-a342-9d01400de68f": {
+      "type": "section-rich-text",
+      "disabled": true,
+      "settings": {
+        "subheading": "",
+        "title": "",
+        "text": "<p>Non sticky. No SPF taste. World first formula.<\/p>",
+        "text_size": 2,
+        "text_columns": 1,
+        "align_text": "text-center",
+        "button_text": "",
+        "button_url": "",
+        "button_color": "btn--neutral",
+        "button_style": "caps--large",
+        "height": "margin--small",
+        "width": "wrapper",
+        "text_color": "text-dark",
+        "bg_color": "#ffffff"
+      }
+    },
+    "subcollections": {
+      "type": "subcollections",
+      "disabled": true,
+      "settings": {
+        "subcollection_layout": "grid",
+        "subcollection_description": false,
+        "select_image": "collection"
+      }
+    },
+    "main": {
+      "type": "collection",
+      "settings": {
+        "enable_sort": false,
+        "enable_filters": false,
+        "filter_layout": "inline-open",
+        "grid": 3,
+        "grid_mobile": "1",
+        "product_limit": 36
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "30845340-b486-4192-a342-9d01400de68f",
+    "subcollections",
+    "main"
+  ]
+}

@@ -1,0 +1,17 @@
+{% assign tabsProud = product.metafields.Title.proud-title %}
+<ul class="tab-proud-be">
+  {% for value in tabsProud %}
+   {% assign i = forloop.index0 %}
+            
+      <div class="item item--{{ i }}">
+        {% if product.metafields.Image.proud-image-key[i] %}
+           <img src="{{ product.metafields.Image.proud-image-key[i] }}">
+        {% endif %}
+        
+        {% if product.metafields.Title.proud-title[i]  %}
+           <li>{{ product.metafields.Title.proud-title[i] }}</li>
+        {% endif %}
+      </div>
+   {% endfor %}
+</ul>
+

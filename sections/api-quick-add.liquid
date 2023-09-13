@@ -1,0 +1,177 @@
+{% assign sca_product = product %}{% assign sca_product_id_text = "," | append : sca_product.id | append : "," %}{% assign sca_price = sca_product.price %}{% assign sca_price_min = sca_product.price_min %}{% assign sca_price_max = sca_product.price_max %}{% assign sca_compare_at_price = sca_product.compare_at_price %}{% assign sca_compare_at_price_min = sca_product.compare_at_price_min %}{% assign sca_compare_at_price_max = sca_product.compare_at_price_max %}{% assign sca_product_available = sca_product.available %}{% assign sca_product_variantCount = sca_product.variants.size %}{% assign sca_compare_at_price_varies = sca_product.compare_at_price_varies %}{% assign sca_price_varies = sca_product.price_varies %}{% assign sca_has_only_default_variant = false %}{% capture sca_product_variants_json %}{{sca_product.variants | json }}{% endcapture %} {% capture sca_product_json %}{ {% if sca_all_gift_products_ids == null or sca_all_gift_products_ids contains sca_product_id_text %}{% assign sca_product_available = false %}{% assign sca_product_variantCount = 0 %}{% assign sca_has_only_default_variant = true %}{% assign sca_is_first_variant = true %}{% capture sca_variants_json %} [{% for variant in sca_product.variants %}{% unless variant.metafields.secomapp.freegifts %}{% unless variant.title contains '(Freegifts)' %}{% unless variant.title contains '% Off' %}{% unless variant.metafields.shappify_qb.qb_hide == "1" %}{% unless variant.metafields.shappify_bundle.is_bundle == "true" %}{% unless variant.metafields.brodev_scn.hide == "true" %}{% unless variant.metafields.wholesaler2.wholesale %}{% unless variant.metafields.Wholesaler.level %}{% unless variant.title contains '(Wholesale' %}{% if sca_is_first_variant%} {{ variant | json }}{% assign sca_price = variant.price %} {% assign sca_price_min = variant.price %} {% assign sca_price_max = variant.price %} {% assign sca_compare_at_price = variant.compare_at_price %} {% assign sca_compare_at_price_min = variant.compare_at_price %} {% assign sca_compare_at_price_max = variant.compare_at_price %} {% assign sca_product_available = variant.available %} {% assign sca_product_variantCount = 1 %} {% assign sca_is_first_variant = false%}{% else %},{{variant | json }} {% if sca_price_min >= variant.price %} {% assign sca_price_min = variant.price %} {% assign sca_price = variant.price %}{% endif %} {% if sca_price_max <= variant.price %} {% assign sca_price_max = variant.price %} {% endif %} {% if variant.compare_at_price %} {% if sca_compare_at_price_min==null or sca_compare_at_price_min >= variant.compare_at_price %} {% assign sca_compare_at_price_min = variant.compare_at_price %} {% assign sca_compare_at_price = variant.compare_at_price %} {% endif %} {% if sca_compare_at_price_max==null or sca_compare_at_price_max < variant.compare_at_price %} {% assign sca_compare_at_price_max = variant.compare_at_price %} {% endif %} {% endif %} {% if variant.available == true %} {% assign sca_product_available = true %} {% endif %} {% assign sca_product_variantCount = sca_product_variantCount | plus: 1 %}{% endif %}{% endunless %}{% endunless %}{% endunless %}{% endunless %}{% endunless %}{% endunless %}{% endunless %}{% endunless %}{% endunless %}{%endfor%} ]{% endcapture %}{% if sca_price_min < sca_price_max %}{% assign sca_price_varies = true %}{% else %}{% assign sca_price_varies = false %}{% endif %}{% if sca_compare_at_price_min < sca_compare_at_price_max %}{% assign sca_compare_at_price_varies = true %}{% else %}{% assign sca_compare_at_price_varies = false %}{% endif %}{% if sca_product_variantCount > 1 %}{% assign sca_has_only_default_variant = false %}{% endif %}{% if sca_product_variantCount == sca_product.variants.size %} "variants":{{ sca_product.variants }},{% else %}{%assign sca_product_variants_json = sca_variants_json %} "variants":{{ sca_variants_json }},{% endif %}{% else %} "variants":{{ sca_product_variants_json }},{% endif %} "id": {{sca_product.id}}, "title": {{sca_product.title | json}}, "handle": {{sca_product.handle | json}}, "description": {{sca_product.description | json}}, "published_at": "{{sca_product.published_at | date: "%Y-%m-%dT%H-%M-%S%:z" }}", "created_at": "{{sca_product.created_at | date: "%Y-%m-%dT%H-%M-%S%:z" }}", "vendor": {{sca_product.vendor | json}}, "type": {{sca_product.type | json}}, "tags": {{sca_product.tags | json}}, "price": {{sca_price}}, "price_min": {{sca_price_min}}, "price_max": {{sca_price_max}}, "available": {{sca_product.available}}, "price_varies": {{sca_price_varies}}, "compare_at_price": {{sca_compare_at_price}}, "compare_at_price_min": {{sca_compare_at_price_min}}, "compare_at_price_max": {{sca_compare_at_price_max}}, "compare_at_price_varies": {{sca_compare_at_price_varies}}, "images": {{sca_product.images | json}}, "featured_image": {{sca_product.featured_image | json }}, "options": {{sca_product.options | json}}, "media": {{sca_product.media | json }}, "content": {{sca_product.content | json }}} {% endcapture sca_product_json %}
+
+<div data-api-content>
+  <div class="form-quick-add">
+    {%- assign current_collection = '||collection-index||' -%}
+    {%- assign current_variant = product.selected_or_first_available_variant -%}
+    {%- assign uniq_id = 'product-' | append: product.id | append: '-' | append: current_collection -%}
+
+    {%- form 'product', product, data-form-quick-add: '', id: uniq_id -%}
+      <script type="application/json" data-product-json>
+        {{ product | json }}
+      </script>
+      <script type="application/json" data-product-options-json>
+        {{ product.options_with_values | json }}
+      </script>
+
+      <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+      {%- unless sca_product_variantCount == 1 -%}
+        {%- for option in product.options_with_values -%}
+          {%- assign is_last = false -%}
+
+          {% if forloop.last %}
+            {%- assign is_last = true -%}
+          {% endif %}
+
+          {%- assign option_name_handle_separator = option.name | handle | prepend: ',' | append: ',' -%}
+          {%- if settings.color_swatches -%}
+  {% comment %} Determine if current option matches swatch handle translations {% endcomment %}
+  {%- assign is_swatch_option = false -%}
+  {%- assign swatch_translation = 'general.swatches.color' | t -%}
+  {%- assign translation_string = swatch_translation | remove: '  ' | replace: ', ', ',' | replace: ' ,', ',' | replace: ',', '____' | handle | replace: '____', ',' | append: ',' | prepend: ',' -%}
+  
+  {%- if translation_string contains option_name_handle_separator -%}
+    {%- assign is_swatch_option = true -%}
+  {%- endif -%}
+{%- endif -%}
+
+          <div class="selector-wrapper selector-wrapper--fullwidth {% unless settings.variant_lines or is_swatch_option %} selector-wrapper--select {% endunless %}" data-select-position="{{ option.position }}" data-select-option>
+            {%- if settings.variant_lines or is_swatch_option -%}            
+              <fieldset class="radio__fieldset radio__fieldset--small">
+                <legend class="radio__legend">
+                  <span class="radio__legend__label">
+                    <a href="#" class="radio__legend-back" data-back-button>
+                      <span class="visually-hidden">{{ 'general.breadcrumbs.go_back' | t }}</span>
+                    </a>
+
+                    {{ 'products.product.select' | t }} {{ option.name | escape_once }}</span>
+                </legend>
+                
+                <div class="selector-wrapper__scrollbar" data-scrollbar>
+                  {%- for value in option.values -%}
+                   {% unless value contains '% off)' %}
+                    {%- capture input_id %}{{uniq_id}}-{{ option.name | escape_once }}-{{ value | escape_once }}{%- endcapture -%}
+    
+                    {%- if is_swatch_option -%}
+                      <span class="swatch__button" data-tooltip="{{ value | escape_once | capitalize }}" data-radio-option>
+                        <input type="radio"
+                          data-single-option-selector
+                          {% if is_last %} data-quick-add-button {% else %} data-go-to-next {% endif %}
+                          data-index="option{{ option.position }}"
+                          name="options[{{ option.name | escape_once }}]"
+                          value="{{ value | escape_once }}" 
+                          id="{{ input_id }}">
+    
+                        <label for="{{ input_id }}" data-swatch="{{ value | escape_once }}">
+                          <span class="visually-hidden">{{ value | escape_once }}</span>
+                        </label>
+                      </span>
+                    {%- else -%}
+                      {% comment %} radio button {% endcomment %}
+                      <span class="radio__button" data-radio-option>
+                        <input
+                          type="radio"
+                          data-single-option-selector
+                          {% if is_last %} data-quick-add-button {% else %} data-go-to-next {% endif %}
+                          data-index="option{{ option.position }}"
+                          name="options[{{ option.name | escape_once }}]"
+                          value="{{ value | escape_once }}" id="{{ input_id }}">
+    
+                        <label for="{{ input_id }}">
+                          <span>{{ value | escape_once }}</span>
+                        </label>
+                      </span>
+                    {%- endif -%}
+                    {% endunless %}
+                  {% endfor %}
+                </div>
+
+                <button type="button" class="radio__fieldset-arrow radio__fieldset-arrow--prev is-hidden" data-scrollbar-arrow-prev>
+                  <span class="visually-hidden">{{ 'products.general.see_all' | t }}</span>
+                </button>
+
+                <button type="button" class="radio__fieldset-arrow radio__fieldset-arrow--next is-hidden" data-scrollbar-arrow-next>
+                  <span class="visually-hidden">{{ 'products.general.see_all' | t }}</span>
+                </button>
+              </fieldset>
+            {%- else -%}
+              {%- assign selects_counter = selects_counter | plus: 1 -%}
+              
+              <div class="select__fieldset select__fieldset--small">
+                {%- capture input_id -%}{{uniq_id}}-option-{{ option.position }}{% endcapture %}
+
+                <div class="radio__legend">
+                  <span class="radio__legend__label">
+                    <a href="#" class="radio__legend-back" data-back-button>
+                      <span class="visually-hidden">{{ 'general.breadcrumbs.go_back' | t }}</span>
+                    </a>
+                    
+                    {{ 'products.product.select' | t }} {{ option.name | escape_once }}
+                  </span>
+                </div>
+
+                <div class="select-popout" data-popout data-popout-prevent="true">
+                  <button 
+                    type="button" 
+                    class="select-popout__toggle" 
+                    aria-expanded="false" 
+                    aria-controls="{{ uniq_id }}-select-{{ option.name | handle }}" 
+                    aria-describedby="{{ uniq_id }}-select-{{ option.name | handle }}-list" 
+                    data-popout-toggle>
+                    {{ 'products.product.select_value' | t }}
+                  </button>
+
+                  <ul id="{{ uniq_id }}-select-{{ option.name | handle }}" class="select-popout__list" data-popout-list>
+                    {%- for value in option.values -%}
+                     {% unless value contains '% off)' %}
+                      <li class="select-popout__item">
+                        <a class="select-popout__option" href="#" data-value="{{ value | escape_once }}" data-popout-option data-popout-option-step>
+                          <span>
+                            {{ value | escape_once }}
+                          </span>
+                        </a>
+                      </li>
+                      {% endunless %}
+                    {%- endfor -%}
+                  </ul>
+
+                  <input 
+                    type="hidden" 
+                    name="options[{{ option.name | escape_once }}]" 
+                    id="{{ input_id }}" 
+                    {% if is_last %} data-quick-add-button {% else %} data-go-to-next {% endif %} 
+                    value="{{ option.selected_value }}" 
+                    data-popout-input 
+                    data-single-option-selector 
+                    data-index="option{{ option.position }}"/>
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      {% endunless %}
+
+      <noscript>
+        <select name="id" class="product__form__select product__form__select--hidden no-js" aria-label="{{ product.options_with_values | map: 'name' | uniq | join: ', ' }}">
+          {% for variant in product.variants %}
+{% unless variant.metafields.secomapp.freegifts %}
+{% unless variant.title contains '% off)' %}
+
+
+            <option
+              {% if variant == current_variant %}selected="selected"{% endif %}
+              {% unless variant.available %}disabled="disabled"{% endunless %}
+              value="{{ variant.id }}">
+                {{ variant.title }}
+            </option>
+
+
+{% endunless %}
+{% endunless %}
+          {% endfor %}
+        </select>
+      </noscript>
+    {%- endform -%}
+  </div>
+</div>

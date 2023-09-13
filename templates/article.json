@@ -1,0 +1,76 @@
+{
+  "sections": {
+    "main": {
+      "type": "article",
+      "blocks": {
+        "related-products": {
+          "type": "related",
+          "settings": {
+            "title": "Related products"
+          }
+        },
+        "recent-articles": {
+          "type": "recent",
+          "settings": {
+            "title": "Recent articles"
+          }
+        }
+      },
+      "block_order": [
+        "related-products",
+        "recent-articles"
+      ],
+      "settings": {
+        "show_image": false,
+        "bg_position": "center-center",
+        "image_height": "screen-height-one-third",
+        "overlay_opacity": 0,
+        "overlay_color": "#000000",
+        "show_date": true,
+        "show_author": true,
+        "tags": false,
+        "social": false,
+        "arrows": false
+      }
+    },
+    "1647689897e1244835": {
+      "type": "section-look",
+      "disabled": true,
+      "blocks": {
+        "164768989784984d8a-0": {
+          "type": "product",
+          "disabled": true,
+          "settings": {
+            "product": "mineral-spf-glow-go-bundle",
+            "position_x": 50,
+            "position_y": 50
+          }
+        },
+        "164768989784984d8a-1": {
+          "type": "product",
+          "disabled": true,
+          "settings": {
+            "product": "",
+            "position_x": 50,
+            "position_y": 50
+          }
+        }
+      },
+      "block_order": [
+        "164768989784984d8a-0",
+        "164768989784984d8a-1"
+      ],
+      "settings": {
+        "image": "shopify:\/\/shop_images\/TGP_5152_Edit.jpg",
+        "bg_position": "center-center",
+        "title": "Shop the Blog",
+        "section_bg": "#fafafa",
+        "dot_color": "#ffffff"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "1647689897e1244835"
+  ]
+}

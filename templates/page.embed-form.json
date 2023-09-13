@@ -1,0 +1,129 @@
+{
+  "sections": {
+    "6306759a-ae7b-4710-9f36-2d6a6d3a0035": {
+      "type": "section-hero",
+      "settings": {
+        "image": "shopify:\/\/shop_images\/Cabana_Glow-edit-24.jpg",
+        "bg_position": "center-center",
+        "height": "screen-height-one-third",
+        "overlay_opacity": 0,
+        "overlay_color": "#000",
+        "title": "SIGN UP TO GET FIRST ACCESS AND YOUR FREE GIFT WITH OUR NEW LAUNCH!",
+        "description": "",
+        "flex_align": "align--middle-center",
+        "text_color": "text-light",
+        "transparent": true,
+        "link_text": "",
+        "link": "",
+        "button_color": "btn--white",
+        "button_style": "hero__btn btn btn--large btn--outline caps"
+      }
+    },
+    "62734aca-7bae-4ef3-a27f-415456663bdf": {
+      "type": "text-promo",
+      "blocks": {
+        "template--16314218184956__62734aca-7bae-4ef3-a27f-415456663bdf-heading-1": {
+          "type": "heading",
+          "settings": {
+            "title": "SIGN UP TO BE THE FIRST TO KNOW!"
+          }
+        },
+        "template--16314218184956__62734aca-7bae-4ef3-a27f-415456663bdf-text-1": {
+          "type": "text",
+          "settings": {
+            "content": ""
+          }
+        },
+        "template--16314218184956__62734aca-7bae-4ef3-a27f-415456663bdf-button-1": {
+          "type": "button",
+          "settings": {
+            "button_text": "",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large"
+          }
+        }
+      },
+      "block_order": [
+        "template--16314218184956__62734aca-7bae-4ef3-a27f-415456663bdf-heading-1",
+        "template--16314218184956__62734aca-7bae-4ef3-a27f-415456663bdf-text-1",
+        "template--16314218184956__62734aca-7bae-4ef3-a27f-415456663bdf-button-1"
+      ],
+      "disabled": true,
+      "settings": {
+        "border": true,
+        "bg_color": "#e2def9",
+        "text_color": "text-dark",
+        "width": "wrapper--full",
+        "bg_position": "center-center",
+        "overlay_opacity": 0,
+        "overlay_color": "#000000"
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "subheading": "SIGN UP TO BE THE FIRST TO KNOW AND GET YOUR FREE GIFT!",
+        "show_title": false,
+        "show_content": true,
+        "text_size": 5,
+        "align_text": "text-center",
+        "height": "margin--medium",
+        "width": "wrapper",
+        "text_color": "text-dark",
+        "bg_color": "#ffffff"
+      }
+    },
+    "16468240777dfec14c": {
+      "type": "section-split-hero",
+      "disabled": true,
+      "settings": {
+        "image_height": "screen-height-two-thirds",
+        "mobile_layout": "stacked",
+        "image_desktop_left": "shopify:\/\/shop_images\/Untitled_design-4.png",
+        "bg_position_left": "center-center",
+        "bg_position_right": "center-center",
+        "overlay_color": "#000000",
+        "overlay_opacity": 0,
+        "title": "ABOUT US",
+        "description": "",
+        "flex_align": "align--middle-center",
+        "text_color": "text-dark",
+        "transparent": true,
+        "link_text": "",
+        "link": "",
+        "button_color": "btn--white",
+        "button_style": "hero__btn btn btn--large btn--outline caps"
+      }
+    },
+    "1647319332eb7a25ba": {
+      "type": "custom-html",
+      "settings": {
+        "html": "<div style=\"width: 100%; max-width: 1200px; padding: 12px 15px; margin: 0 auto;\"><div><script type=\"text\/javascript\" src=\"https:\/\/forms-akamai.smsbump.com\/683455\/form_232789.js?ver=1692769981\"><\/script><\/div><\/div>",
+        "show_padding": false
+      }
+    },
+    "1646563129eca30528": {
+      "type": "section-collection-carousel",
+      "settings": {
+        "heading": "Shop Naked Sundays",
+        "description": "",
+        "text_alignment": "inline",
+        "link_text": "Shop All",
+        "link_url": "shopify:\/\/collections\/all",
+        "button_color": "btn--black",
+        "button_style": "hero__btn btn btn--input btn--outline caps",
+        "featured_collection": "all"
+      }
+    }
+  },
+  "order": [
+    "6306759a-ae7b-4710-9f36-2d6a6d3a0035",
+    "62734aca-7bae-4ef3-a27f-415456663bdf",
+    "main",
+    "16468240777dfec14c",
+    "1647319332eb7a25ba",
+    "1646563129eca30528"
+  ]
+}

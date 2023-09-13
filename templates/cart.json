@@ -1,0 +1,39 @@
+{
+  "sections": {
+    "main": {
+      "type": "cart",
+      "settings": {
+        "enable_freegift": true,
+        "free_gift_limit": "20",
+        "collection": "free-gift"
+      }
+    },
+    "164682321530201f5c": {
+      "type": "section-recent-products",
+      "settings": {
+        "product_recently_heading": "Recently viewed",
+        "product_recently_limit": 6,
+        "product_recently_minimum": 4
+      }
+    },
+    "16477628042542699a": {
+      "type": "section-collection-carousel",
+      "disabled": true,
+      "settings": {
+        "heading": "BESTSELLERS",
+        "description": "",
+        "text_alignment": "inline",
+        "link_text": "Shop All",
+        "link_url": "shopify:\/\/collections\/all",
+        "button_color": "btn--black",
+        "button_style": "hero__btn btn btn--input btn--outline caps",
+        "featured_collection": "all"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "164682321530201f5c",
+    "16477628042542699a"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "sections": {
+    "main": {
+      "type": "article",
+      "blocks": {
+        "related-products": {
+          "type": "related",
+          "settings": {
+            "title": "Related products"
+          }
+        },
+        "recent-articles": {
+          "type": "recent",
+          "settings": {
+            "title": "Recent articles"
+          }
+        }
+      },
+      "block_order": [
+        "related-products",
+        "recent-articles"
+      ],
+      "settings": {
+        "show_image": false,
+        "bg_position": "center-center",
+        "image_height": "screen-height-one-third",
+        "overlay_opacity": 0,
+        "overlay_color": "#000",
+        "show_date": true,
+        "show_author": true,
+        "tags": false,
+        "social": false,
+        "arrows": false
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "sections": {
+    "featured": {
+      "type": "featured-posts",
+      "blocks": {
+        "feat": {
+          "type": "featured_post",
+          "disabled": true,
+          "settings": {
+            "featured_post": "how-to-spf-with-naked-sundays\/all-your-naked-sundays-spf50-clear-glow-questions-answered",
+            "subheading": "Featured post",
+            "image": "shopify:\/\/shop_images\/TGP_6460_Edit.jpg",
+            "bg_position": "center-center"
+          }
+        }
+      },
+      "block_order": [
+        "feat"
+      ],
+      "settings": {
+        "show_author": false,
+        "show_date": false,
+        "show_button": true
+      }
+    },
+    "main": {
+      "type": "blog",
+      "disabled": true,
+      "settings": {
+        "show_title": true,
+        "show_rss": false,
+        "show_tag_nav": false,
+        "grid": 4,
+        "rows": 4,
+        "aspect_ratio": 1,
+        "show_tags": false,
+        "show_author": false,
+        "show_date": false,
+        "show_button": false,
+        "show_comments": false
+      }
+    },
+    "1646565774e9109657": {
+      "type": "section-blog",
+      "settings": {
+        "blog_name": "how-to-spf-with-naked-sundays",
+        "title": "The Naked Sundays Blog: How to SPF!",
+        "grid": 2,
+        "rows": 4,
+        "aspect_ratio": 1,
+        "show_tags": false,
+        "show_author": false,
+        "show_date": false,
+        "show_button": true,
+        "show_comments": false
+      }
+    }
+  },
+  "order": [
+    "featured",
+    "main",
+    "1646565774e9109657"
+  ]
+}

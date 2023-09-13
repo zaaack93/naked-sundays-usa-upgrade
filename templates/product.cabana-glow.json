@@ -1,0 +1,404 @@
+{
+  "sections": {
+    "main": {
+      "type": "product",
+      "blocks": {
+        "price_and_title": {
+          "type": "price_and_title",
+          "settings": {
+            "subheading_option": "none",
+            "show_rating": false,
+            "enable_star_rating": false,
+            "show_rating_count": false
+          }
+        },
+        "ff706bf2-539d-48e0-b2ed-a1443b81d954": {
+          "type": "text",
+          "settings": {
+            "title": "<p>{{ product.metafields.my_fields.short_description | metafield_tag }} <\/p>"
+          }
+        },
+        "form": {
+          "type": "form",
+          "settings": {
+            "info_page": "",
+            "show_labels": false,
+            "show_quantity": true,
+            "show_payment_button": false,
+            "afterpay_zip": false,
+            "subscriptions_enable_selectors": true
+          }
+        },
+        "92c6e452-98ea-419a-8771-67323f72f69f": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "title": "<p><em>Avoid contact with eyes, wear protective clothing, hats and eyewear when exposed to the sun. Avoid prolonged exposure in the sun. Remember, sunscreen is only one component of sun protection.<\/em><\/p>"
+          }
+        },
+        "pickup": {
+          "type": "pickup",
+          "disabled": true,
+          "settings": {
+          }
+        },
+        "c1406c0e-7b8a-4288-9dab-333c5fe83d98": {
+          "type": "textarea",
+          "settings": {
+            "titletextarea": "<p><em>All CabanaGlows will be shipped from Sept 4th<\/em><\/p>"
+          }
+        },
+        "ee74f8f5-f7f1-4ac5-9ac0-2947ef1bc4a0": {
+          "type": "upsell",
+          "settings": {
+          }
+        },
+        "tabs": {
+          "type": "tab_richtext",
+          "settings": {
+            "show_read_more": false,
+            "show_read_more_ingredients": false,
+            "style": "accordions",
+            "title_1": "Ingredients & Drug Facts",
+            "raw_content_1": "<p>Active Ingredients:<br\/>Titanium Dioxide 3.3%, Zinc Oxide 14.9%, Purpose: Sunscreen<br\/><br\/>Uses: Helps prevent sunburn. If used as directed with other sun protection measures (see directions), decreases the risk of skin cancer and early skin ageing caused by the sun.<\/p><p><br\/>Warnings: For external use only. Do not use on damaged or broken skin Avoid prolonged sun exposure. If it gets in your eyes, wash well with water. Keep out of reach of children.<br\/>Stop use and ask a doctor if rashes occur. If product is swallowed, get medical help or contact a Poison Control Center right away.<br\/><br\/>Directions: Shake well before use.<br\/>Apply liberally and reapply every 80 minutes, especially after swimming or towel drying.<\/p><p><br\/>Sun Protection Measures: Spending time in the sun increases your risk of skin cancer and early skin aging. To decrease this risk, regularly use a sunscreen with a Broad Spectrum SPF value of 15 or higher and other sun protection measures including: Limit lime in the sun, especially from 10 am-2 pm Wear long sleeved<br\/>shirts, pants, hats, and sunglasses. For Children under 6 months of age ask a doctor<br\/><br\/>Inactive Ingredients: Aluminum Hydroxide, Aqua, Butyloctyl Salicylate, C12-15 Alkyl Benzoate, Coco-Caprylate\/Caprate, Dimethicone, Dunaliella Salina Extract, Ethylhexyl Methoxycrylene, Ethylhexylglycerin, Hibiscus sabdariffa Flower Extract, Hydroxyacetophenone, Iron Oxides, Isododecane, Isostearic Acid, Lauryl<br\/>PEG-8 Dimethicone, Magnesium Sulfate, Mica, Phenoxyethanol, Polyglyceryl-2 Tetraisostearate,<br\/>Polyglyceryl-2 Tetraisostearate, Polyglyceryl-3 Polyricinoleate, Propanediol, Sodium Hyaluronate,<br\/>Stearic Acid, Silica, Simmondsia Chinensis (Jojoba) Seed. <\/p>",
+            "title_2": "",
+            "raw_content_2": "",
+            "title_3": "",
+            "raw_content_3": "",
+            "title_4": "",
+            "raw_content_4": "",
+            "title_5": "",
+            "raw_content_5": ""
+          }
+        },
+        "f75d1dcb-192d-4b55-aa0f-9f715e8bc418": {
+          "type": "liquid",
+          "disabled": true,
+          "settings": {
+            "custom_liquid": ""
+          }
+        }
+      },
+      "block_order": [
+        "price_and_title",
+        "ff706bf2-539d-48e0-b2ed-a1443b81d954",
+        "form",
+        "92c6e452-98ea-419a-8771-67323f72f69f",
+        "pickup",
+        "c1406c0e-7b8a-4288-9dab-333c5fe83d98",
+        "ee74f8f5-f7f1-4ac5-9ac0-2947ef1bc4a0",
+        "tabs",
+        "f75d1dcb-192d-4b55-aa0f-9f715e8bc418"
+      ],
+      "settings": {
+        "product_sticky_enable": true,
+        "image_layout": "thumbnails",
+        "image_size": "normal",
+        "show_cart_bar": false,
+        "enable_zoom": true,
+        "enable_video_looping": false
+      }
+    },
+    "b34ac534-23fe-4765-b1fb-870f2f300af9": {
+      "type": "section-custom-content",
+      "blocks": {
+        "template--16770816409852__b34ac534-23fe-4765-b1fb-870f2f300af9-image-1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/3_2b506f6f-b35a-456e-a77d-7bef9bd87b74.png",
+            "bg_position": "center-center",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "title": "",
+            "description": "",
+            "flex_align": "align--middle-center",
+            "text_color": "text-light",
+            "transparent": true,
+            "link_text": "",
+            "link": "",
+            "button_color": "btn--white",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        },
+        "template--16770816409852__b34ac534-23fe-4765-b1fb-870f2f300af9-text-1": {
+          "type": "text",
+          "settings": {
+            "subheading": "",
+            "title": "Why We Love It",
+            "text": "<p>✨ World-first SPF-infused makeup serum drops<\/p><p>✨ Illuminating drops with buildable pigment helps perfect uneven skin tone, is suitable for all skin tones and can be worn under makeup or on its own<\/p><p>✨ Packed with antioxidants including Pink Algae, Hyaluronic Acid & Wild Rosella to help increase firmness and elasticity<\/p><p>✨Our unique mineral formula helps to bright & revitalise dull skin while adding a subtle tint and illumination. <\/p><p>✨Mix & Match for your ideal shade<\/p><p>✨Suitable for all skins tones<\/p>",
+            "text_size": 3,
+            "text_columns": 1,
+            "align_text": "text-center",
+            "text_color": "text-dark",
+            "bg_color": "#e2def9",
+            "button_text": "Learn more",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        }
+      },
+      "block_order": [
+        "template--16770816409852__b34ac534-23fe-4765-b1fb-870f2f300af9-image-1",
+        "template--16770816409852__b34ac534-23fe-4765-b1fb-870f2f300af9-text-1"
+      ],
+      "settings": {
+        "height": "screen-height-two-thirds",
+        "padding": false,
+        "borders": false,
+        "wrapper": false
+      }
+    },
+    "fb2aceab-f4aa-4fde-b132-e747ecf4b882": {
+      "type": "section-columns",
+      "blocks": {
+        "1589826c-781e-4a89-b2fb-ddda40c6b062": {
+          "type": "text_block",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/PearlLidOn.jpg",
+            "bg_position": "center-center",
+            "title": "CabanaGlow™ SPF50 Pearl",
+            "text": "",
+            "button_text": "Learn more",
+            "button_url": "shopify:\/\/products\/cabana-glow-spf50-mineral-glow-serum-drops-pearlescent",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large",
+            "enable_video": false,
+            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "4b0ad043-e692-42cb-8d0c-c7296f8f6d73": {
+          "type": "text_block",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/illuminatingLidOn.jpg",
+            "bg_position": "center-center",
+            "title": "CabanaGlow™ SPF50 Illuminating",
+            "text": "",
+            "button_text": "Learn more",
+            "button_url": "shopify:\/\/products\/cabanaglow-spf50-mineral-glow-serum-drops-illuminating",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large",
+            "enable_video": false,
+            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "19eed68d-ad41-4cf7-947d-eb2c66f19037": {
+          "type": "text_block",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/BronzeLidOn.jpg",
+            "bg_position": "center-center",
+            "title": "CabanaGlow™ SPF50 Bronze",
+            "text": "",
+            "button_text": "Learn more",
+            "button_url": "shopify:\/\/products\/cabana-glow-spf50-mineral-glow-serum-drops-bronze",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large",
+            "enable_video": false,
+            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "fc04c753-5cd5-47ea-9c29-97406b057705": {
+          "type": "text_block",
+          "disabled": true,
+          "settings": {
+            "image": "shopify:\/\/shop_images\/5_d7d448ad-421e-4c05-b4bd-bef5b21a0cca.jpg",
+            "bg_position": "center-center",
+            "title": "",
+            "text": "",
+            "button_text": "Learn more",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large",
+            "enable_video": false,
+            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          }
+        }
+      },
+      "block_order": [
+        "1589826c-781e-4a89-b2fb-ddda40c6b062",
+        "4b0ad043-e692-42cb-8d0c-c7296f8f6d73",
+        "19eed68d-ad41-4cf7-947d-eb2c66f19037",
+        "fc04c753-5cd5-47ea-9c29-97406b057705"
+      ],
+      "settings": {
+        "title": "Choose your Shade!",
+        "bg_color": "#fcf0f0",
+        "align_text": "text-left",
+        "width": "wrapper--full",
+        "equalize_height": true,
+        "photo_aspect_ratio": 1.1,
+        "enable_image": true
+      }
+    },
+    "adc6f694-43e2-42eb-868c-434a622d00bd": {
+      "type": "section-columns",
+      "blocks": {
+        "template--16770816409852__adc6f694-43e2-42eb-868c-434a622d00bd-text_block-1": {
+          "type": "text_block",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/2_cf182315-b134-4984-b82b-989a8d2d1814.jpg",
+            "bg_position": "center-center",
+            "title": "",
+            "text": "",
+            "button_text": "",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large",
+            "enable_video": false,
+            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "template--16770816409852__adc6f694-43e2-42eb-868c-434a622d00bd-text_block-3": {
+          "type": "text_block",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/1_55b23a07-3d7d-4916-be0d-51520ff33dde.jpg",
+            "bg_position": "center-center",
+            "title": "",
+            "text": "",
+            "button_text": "",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large",
+            "enable_video": false,
+            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "b456e2c6-2d4b-4784-92d6-979b8a3da68e": {
+          "type": "text_block",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/4_81e384e7-777b-4a8f-9b10-b88b80eba24e.jpg",
+            "bg_position": "center-center",
+            "title": "",
+            "text": "",
+            "button_text": "",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large",
+            "enable_video": false,
+            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          }
+        },
+        "template--16770816409852__adc6f694-43e2-42eb-868c-434a622d00bd-text_block-2": {
+          "type": "text_block",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/5_d7d448ad-421e-4c05-b4bd-bef5b21a0cca.jpg",
+            "bg_position": "center-center",
+            "title": "",
+            "text": "",
+            "button_text": "",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "caps--large",
+            "enable_video": false,
+            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
+          }
+        }
+      },
+      "block_order": [
+        "template--16770816409852__adc6f694-43e2-42eb-868c-434a622d00bd-text_block-1",
+        "template--16770816409852__adc6f694-43e2-42eb-868c-434a622d00bd-text_block-3",
+        "b456e2c6-2d4b-4784-92d6-979b8a3da68e",
+        "template--16770816409852__adc6f694-43e2-42eb-868c-434a622d00bd-text_block-2"
+      ],
+      "settings": {
+        "title": "Before & After",
+        "bg_color": "#e2def9",
+        "align_text": "text-left",
+        "width": "wrapper--full",
+        "equalize_height": true,
+        "photo_aspect_ratio": 1.1,
+        "enable_image": true
+      }
+    },
+    "reviews": {
+      "type": "reviews",
+      "disabled": true,
+      "settings": {
+        "enable_product_reviews": false,
+        "enable_accordion": false
+      }
+    },
+    "1d2fcbe7-ab0c-440b-91c5-0844cc2c2d8f": {
+      "type": "section-logo-list",
+      "blocks": {
+        "template--16314218610940__1d2fcbe7-ab0c-440b-91c5-0844cc2c2d8f-16675447739c66e04f-0": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/2_658fbf30-33bf-4afa-bc91-7f7578e4740b.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "template--16314218610940__1d2fcbe7-ab0c-440b-91c5-0844cc2c2d8f-16675447739c66e04f-1": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/4_41abaed2-84bb-4a0d-bd9e-2a0950e620f9.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "template--16314218610940__1d2fcbe7-ab0c-440b-91c5-0844cc2c2d8f-16675447739c66e04f-2": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/1_ace75741-d3e7-44fe-b962-1143ff646f18.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "b7d1e9d2-2bd9-46a1-bb1a-e9539cab6b3f": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/3_7eb83b9b-2846-48b5-9888-7386a07e0f05.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "template--16314218610940__1d2fcbe7-ab0c-440b-91c5-0844cc2c2d8f-16675447739c66e04f-0",
+        "template--16314218610940__1d2fcbe7-ab0c-440b-91c5-0844cc2c2d8f-16675447739c66e04f-1",
+        "template--16314218610940__1d2fcbe7-ab0c-440b-91c5-0844cc2c2d8f-16675447739c66e04f-2",
+        "b7d1e9d2-2bd9-46a1-bb1a-e9539cab6b3f"
+      ],
+      "settings": {
+        "title": "AS SEEN IN...",
+        "text_color": "text-dark",
+        "bg_color": "#ffffff"
+      }
+    },
+    "related": {
+      "type": "related",
+      "settings": {
+        "related_products_enable": true,
+        "limit": 4,
+        "product_recommendations_heading": "You Might Also Like",
+        "show_recently_viewed": true,
+        "product_recently_limit": 4,
+        "product_recently_heading": ""
+      }
+    },
+    "16484434565068796c": {
+      "type": "section-liquid",
+      "settings": {
+        "custom_liquid": "<script type=\"text\/javascript\">\n  var _learnq = _learnq || [];\n  var item = {\n    Name: {{ product.title|json }},\n    ProductID: {{ product.id|json }},\n    Categories: {{ product.collections|map:'title'|json }},\n    ImageURL: \"https:{{ product.featured_image.src|img_url:'grande' }}\",\n    URL: \"{{ shop.secure_url }}{{ product.url }}\",\n    Brand: {{ product.vendor|json }},\n    Price: {{ product.price|money|json }},\n    CompareAtPrice: {{ product.compare_at_price_max|money|json }}\n  };\n  _learnq.push(['track', 'Viewed Product', item]);\n  _learnq.push(['trackViewedItem', {\n    Title: item.Name,\n    ItemId: item.ProductID,\n    Categories: item.Categories,\n    ImageUrl: item.ImageURL,\n    Url: item.URL,\n    Metadata: {\n      Brand: item.Brand,\n      Price: item.Price,\n      CompareAtPrice: item.CompareAtPrice\n    }\n  }]);\n<\/script>"
+      }
+    },
+    "1648445413e303bb48": {
+      "type": "section-liquid",
+      "settings": {
+        "custom_liquid": "<script type=\"text\/javascript\">\nvar _learnq = _learnq || [];\n  var classname = document.getElementsByClassName(\"btn product__submit__add\");\nvar addToCart = function() {\n_learnq.push(['track', 'Added to Cart', item]);\n}; for (var i = 0; i < classname.length; i++) {\nclassname[i].addEventListener('click', addToCart, false);\n}\n<\/script>"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "b34ac534-23fe-4765-b1fb-870f2f300af9",
+    "fb2aceab-f4aa-4fde-b132-e747ecf4b882",
+    "adc6f694-43e2-42eb-868c-434a622d00bd",
+    "reviews",
+    "1d2fcbe7-ab0c-440b-91c5-0844cc2c2d8f",
+    "related",
+    "16484434565068796c",
+    "1648445413e303bb48"
+  ]
+}

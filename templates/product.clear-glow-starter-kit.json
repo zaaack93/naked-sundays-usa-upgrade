@@ -1,0 +1,161 @@
+{
+  "sections": {
+    "main": {
+      "type": "product",
+      "blocks": {
+        "price_and_title": {
+          "type": "price_and_title",
+          "settings": {
+            "subheading_option": "none",
+            "show_rating": false,
+            "enable_star_rating": false,
+            "show_rating_count": false
+          }
+        },
+        "ff706bf2-539d-48e0-b2ed-a1443b81d954": {
+          "type": "text",
+          "settings": {
+            "title": "<p><em>{{ product.metafields.my_fields.short_description | metafield_tag }}<\/em><em> <\/em><\/p>"
+          }
+        },
+        "form": {
+          "type": "form",
+          "settings": {
+            "info_page": "",
+            "show_labels": false,
+            "show_quantity": true,
+            "show_payment_button": false,
+            "afterpay_zip": true,
+            "subscriptions_enable_selectors": true
+          }
+        },
+        "b4cce387-51e7-42d0-a3ac-04d9ad0cf045": {
+          "type": "textarea",
+          "settings": {
+            "titletextarea": "<p><em>Avoid contact with eyes, wear protective clothing, hats and eyewear when exposed to the sun. Avoid prolonged exposure in the sun. Remember, sunscreen is only one component of sun protection.<\/em><\/p>"
+          }
+        },
+        "pickup": {
+          "type": "pickup",
+          "disabled": true,
+          "settings": {
+          }
+        },
+        "tabs": {
+          "type": "tab_richtext",
+          "settings": {
+            "show_read_more": false,
+            "show_read_more_ingredients": false,
+            "style": "accordions",
+            "title_1": "{{ product.metafields.my_fields.added_benefits_title.value }}",
+            "raw_content_1": "<p>{{ product.metafields.my_fields.added_benefits | metafield_tag }}<\/p>",
+            "title_2": "{{ product.metafields.my_fields.feature_heading.value }}",
+            "raw_content_2": "<p>{{ product.metafields.my_fields.feature | metafield_tag }}<\/p>",
+            "title_3": "{{ product.metafields.my_fields.ingredients_title.value }}",
+            "raw_content_3": "<p>{{ product.metafields.my_fields.ingredients | metafield_tag }}<\/p>",
+            "title_4": "What's Included",
+            "raw_content_4": "<p>{{ product.metafields.my_fields.enable_tab_whats_included.value }}<\/p>",
+            "title_5": "",
+            "raw_content_5": ""
+          }
+        }
+      },
+      "block_order": [
+        "price_and_title",
+        "ff706bf2-539d-48e0-b2ed-a1443b81d954",
+        "form",
+        "b4cce387-51e7-42d0-a3ac-04d9ad0cf045",
+        "pickup",
+        "tabs"
+      ],
+      "settings": {
+        "product_sticky_enable": true,
+        "image_layout": "stacked",
+        "image_size": "normal",
+        "show_cart_bar": true,
+        "enable_zoom": true,
+        "enable_video_looping": false
+      }
+    },
+    "reviews": {
+      "type": "reviews",
+      "disabled": true,
+      "settings": {
+        "enable_product_reviews": false,
+        "enable_accordion": false
+      }
+    },
+    "f9fd053c-e2dc-44db-9662-1faf32d5e7da": {
+      "type": "section-logo-list",
+      "blocks": {
+        "template--16314218479868__f9fd053c-e2dc-44db-9662-1faf32d5e7da-166754757534da66ef-0": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/2_658fbf30-33bf-4afa-bc91-7f7578e4740b.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "template--16314218479868__f9fd053c-e2dc-44db-9662-1faf32d5e7da-166754757534da66ef-1": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/4_41abaed2-84bb-4a0d-bd9e-2a0950e620f9.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "template--16314218479868__f9fd053c-e2dc-44db-9662-1faf32d5e7da-166754757534da66ef-2": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/1_ace75741-d3e7-44fe-b962-1143ff646f18.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "a5e7b6e3-060f-4adb-bb37-70da0829f999": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/3_7eb83b9b-2846-48b5-9888-7386a07e0f05.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "template--16314218479868__f9fd053c-e2dc-44db-9662-1faf32d5e7da-166754757534da66ef-0",
+        "template--16314218479868__f9fd053c-e2dc-44db-9662-1faf32d5e7da-166754757534da66ef-1",
+        "template--16314218479868__f9fd053c-e2dc-44db-9662-1faf32d5e7da-166754757534da66ef-2",
+        "a5e7b6e3-060f-4adb-bb37-70da0829f999"
+      ],
+      "settings": {
+        "title": "AS SEEN IN...",
+        "text_color": "text-dark",
+        "bg_color": "#ffffff"
+      }
+    },
+    "related": {
+      "type": "related",
+      "settings": {
+        "related_products_enable": true,
+        "limit": 4,
+        "product_recommendations_heading": "Related products",
+        "show_recently_viewed": true,
+        "product_recently_limit": 4,
+        "product_recently_heading": "Recently viewed"
+      }
+    },
+    "1648444870ca6cf5f5": {
+      "type": "section-liquid",
+      "settings": {
+        "custom_liquid": "<script type=\"text\/javascript\">\n  var _learnq = _learnq || [];\n  var item = {\n    Name: {{ product.title|json }},\n    ProductID: {{ product.id|json }},\n    Categories: {{ product.collections|map:'title'|json }},\n    ImageURL: \"https:{{ product.featured_image.src|img_url:'grande' }}\",\n    URL: \"{{ shop.secure_url }}{{ product.url }}\",\n    Brand: {{ product.vendor|json }},\n    Price: {{ product.price|money|json }},\n    CompareAtPrice: {{ product.compare_at_price_max|money|json }}\n  };\n  _learnq.push(['track', 'Viewed Product', item]);\n  _learnq.push(['trackViewedItem', {\n    Title: item.Name,\n    ItemId: item.ProductID,\n    Categories: item.Categories,\n    ImageUrl: item.ImageURL,\n    Url: item.URL,\n    Metadata: {\n      Brand: item.Brand,\n      Price: item.Price,\n      CompareAtPrice: item.CompareAtPrice\n    }\n  }]);\n<\/script>"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "reviews",
+    "f9fd053c-e2dc-44db-9662-1faf32d5e7da",
+    "related",
+    "1648444870ca6cf5f5"
+  ]
+}

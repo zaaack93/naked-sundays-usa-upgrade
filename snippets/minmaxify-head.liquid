@@ -1,0 +1,7 @@
+{% if content_for_header contains 'shopifyorderlimits.s3.amazonaws.com' %}
+{% if shop.permanent_domain == 'naked-sundays-sunscreen.myshopify.com' %}
+<script data-src="https://shopifyorderlimits.s3.amazonaws.com/limits/naked-sundays-sunscreen.myshopify.com?v=89c&r=20220320080931&shop=naked-sundays-sunscreen.myshopify.com"></script>
+{% endif %}
+{% else %}
+<script type="text/javascript">console.error("MinMaxify is deactivated for this website. Please don't forget to remove minmaxify-head.liquid still being referenced by theme.liquid")</script>
+{% endif %}

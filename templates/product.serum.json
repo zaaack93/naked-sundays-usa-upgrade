@@ -1,0 +1,241 @@
+{
+  "sections": {
+    "main": {
+      "type": "product",
+      "blocks": {
+        "price_and_title": {
+          "type": "price_and_title",
+          "settings": {
+            "subheading_option": "none",
+            "show_rating": false,
+            "enable_star_rating": false,
+            "show_rating_count": false
+          }
+        },
+        "ff706bf2-539d-48e0-b2ed-a1443b81d954": {
+          "type": "text",
+          "settings": {
+            "title": "<p>{{ product.metafields.my_fields.short_description | metafield_tag }}<\/p>"
+          }
+        },
+        "form": {
+          "type": "form",
+          "settings": {
+            "info_page": "",
+            "show_labels": false,
+            "show_quantity": true,
+            "show_payment_button": false,
+            "afterpay_zip": true,
+            "subscriptions_enable_selectors": true
+          }
+        },
+        "e1878f15-be70-402f-aec0-13b01134b083": {
+          "type": "textarea",
+          "settings": {
+            "titletextarea": "<p><em>Avoid contact with eyes, wear protective clothing, hats and eyewear when exposed to the sun. Avoid prolonged exposure in the sun. Remember, sunscreen is only one component of sun protection.<\/em><\/p>"
+          }
+        },
+        "5897c74e-682c-41a5-a07c-c75a0ba89259": {
+          "type": "upsell",
+          "disabled": true,
+          "settings": {
+          }
+        },
+        "pickup": {
+          "type": "pickup",
+          "disabled": true,
+          "settings": {
+          }
+        },
+        "tabs": {
+          "type": "tab_richtext",
+          "settings": {
+            "show_read_more": false,
+            "show_read_more_ingredients": true,
+            "style": "accordions",
+            "title_1": "{{ product.metafields.my_fields.added_benefits_title.value }}",
+            "raw_content_1": "<p>{{ product.metafields.my_fields.added_benefits | metafield_tag }}<\/p>",
+            "title_2": "{{ product.metafields.my_fields.ingredients_title.value }}",
+            "raw_content_2": "<p>{{ product.metafields.my_fields.ingredients | metafield_tag }}<\/p>",
+            "title_3": "{{ product.metafields.my_fields.feature_heading.value }}",
+            "raw_content_3": "<p>{{ product.metafields.my_fields.feature | metafield_tag }}<\/p>",
+            "title_4": "",
+            "raw_content_4": "",
+            "title_5": "",
+            "raw_content_5": ""
+          }
+        }
+      },
+      "block_order": [
+        "price_and_title",
+        "ff706bf2-539d-48e0-b2ed-a1443b81d954",
+        "form",
+        "e1878f15-be70-402f-aec0-13b01134b083",
+        "5897c74e-682c-41a5-a07c-c75a0ba89259",
+        "pickup",
+        "tabs"
+      ],
+      "settings": {
+        "product_sticky_enable": true,
+        "image_layout": "stacked",
+        "image_size": "normal",
+        "show_cart_bar": true,
+        "enable_zoom": true,
+        "enable_video_looping": false
+      }
+    },
+    "1957ad46-1dde-45b6-a496-169bd9c86062": {
+      "type": "section-logo-list",
+      "blocks": {
+        "template--16314218905852__1957ad46-1dde-45b6-a496-169bd9c86062-1667546676feb6410e-0": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/2_658fbf30-33bf-4afa-bc91-7f7578e4740b.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "template--16314218905852__1957ad46-1dde-45b6-a496-169bd9c86062-1667546676feb6410e-1": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/4_41abaed2-84bb-4a0d-bd9e-2a0950e620f9.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "template--16314218905852__1957ad46-1dde-45b6-a496-169bd9c86062-1667546676feb6410e-2": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/1_ace75741-d3e7-44fe-b962-1143ff646f18.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        },
+        "e945bec3-1c26-4447-b05b-5fb6c55da4b2": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/3_7eb83b9b-2846-48b5-9888-7386a07e0f05.png",
+            "logo_width": 120,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "template--16314218905852__1957ad46-1dde-45b6-a496-169bd9c86062-1667546676feb6410e-0",
+        "template--16314218905852__1957ad46-1dde-45b6-a496-169bd9c86062-1667546676feb6410e-1",
+        "template--16314218905852__1957ad46-1dde-45b6-a496-169bd9c86062-1667546676feb6410e-2",
+        "e945bec3-1c26-4447-b05b-5fb6c55da4b2"
+      ],
+      "settings": {
+        "title": "AS SEEN IN...",
+        "text_color": "text-dark",
+        "bg_color": "#ffffff"
+      }
+    },
+    "custom": {
+      "type": "section-custom-content",
+      "blocks": {
+        "custom-1": {
+          "type": "text",
+          "settings": {
+            "subheading": "\"HOW TO\" SPF WITH NAKED SUNDAYS",
+            "title": "HOW TO USE ... SPF50 Clear Glow Radiant Sun Serum",
+            "text": "<p><strong>Where does this fit into my routine? <\/strong><\/p><p>SPF is typically the last step in your skin routine, but this multi-tasking serum can act as your primer, serum & SPF so it can sit on its own, or you can put moisturiser on as well if you need. <\/p><p><strong>How much do I use?<\/strong><\/p><p>Apply generously to your face (1\/4 tsp for face, 1\/2 tsp for face and neck.) Apply in layers and allow each layer to dry down for around 5 seconds. Use our SPF BFF brush to help the product soak into the skin. <\/p><p>Whilst this is the only serum you will need, it can be worn with other serums \/ moisturisers underneath and makeup on top too. <\/p><p><strong>Is this enough SPF for the entire day? <\/strong><\/p><p>All SPF products needs to be topped up every 2 hours for continued<br\/>protection. You can use our SPF50+ Hydrating Glow Mist to top up your SPF easily and seamlessly. Or carry your SPF BFF Brush to reapply for serum without sticky fingers. <\/p><p>*<em>Avoid prolonged sun exposure, re-apply sunscreen at least every two<br\/>hours or after swimming or sweating, use as directed, wear protective clothing, hat & sunglasses when outside. <\/em><\/p><p><em>Note: this is a chemical sunscreen and not<br\/>suitable for sensitive eyes or skin.<\/em><\/p>",
+            "text_size": 2,
+            "text_columns": 1,
+            "align_text": "text-left",
+            "text_color": "text-dark",
+            "bg_color": "#fdfdfd",
+            "button_text": "",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        },
+        "a4ea3c49-4012-47df-8ffe-832d999d6241": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/IMG_7466.jpg",
+            "bg_position": "center-center",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "title": "",
+            "description": "",
+            "flex_align": "align--middle-center",
+            "text_color": "text-light",
+            "transparent": true,
+            "link_text": "",
+            "link": "",
+            "button_color": "btn--white",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        }
+      },
+      "block_order": [
+        "custom-1",
+        "a4ea3c49-4012-47df-8ffe-832d999d6241"
+      ],
+      "settings": {
+        "height": "image-height",
+        "padding": false,
+        "borders": false,
+        "wrapper": false
+      }
+    },
+    "16480048396ad24a41": {
+      "type": "section-video",
+      "disabled": true,
+      "settings": {
+        "video_link_bg": "https:\/\/cdn.shopify.com\/s\/files\/1\/0495\/7211\/8692\/files\/16_9_CAMPAIGN_-_SLOW_-_NO_TEXT-2.mp4?v=1648117195",
+        "video_link": "",
+        "bg_position": "center-center",
+        "height": "five-fifty-height-hero",
+        "overlay_opacity": 0,
+        "overlay_color": "#000000",
+        "title": "",
+        "description": "",
+        "flex_align": "align--middle-center",
+        "text_color": "text-light",
+        "transparent": true,
+        "link_text": "",
+        "link": "",
+        "button_color": "btn--white",
+        "button_style": "hero__btn btn btn--large caps"
+      }
+    },
+    "reviews": {
+      "type": "reviews",
+      "disabled": true,
+      "settings": {
+        "enable_product_reviews": false,
+        "enable_accordion": false
+      }
+    },
+    "related": {
+      "type": "related",
+      "settings": {
+        "related_products_enable": true,
+        "limit": 4,
+        "product_recommendations_heading": "Related products",
+        "show_recently_viewed": true,
+        "product_recently_limit": 4,
+        "product_recently_heading": "Recently viewed"
+      }
+    },
+    "16484450458a456fa6": {
+      "type": "section-liquid",
+      "settings": {
+        "custom_liquid": "<script type=\"text\/javascript\">\n  var _learnq = _learnq || [];\n  var item = {\n    Name: {{ product.title|json }},\n    ProductID: {{ product.id|json }},\n    Categories: {{ product.collections|map:'title'|json }},\n    ImageURL: \"https:{{ product.featured_image.src|img_url:'grande' }}\",\n    URL: \"{{ shop.secure_url }}{{ product.url }}\",\n    Brand: {{ product.vendor|json }},\n    Price: {{ product.price|money|json }},\n    CompareAtPrice: {{ product.compare_at_price_max|money|json }}\n  };\n  _learnq.push(['track', 'Viewed Product', item]);\n  _learnq.push(['trackViewedItem', {\n    Title: item.Name,\n    ItemId: item.ProductID,\n    Categories: item.Categories,\n    ImageUrl: item.ImageURL,\n    Url: item.URL,\n    Metadata: {\n      Brand: item.Brand,\n      Price: item.Price,\n      CompareAtPrice: item.CompareAtPrice\n    }\n  }]);\n<\/script>"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "1957ad46-1dde-45b6-a496-169bd9c86062",
+    "custom",
+    "16480048396ad24a41",
+    "reviews",
+    "related",
+    "16484450458a456fa6"
+  ]
+}

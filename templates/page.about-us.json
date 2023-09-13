@@ -1,0 +1,198 @@
+{
+  "sections": {
+    "16553797266bd2cec6": {
+      "type": "section-slideshow",
+      "blocks": {
+        "16553797266043c823-0": {
+          "type": "image",
+          "settings": {
+            "bg_position": "center-center",
+            "image": "shopify:\/\/shop_images\/TGP_6351_Edit.jpg",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "title": "",
+            "description": "",
+            "flex_align": "align--middle-center",
+            "text_color": "text-light",
+            "transparent": true,
+            "link_text": "",
+            "link": "",
+            "button_color": "btn--white",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        }
+      },
+      "block_order": [
+        "16553797266043c823-0"
+      ],
+      "settings": {
+        "height": "screen-height-two-thirds",
+        "transition": "slide",
+        "arrows_style": true,
+        "dots_style": "hidden",
+        "autoplay": false,
+        "autoplay_speed": 8
+      }
+    },
+    "16468240777dfec14c": {
+      "type": "section-split-hero",
+      "disabled": true,
+      "settings": {
+        "image_height": "screen-height-two-thirds",
+        "mobile_layout": "stacked",
+        "image_desktop_left": "shopify:\/\/shop_images\/Product_Page_-_Rich_Image_with_Text_f512bf3d-f3ee-4f99-86b5-ff1d1b81bfcb.jpg",
+        "bg_position_left": "center-center",
+        "image_desktop_right": "shopify:\/\/shop_images\/naked_sundays_330406_r_copy_small_3a8c450d-4fef-4b0d-9dee-35b22ad86d67.jpg",
+        "bg_position_right": "center-center",
+        "overlay_color": "#000000",
+        "overlay_opacity": 0,
+        "title": "ABOUT US",
+        "description": "",
+        "flex_align": "align--middle-center",
+        "text_color": "text-dark",
+        "transparent": true,
+        "link_text": "",
+        "link": "",
+        "button_color": "btn--white",
+        "button_style": "hero__btn btn btn--large btn--outline caps"
+      }
+    },
+    "1646564000d0820cde": {
+      "type": "section-custom-content",
+      "blocks": {
+        "1646564000987ab47a-0": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "image": "shopify:\/\/shop_images\/Untitled_design-4.png",
+            "bg_position": "center-center",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "title": "",
+            "description": "",
+            "flex_align": "align--middle-center",
+            "text_color": "text-light",
+            "transparent": true,
+            "link_text": "",
+            "link": "",
+            "button_color": "btn--white",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        },
+        "1646564000987ab47a-1": {
+          "type": "text",
+          "settings": {
+            "subheading": "",
+            "title": "OUR STORY",
+            "text": "<p>Welcome to Naked Sundays! Home of Australian-made SPF \"BeautyScreens\" - a hybrid between a beauty product and high performance SPF. We are Vegan & Cruelty Free with zero whitecast, packed skin-loving ingredients, SPF50 UVA & UVB protection made in Australia (with the strictest SPF rules in the world!) all wrapped up in cute as heck packaging to boot. <\/p><p><\/p><p><strong>WHY WE LAUNCHED! <\/strong><\/p><p>We launched out of sheer necessity. Our founder, Samantha Brett, has been a television news reporter out on the road in the blazing sun for hours on end with heavy makeup and bright camera lights. Despite the prevalance of skin cancer in Australia, Samantha quickly found that there <strong>was no way to top up her SPF. <\/strong><\/p><p>After witnessing two colleagues have to get skin cancers cut out of their faces, Samantha knew something needed to be done. <\/p><p>After working with the best makeup artists and skin experts in the world as part of her decade-long television career, she knew they too struggled to find an SPF that didn't throw whitecast, didn't pill under makeup, could be reapplied OVER makeup (never been done before) <em>and <\/em>double up as skincare too. <\/p><p>So ... Naked Sundays was born. An SPF for women, by women with makeup wearers in mind, and those who just want damn good skin all year round. <\/p>",
+            "text_size": 2,
+            "text_columns": 1,
+            "align_text": "text-left",
+            "text_color": "text-dark",
+            "bg_color": "#ffffff",
+            "button_text": "",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        }
+      },
+      "block_order": [
+        "1646564000987ab47a-0",
+        "1646564000987ab47a-1"
+      ],
+      "settings": {
+        "height": "screen-height-one-half",
+        "padding": false,
+        "borders": false,
+        "wrapper": false
+      }
+    },
+    "16465643844bae1f64": {
+      "type": "section-custom-content",
+      "blocks": {
+        "1646564384a4dda9cd-1": {
+          "type": "text",
+          "settings": {
+            "subheading": "",
+            "title": "",
+            "text": "<p><strong>WHAT WE STAND FOR<\/strong><\/p><p>We are vegan friendly and cruelty free, with no oxybenzone, no octinoxate, no whitecast, no mineral oil, no parabens and no BS. We are also free from sulfates (SLS\/SLES), GOs, petrolatum or synthetic colours. Our cremes, serums and lotions are 100% fragrance free too.<br\/><br\/><strong>OUR MOTTO<\/strong><\/p><p><br\/>Protect your skin now... for kickass (and glowy and healthy) skin in the future. We aim to encourage you to wear SPF Every Day.<\/p><p><strong>WHY NAKED SUNDAYS? <\/strong><\/p><p>We want you love and revel in every day of your life like it's a Sunday; filled with self love and carefree vibes, and of course, a whole 'lotta lilac! <br\/><br\/><strong>SPF INNOVATION AT ITS BEST<\/strong><\/p><p>Our first to market formulations are made in TGA-listed labs in Australia, where every batch is tested for SPF levels. Australia has some of the strictest SPF rules on the planet, so you know you're in good hands.<\/p>",
+            "text_size": 2,
+            "text_columns": 1,
+            "align_text": "text-left",
+            "text_color": "text-dark",
+            "bg_color": "#ffffff",
+            "button_text": "",
+            "button_url": "",
+            "button_color": "btn--neutral",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        },
+        "1646564384a4dda9cd-0": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/NS_63.jpg",
+            "bg_position": "center-center",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "title": "",
+            "description": "",
+            "flex_align": "align--middle-center",
+            "text_color": "text-light",
+            "transparent": true,
+            "link_text": "",
+            "link": "",
+            "button_color": "btn--white",
+            "button_style": "hero__btn btn btn--large btn--outline caps"
+          }
+        }
+      },
+      "block_order": [
+        "1646564384a4dda9cd-1",
+        "1646564384a4dda9cd-0"
+      ],
+      "settings": {
+        "height": "screen-height-two-thirds",
+        "padding": false,
+        "borders": false,
+        "wrapper": false
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "subheading": "",
+        "show_title": false,
+        "show_content": true,
+        "text_size": 2,
+        "align_text": "text-center",
+        "height": "margin--medium",
+        "width": "wrapper",
+        "text_color": "text-dark",
+        "bg_color": "#ffffff"
+      }
+    },
+    "1646563129eca30528": {
+      "type": "section-collection-carousel",
+      "settings": {
+        "heading": "Shop the collection",
+        "description": "",
+        "text_alignment": "inline",
+        "link_text": "Shop All",
+        "link_url": "shopify:\/\/collections\/all",
+        "button_color": "btn--black",
+        "button_style": "hero__btn btn btn--input btn--outline caps",
+        "featured_collection": "all"
+      }
+    }
+  },
+  "order": [
+    "16553797266bd2cec6",
+    "16468240777dfec14c",
+    "1646564000d0820cde",
+    "16465643844bae1f64",
+    "main",
+    "1646563129eca30528"
+  ]
+}

@@ -1,0 +1,31 @@
+{% assign tabsWhats = product.metafields.Title.whats-title %}
+<div class="whats-content">
+<ul class="tab-whats-included">
+  {% for value in tabsWhats %}
+   {% assign k = forloop.index0 %}
+            
+  <div class="item-main item--{{ k }}">
+    <ul class="img">
+      
+      {% if product.metafields.Image.what-image-key[k] %}
+      <li class="img-whats"><a href="{{product.metafields.Link.whats-image-link[k]}}"><img src="{{product.metafields.Image.what-image-key[k] }}"></a></li>
+      {% endif %}
+    </ul>
+    <ul class="content">
+      {% if product.metafields.Title.whats-title[k] %}
+      <li class="title-whats"><a href="{{product.metafields.Link.whats-image-link[k]}}"><h6>{{product.metafields.Title.whats-title[k] }}</h6></a></li>
+      {% endif %}
+      {% if product.metafields.Subtitle.whats-subtitle[k] %}
+       <li class="subtitle-whats">{{product.metafields.Subtitle.whats-subtitle[k] }}</li>
+      {% endif %}
+      {% if product.metafields.Short_Description.whats-short-description[k] %}
+       <li class="short-desc-whats">{{product.metafields.Short_Description.whats-short-description[k] }}</li>
+      {% endif %}
+      {% if product.metafields.Long_Description.whats-long-description[k] %}
+       <li class="long-desc-whats">{{product.metafields.Long_Description.whats-long-description[k] }}</li>
+      {% endif %}
+    </ul>
+  </div>
+   {% endfor %}
+</ul>
+</div>

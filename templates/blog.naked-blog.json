@@ -1,0 +1,75 @@
+{
+  "sections": {
+    "featured": {
+      "type": "featured-posts",
+      "blocks": {
+        "feat": {
+          "type": "featured_post",
+          "disabled": true,
+          "settings": {
+            "featured_post": "",
+            "subheading": "Featured post",
+            "image": "shopify:\/\/shop_images\/NS_72.jpg",
+            "bg_position": "center-center"
+          }
+        },
+        "bc8208fe-173a-47dd-8469-f76fcd6e6f47": {
+          "type": "featured_post",
+          "disabled": true,
+          "settings": {
+            "featured_post": "",
+            "subheading": "Elle Magazine",
+            "image": "shopify:\/\/shop_images\/Elle_1.jpg",
+            "bg_position": "center-center"
+          }
+        }
+      },
+      "block_order": [
+        "feat",
+        "bc8208fe-173a-47dd-8469-f76fcd6e6f47"
+      ],
+      "settings": {
+        "show_author": false,
+        "show_date": false,
+        "show_button": false
+      }
+    },
+    "main": {
+      "type": "blog",
+      "disabled": true,
+      "settings": {
+        "show_title": true,
+        "show_rss": false,
+        "show_tag_nav": false,
+        "grid": 4,
+        "rows": 4,
+        "aspect_ratio": 1,
+        "show_tags": false,
+        "show_author": false,
+        "show_date": false,
+        "show_button": false,
+        "show_comments": false
+      }
+    },
+    "1646565774e9109657": {
+      "type": "section-blog",
+      "settings": {
+        "blog_name": "how-to-spf-with-naked-sundays",
+        "title": "How To SPF! With Naked Sundays",
+        "grid": 3,
+        "rows": 4,
+        "aspect_ratio": 1,
+        "show_tags": false,
+        "show_author": false,
+        "show_date": false,
+        "show_button": true,
+        "show_comments": false
+      }
+    }
+  },
+  "order": [
+    "featured",
+    "main",
+    "1646565774e9109657"
+  ]
+}

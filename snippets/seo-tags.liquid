@@ -1,0 +1,25 @@
+{% assign domains = "https://nakedsundays.com|en-au,https://us.nakedsundays.com|en-us" | split: "," %}
+{% if template contains 'collection' %}
+    {% for item in domains %}
+		{% assign domainObject = item | split: "|" %}
+		{% assign url = domainObject[0] %}
+		{% assign locale = domainObject[1] %}
+        {% if url == domain %}
+            <link rel="canonical" href="{{ shop.url }}{{ collection.url }}" />
+        {% else %}
+		  	<link rel="alternate" hreflang="{{ locale }}" href="{{ url }}{{ collection.url }}" />
+        {% endif %}
+    {% endfor %}    
+{% else %}
+	{% for item in domains %}
+		{% assign domainObject = item | split: "|" %}
+		{% assign url = domainObject[0] %}
+		{% assign locale = domainObject[1] %}
+        {% if shop.url == url %}
+		    <link rel="canonical" href="{{ canonical_url }}" />
+        {% else %}
+		  	<link rel="alternate" hreflang="{{ locale }}" href="{{ url }}{{ page.url }}" />
+        {% endif %}
+    {% endfor %}
+{% endif %}
+  
