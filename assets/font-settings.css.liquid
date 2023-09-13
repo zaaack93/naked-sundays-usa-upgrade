@@ -32,10 +32,13 @@
   elsif heading_font_400 and heading_font_400.weight > heading_font.weight
     assign heading_font_bold = heading_font_400
   endif
+
+  assign btn_font = settings.btn_font
 -%}
 
 {{ heading_font | font_face: font_display: 'swap' }}
 {{ base_font | font_face: font_display: 'swap' }}
+{{ btn_font | font_face: font_display: 'swap' }}
 
 {% if heading_font_bold %}
   {{ heading_font_bold | font_face: font_display: 'swap' }}

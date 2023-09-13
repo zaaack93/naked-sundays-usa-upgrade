@@ -1,160 +1,183 @@
-{%- assign block_element = block_element | default: false -%}
-{%- assign section_height = section_height | default: section.settings.height -%}
-{%- assign transparency_class = '' -%}
-{%- if section.settings.transparent -%}
-  {%- assign transparency_class = 'hero__content--transparent' -%}
-{%- endif -%}
+{%- liquid
+  assign block_element = block_element | default: false
+  assign desktop_height = desktop_height | default: section.settings.desktop_height
+  assign mobile_height = mobile_height | default: section.settings.mobile_height
+  assign video = section.settings.video
+  assign video_popup = section.settings.video_popup | default: section.settings.video_popup_social
+  assign desktop_image = section.settings.image | default: video.preview_image
+  assign mobile_image = section.settings.mobile_image
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.color
+  assign color_brightness = text_color | color_brightness
+  assign overlay_color = section.settings.overlay_color
+  assign overlay_opacity = section.settings.overlay_opacity | times: 0.01
+  assign show_overlay_text = section.settings.show_overlay_text
+  assign text_color_class = ''
+  assign animation_anchor = '#Video--' | append: section.id
 
-{%- assign animation_anchor = '#video--' | append: section.id -%}
+  assign title = section.settings.title
+  assign description = section.settings.description
+  assign link_text = section.settings.link_text
 
-<div class="hero__content__wrapper {{ section.settings.flex_align }} {{ transparency_class }}" id="video--{{ section.id }}">
-  <div class="hero__content{% unless block_element %} js-overflow-content{% endunless %}"{% if block_element %} data-overflow-content{% endif %}>
-    {% if section.settings.title != blank %}
-      <h1 class="hero__title"
-        data-aos="hero"
-        data-aos-anchor="{{ animation_anchor }}"
-        data-aos-order="1">
-        {{ section.settings.title | escape }}
-      </h1>
-    {% endif %}
+  assign button_style = section.settings.button_style
+  if button_style == 'btn--text' and section.settings.show_arrow
+    assign button_style = button_style | append: ' btn--text-no-underline'
+  endif
 
-    {% if section.settings.description != blank %}
-      <p class="hero__description h5--body"
-        data-aos="hero"
-        data-aos-anchor="{{ animation_anchor }}"
-        data-aos-order="2">
-        {{ section.settings.description }}
-      </p>
-    {% endif %}
+  assign show_video_popup = false
+  if section.settings.show_video_popup and video_popup != blank
+    assign show_video_popup = true
+  endif
 
-    {% if section.settings.link_text != blank and section.settings.video_link == blank %}
-      <a class="{{ section.settings.button_style }} {{ section.settings.button_color }}"
-        href="{{ section.settings.link }}"
-        data-aos="hero"
-        data-aos-anchor="{{ animation_anchor }}"
-        data-aos-order="3">
-        {{ section.settings.link_text | escape }}
-      </a>
-    {% endif %}
+  if color_brightness > 127
+    assign text_color_class = 'text-light'
+  else
+    assign text_color_class = 'text-dark'
+  endif
 
-    {%- if section.settings.video_link != blank -%}
-      {%- assign video_link_downcase = section.settings.video_link | downcase -%}
-      {%- assign video_type = '' -%}
-      {%- assign video_id = '' -%}
-      {%- if section.settings.video_link contains "vimeo.com" -%}
-        {%- assign video_type = "vimeo" -%}
-      {%- elsif section.settings.video_link contains "youtube.com" -%}
-        {%- assign video_type = "youtube" -%}
-      {%- elsif section.settings.video_link contains "youtu.be" -%}
-        {%- assign video_type = "youtube" -%}
-        {%- assign youtubeShortlink = true -%}
-      {%- elsif video_link_downcase contains ".mp4" -%}
-        {%- assign video_type = "native" -%}
-      {%- endif -%}
-      {%- assign link_array = section.settings.video_link | split: '/' -%}
-      {%- assign id_with_params = link_array | last -%}
+  assign hero_transparent = false
+  if bg_color == 'rgba(0,0,0,0)' or bg_color == blank
+    assign hero_transparent = true
+  endif
 
-      {%- if video_type == "vimeo" or youtubeShortlink -%}
-        {% comment %}
-          https://vimeo.com/[ID]?foo=bar&baz=boo
-          https://youtu.be/[ID]?foo=bar&baz=boo
-        {% endcomment %}
-        {%- assign starts_with_id = id_with_params | split: '?' -%}
-        {%- assign video_id = starts_with_id | first -%}
-      {%- elsif video_type == "youtube"  -%}
-        {% comment %}
-          https://youtube.com/watch?v=[ID]?foo=bar&baz=boo
-        {% endcomment %}
-        {%- assign first_param = id_with_params | split: '&' | first -%}
-        {%- assign watch_then_id = first_param | split: '?' -%}
-        {%- assign equals_id = watch_then_id[1] -%}
-        {%- assign ends_with_id = equals_id | split: '=' -%}
-        {%- assign video_id = ends_with_id | last -%}
-      {%- endif -%}
+  assign show_header_backdrop = false
+  if hero_transparent and show_overlay_text
+    assign show_header_backdrop = true
+  endif
 
-      {%- if video_type != '' -%}
-        {%- if video_type == 'youtube' -%}
-          {% capture video_link %}https://www.youtube.com/watch?v={{ video_id }}{% endcapture %}
-        {%- elsif video_type == 'vimeo' -%}
-          {% capture video_link %}https://vimeo.com/{{ video_id }}{% endcapture %}
-        {%- elsif video_type == 'native' -%}
-        {% capture video_link %}{{ section.settings.video_link }}{% endcapture %}
-        {%- endif -%}
+  assign animation_order = 0
+-%}
 
-        {%- assign video_parent_id = 'item-video-' | append: section.id -%}
+{%- style -%}
+  #Video--{{ section.id }} {
+    {%- unless bg_color == 'rgba(0,0,0,0)' or bg_color == blank -%}
+      --bg: {{ bg_color }};
+    {%- endunless -%}
 
-        <a href="{{ video_link }}"
-          class="{{ section.settings.button_style }} {{ section.settings.button_color }} image__video__play"
+    {%- unless text_color == 'rgba(0,0,0,0)' or text_color == blank -%}
+      --text: {{ text_color }};
+    {%- endunless -%}
+  }
+{%- endstyle -%}
+
+{%- if title != blank or description != blank or link_text != blank -%}
+  <div class="hero__content__wrapper frame__item {{ section.settings.flex_align }} {{ text_color_class }}{% if show_header_backdrop %} backdrop--linear{% endif %}" id="Video--{{ section.id }}"{% if show_header_backdrop %} style="--header-overlay-color: {{ overlay_color }}; --header-overlay-opacity: {{ overlay_opacity }};"{% endif %}>
+    <div class="hero__content{% if hero_transparent %} hero__content--transparent{% if show_overlay_text %} backdrop--radial{% endif %}{% endif %}"{% if show_header_backdrop %} style="--bg: {{ overlay_color }}; --overlay-opacity: {{ overlay_opacity }};"{% endif %}>
+      {%- if title != blank -%}
+        {%- liquid
+          assign animation_order = animation_order | plus: 1
+          if section.settings.heading_size != blank
+            assign heading_size = 'heading-size-' | append: section.settings.heading_size
+          else
+            assign heading_size = 'heading-size-6'
+          endif
+        -%}
+        <h2 class="hero__title {{ heading_size }}"
           data-aos="hero"
           data-aos-anchor="{{ animation_anchor }}"
-          data-aos-order="3"
-          data-video-play="{%- render 'photoswipe-video-html' item_link: section.settings.video_link, item_link_type: video_type, item_link_id: video_id, item_id: video_parent_id -%}">
-            &#8203;
-            {% render 'icon-play' %}
-        </a>
+          data-aos-order="{{ animation_order }}">
+          {{ title | escape }}
+        </h2>
       {%- endif -%}
+
+      {%- if description != blank -%}
+        {%- assign animation_order = animation_order | plus: 1 -%}
+        <p class="hero__description{% if section.settings.text_size != blank %} body-size-{{ section.settings.text_size }}{% endif %}"
+          data-aos="hero"
+          data-aos-anchor="{{ animation_anchor }}"
+          data-aos-order="{{ animation_order }}">
+          {{ description }}
+        </p>
+      {%- endif -%}
+
+      {%- if link_text != blank or show_video_popup -%}
+        <div class="hero__button-group">
+          {%- if link_text != blank -%}
+            {%- assign animation_order = animation_order | plus: 1 -%}
+            <div class="hero__button"
+              data-aos="hero"
+              data-aos-anchor="{{ animation_anchor }}"
+              data-aos-order="{{ animation_order }}">
+              <a class="btn {{ button_style }} {{ section.settings.button_type }} {{ section.settings.button_size }}" href="{{ section.settings.link }}">
+                <span>{{ link_text | escape }}</span>
+
+                {%- if section.settings.show_arrow -%}
+                  {%- render 'icon-arrow-right' -%}
+                {%- endif -%}
+              </a>
+            </div>
+          {%- endif -%}
+
+          {%- if show_video_popup -%}
+            {%- liquid
+              assign video_parent_id = 'item-video-' | append: section.id
+              assign animation_order = animation_order | plus: 1
+            -%}
+
+            <div class="hero__button"
+              data-aos="hero"
+              data-aos-anchor="{{ animation_anchor }}"
+              data-aos-order="{{ animation_order }}">
+              <a href="{{ video_popup }}"
+                class="btn {{ section.settings.button_size }} {{ section.settings.button_style }} {{ section.settings.button_type }} image__video__play"
+                data-video-play="{%- render 'photoswipe-video-html' item_link: video_popup, item_id: video_parent_id, item_enable_sound: 'false' -%}">
+                &#8203;
+                {% render 'icon-play' %}
+              </a>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.link != blank and link_text == blank -%}
+      <a href="{{ section.settings.link }}" class="hero__content__link" aria-label="{{ desktop_image.alt | default: title | default: description | strip_html | escape }}">&nbsp;</a>
     {%- endif -%}
   </div>
+{%- endif -%}
 
-  {% if section.settings.link != blank %}
-    {% unless section.settings.link_text != blank %}
-      <a href="{{ section.settings.link }}" class="hero__content__link">&nbsp;</a>
-    {% endunless %}
-  {% endif %}
+<div class="hero__video frame__item">
+  {%- liquid
+    capture video_poster
+      assign modifier = ''
+
+      if mobile_image
+        assign modifier = 'desktop'
+      endif
+
+      render 'image-hero', image: desktop_image, desktop_height: desktop_height, mobile_height: mobile_height, modifier: modifier
+
+      if mobile_image
+        render 'image-hero', image: mobile_image, mobile_height: mobile_height, modifier: 'mobile'
+      endif
+    endcapture
+  -%}
+
+  {%- if video != nil or external_video_url_metafield !=blank -%}
+    <div class="video-background {{ desktop_height }} {{ mobile_height }}">
+      <div class="video__poster">
+        {{ video_poster }}
+      </div>
+      <div class="video__player is-loading" data-video-player data-video-id="{{ section.id }}-video-background">
+        <template data-video-template>
+          {% if external_video_url_metafield != blank%}
+            {% assign video_id = external_video_url_metafield | split: "watch?v=" %}
+            <iframe src="https://www.youtube.com/embed/{{video_id.last}}?playsinline=1&autoplay=1&controls=1&mute=1&loop=1&playlist={{video_id.last}}&enablejsapi=1&rel=0&modestbranding=1&origin={{ 'https://' | append: request.host | url_encode }}" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen"></iframe>
+          {%else%}
+            {{ video | video_tag: autoplay: true, loop: true, muted: true, controls: false }}
+          {%endif%}
+          
+        </template>
+      </div>
+    </div>
+  {%- else -%}
+    {{ video_poster }}
+  {%- endif -%}
+
+  {%- unless show_overlay_text -%}
+    {%if  external_video_url_metafield == blank %}
+    {% comment %} fix hide the overlay is external video is added {% endcomment %}
+      <div class="image-overlay" style="--bg: {{ overlay_color }}; --overlay-opacity: {{ overlay_opacity }};"></div>
+    {%endif%}
+  {%- endunless -%}
 </div>
-{% assign overlay_opacity = section.settings.overlay_opacity | times: 0.01 %}
-<div class="image-overlay" style="background-color:{{ section.settings.overlay_color }} !important; opacity:{{ overlay_opacity }};"></div>
-
-{%- assign video_bg_show = false -%}
-{%- if section.settings.video_link_bg != blank -%}
-  {%- assign video_link_bg_downcase = section.settings.video_link_bg | downcase -%}
-
-  {%- if video_link_bg_downcase contains '.mp4' -%}
-    {%- assign video_bg_show = true -%}
-  {%- endif -%}
-{%- endif -%}
-
-{%- if video_bg_show -%}
-  {%- assign image_height_styles = '' -%}
-  {% if section_height == 'image-height' %}
-    {%- assign default_image = 'blank.svg' | asset_url -%}
-    {%- assign section_image = section.settings.image | default: default_image -%}
-    {%- assign aspect_ratio = section_image.aspect_ratio | default: 2.63 -%}
-    {%- capture image_height_styles -%}
-      style="padding-top: {{ 1 | divided_by: aspect_ratio | times: 100 }}%;
-            background-image: url('{{ section_image | img_url: '1x1' }}');"
-    {%- endcapture -%}
-  {% endif %}
-  <div 
-    class="video-background {{ section_height }}"
-    data-overflow-background
-    {{ image_height_styles }}>
-    <video 
-      {% if section.settings.image != blank %}poster="{{ section.settings.image }}"{% endif %}
-      id="{{ section.id }}-video-background" 
-      data-video-type="native"
-      data-video-id="{{ section.id }}-video-background"
-      playsinline
-      autoplay
-      loop
-      muted
-      width="320" 
-      height="240">
-      <source src="{{ section.settings.video_link_bg }}" type="video/mp4" />
-    </video>
-  </div>
-{%- else -%}
-  {%- assign desktop_image_modifier = '' -%}
-  {%- assign mobile_image = '' -%}
-  {%- if section.settings.mobile_image != blank -%}
-    {%- assign desktop_image_modifier = 'desktop' -%}
-    
-    {%- capture mobile_image -%}
-      {% render 'image-background', img_object: section.settings.mobile_image, frame_height_class: section_height, bg_position: section.settings.bg_position, modifier: 'mobile' %}
-    {%- endcapture -%}
-  {%- endif -%}
-
-  {% render 'image-background', img_object: section.settings.image, frame_height_class: section_height, bg_position: section.settings.bg_position, modifier: desktop_image_modifier %}
-
-  {{ mobile_image }}
-{%- endif -%}

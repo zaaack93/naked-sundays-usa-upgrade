@@ -79,7 +79,7 @@
 {%- assign animation_anchor_default = item_unique | prepend: '.' -%}
 {%- assign animation_anchor = animation_anchor | default: animation_anchor_default -%}
 
-<div class="product-item one-quarter medium--one-half product-item--centered product-item--borderless" data-product-grid-item {{ additional_attributes }} data-handle="{{product.handle}}" data-variantid="{{product.selected_or_first_available_variant.id}}">
+<div class="product-item one-quarter medium-down--one-half product-item--centered product-item--borderless" data-product-grid-item {{ additional_attributes }} data-handle="{{product.handle}}" data-variantid="{{product.selected_or_first_available_variant.id}}">
   {%- capture over_image_content -%}
     {%- assign product_tags = product.tags | join: ',' | append: ',' -%}
     {%- assign preorder = false -%}
@@ -146,47 +146,47 @@
   {%- endcapture -%}
 
   <div class="product-item__image{% if double_img %} double__image{% endif %}" data-product-image>
-      {% if product.media.size > 0 %}
-        <div class="product-item__bg lazyload"
-          data-grid-slide
-          data-aos="img-in"
-          data-aos-delay="{{ aos_image_delay }}"
-          data-aos-duration="{{ aos_image_duration }}"
-          data-aos-anchor="{{ animation_anchor }}"
-          data-aos-easing="ease-out-quart"
-          data-bgset="{% render 'bgset', image: product.featured_media.preview_image %}">&nbsp;</div>
-        {% if double_img %}
-          <div class="product-item__bg__under lazyload" data-bgset="{% render 'bgset', image: product.media[1].preview_image %}">&nbsp;</div>
-        {% endif %}
-      {% else %}
-        {%- comment -%} Show "No image" if product has no media {%- endcomment -%}
-        {%- assign image_url_pattern = product.featured_image | img_url: '540x' | replace: '_540x.', '_{width}x.' -%}
-        {%- assign image_widths = "[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]" -%}
+    <a class="product-link" href="{{ product_url }}" aria-label="{{ product.title | strip_html | escape }}" data-product-link="{{ product_url }}">
+      {%- if product.media.size > 0 -%}
+        <div class="product-item__bg" data-product-image-default>
 
-        <div class="product-item__bg product-item__bg--empty"
-          data-grid-slide
-          data-aos="img-in"
-          data-aos-delay="{{ aos_image_delay }}"
-          data-aos-duration="{{ aos_image_duration }}"
-          data-aos-anchor="{{ animation_anchor }}"
-          data-aos-easing="ease-out-quart">
-            <img
-              class="lazyload"
-              src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-              data-src="{{ image_url_pattern }}"
-              data-widths= "{{ image_widths }}"
-              data-aspectratio="1"
-              data-sizes="auto"
-              width="540"
-              height="540"
-              alt="{{ product.title | strip_html | escape }}">
+          {%- render 'image' image: product.featured_media.preview_image, aspect_ratio: aspect_ratio, sizes: sizes, widths: widths, attributes: image_animations, cover: true -%}
+
+          {%- if settings.color_swatches and current_variant -%}
+            {%- assign image_inner_empty = true -%}
+            {%- for variant in product.variants -%}
+              {%- if variant.featured_image != blank -%}
+                {%- assign image_inner_empty = false -%}
+                {%- assign variant_title = variant.title | replace: '"', "'" -%}
+                <div class="product-item__bg__inner" data-variant-title="{{ variant_title }}" style="display: none;">
+                  {%- render 'image' image: variant.featured_image, aspect_ratio: aspect_ratio, sizes: sizes, widths: widths, attributes: image_animations, cover: true -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if image_inner_empty -%}
+              &nbsp;
+            {%- endif -%}
+          {%- else -%}
+            &nbsp;
+          {%- endif -%}
         </div>
-      {% endif %}
+
+        {%- if double_img -%}
+          <div class="product-item__bg__under">
+            {%- render 'image' image: product.media[1].preview_image, aspect_ratio: aspect_ratio, sizes: sizes, widths: widths, attributes: image_animations, cover: true -%}
+          </div>
+        {%- endif -%}
+      {%- else -%}
+        {%- comment -%} Show Empty image if product has no media {%- endcomment -%}
+        <div class="product-item__bg product-item__bg--empty" data-product-image-default></div>
+      {%- endif -%}
+
+      {%- if has_siblings -%}
+        <div class="product-item__bg__sibling" data-product-image-sibling></div>
+      {%- endif -%}
+    </a>
 
     {{ over_image_content }}
-
-    <span><img style="display:none;" id="secomapp-fg-image-{{ product.id }}" src="{{ "icon-freegift.png" | asset_url }}" alt="Free Gift Icon" class="sca-fg-img-collect"></span>
-    <span class="sca-fg-cat-list prod-show-list" style="display:none;" id="secomapp-fg-data-{{ product.id }}"></span>
   </div>
 
   <noscript>
@@ -211,10 +211,6 @@
       <p class="product__grid__title">
         {{ product.title | strip_html | escape }}
       </p>
-
-<!-- Stamped - Begin badge -->
-<span class="stamped-product-reviews-badge" data-id="{{ product.id }}" data-product-title="{{ product.title | escape }}" data-product-type="{{ product.type }}" style="display: block;"></span>
-<!-- Stamped - End badge -->
 
       <span class="price{% if sca_compare_at_price > sca_price %} sale{% endif %}">
         {% if product.available %}
@@ -261,7 +257,7 @@
     
     <div class="product_add">
        {%- assign variant = product.selected_or_first_available_variant -%}
-      <span class="add-btn-text btn ajax-add-to-cart {% if isProductInCart %} disabled{% endif %} {% if isGiftAdded %}disabled{% endif %}" data-variantid="{{variant.id}}">{% if isProductInCart %}Added{% else %}Add{% endif %}</span>
+      <span class="add-btn-text btn btn--full btn--primary btn--solid ajax-add-to-cart {% if isProductInCart %} isTheCurrentProduct {% endif %} {% if isGiftAdded %}disabled{% endif %}" data-variantid="{{variant.id}}">{% if isProductInCart %}Remove{% else %}Add to cart{% endif %}</span>
     </div>
      
   </div>

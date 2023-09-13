@@ -1,0 +1,20 @@
+{
+  "parent": "product.json",
+  "context": {
+    "market": "au"
+  },
+  "sections": {
+    "custom": {
+      "settings": {
+      },
+      "blocks": {
+        "custom-1": {
+          "settings": {
+            "title": "{{ product.metafields.custom.best_bits_title_.value }}",
+            "text": "{{ product.metafields.custom.best_bits_content_ | metafield_tag }}"
+          }
+        }
+      }
+    }
+  }
+}

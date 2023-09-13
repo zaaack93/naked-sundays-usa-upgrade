@@ -1,0 +1,586 @@
+{
+  "sections": {
+    "main": {
+      "type": "product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "subheading_option": "none",
+            "show_rating": false,
+            "enable_star_rating": false,
+            "show_rating_count": false,
+            "padding_bottom": 8
+          }
+        },
+        "a846c587-99fa-4f55-a29d-93117976e2cf": {
+          "type": "product_rating",
+          "settings": {
+            "padding_bottom": 8
+          }
+        },
+        "90f57bd6-4319-4f33-8ea8-6dfedeb3b1f3": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "title": "",
+            "text": "<p>{{ product.metafields.my_fields.short_description | metafield_tag }}<\/p>",
+            "padding_bottom": 10
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "padding_bottom": 16
+          }
+        },
+        "variants": {
+          "type": "variants",
+          "settings": {
+            "info_page": "",
+            "subscriptions_enable_selectors": false,
+            "padding_bottom": 18
+          }
+        },
+        "304f09b5-0771-4bb4-b90f-1e1bcc842967": {
+          "type": "text",
+          "settings": {
+            "title": "",
+            "text": "{{ product.metafields.custom.promotion_text | metafield_tag }}",
+            "padding_bottom": 16
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "show_quantity": true,
+            "show_payment_button": false,
+            "show_gift_card_recipient": false,
+            "padding_bottom": 32
+          }
+        },
+        "icon_2": {
+          "type": "icon",
+          "settings": {
+            "icon_name": "icon-truck",
+            "icon_size": 20,
+            "icon_color": "#edb3ff",
+            "title": "Free AUS Shipping +$49",
+            "width": "half",
+            "padding_bottom": 16
+          }
+        },
+        "icon_1": {
+          "type": "icon",
+          "settings": {
+            "icon_name": "icon-flare",
+            "icon_size": 20,
+            "icon_color": "#edb3ff",
+            "title": "Afterpay  &   ZipPay",
+            "width": "half",
+            "padding_bottom": 16
+          }
+        },
+        "divider_1": {
+          "type": "divider",
+          "disabled": true,
+          "settings": {
+            "show_line": true,
+            "padding_top": 20,
+            "padding_bottom": 16
+          }
+        },
+        "4d5dccc5-4dbe-473e-9713-d4e1627c7d22": {
+          "type": "icon",
+          "disabled": true,
+          "settings": {
+            "icon_name": "icon-leaf",
+            "image": "{{ product.metafields.custom.key_benefit_image_1.value }}",
+            "icon_size": 30,
+            "icon_color": "#ffaffe",
+            "title": "{{ product.metafields.custom.key_benefit_1.value }}",
+            "width": "full",
+            "padding_bottom": 16
+          }
+        },
+        "cfd2fdfc-911c-449b-8cbd-35baf09631d2": {
+          "type": "icon",
+          "disabled": true,
+          "settings": {
+            "icon_name": "icon-flower",
+            "image": "{{ product.metafields.custom.key_benefit_image_2.value }}",
+            "icon_size": 30,
+            "icon_color": "#ffaffe",
+            "title": "{{ product.metafields.custom.key_benefit_2.value }}",
+            "width": "full",
+            "padding_bottom": 16
+          }
+        },
+        "c0f364d0-a292-4fef-b3fa-467452d234ca": {
+          "type": "icon",
+          "disabled": true,
+          "settings": {
+            "icon_name": "icon-heart",
+            "image": "{{ product.metafields.custom.key_benefit_image_3.value }}",
+            "icon_size": 30,
+            "icon_color": "#ff81f5",
+            "title": "{{ product.metafields.custom.key_benefit_3.value }}",
+            "width": "full",
+            "padding_bottom": 16
+          }
+        },
+        "pickup": {
+          "type": "pickup",
+          "disabled": true,
+          "settings": {
+            "padding_bottom": 32
+          }
+        },
+        "tabs": {
+          "type": "tab_richtext",
+          "settings": {
+            "show_read_more": false,
+            "style": "accordions",
+            "title_1": "{{ product.metafields.my_fields.title_how_to_use_.value }}",
+            "raw_content_1": "<p>{{ product.metafields.my_fields.how_to_use | metafield_tag }}<\/p>",
+            "title_2": "{{ product.metafields.my_fields.ingredients_title.value }}",
+            "raw_content_2": "<p>{{ product.metafields.my_fields.ingredients | metafield_tag }}<\/p>",
+            "title_3": "{{ product.metafields.my_fields.added_benefits_title.value }}",
+            "raw_content_3": "<p>{{ product.metafields.my_fields.added_benefits | metafield_tag }}<\/p>",
+            "title_4": "",
+            "raw_content_4": "",
+            "title_5": "",
+            "raw_content_5": "",
+            "show_product_bundle": true,
+            "padding_bottom": 0
+          }
+        },
+        "upsell": {
+          "type": "upsell",
+          "disabled": true,
+          "settings": {
+            "upsell_product": "spf50-glow-balm-makeup-sticks-set-rose-champagne-espresso-martini",
+            "bg_color": "",
+            "padding_bottom": 16
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "a846c587-99fa-4f55-a29d-93117976e2cf",
+        "90f57bd6-4319-4f33-8ea8-6dfedeb3b1f3",
+        "price",
+        "variants",
+        "304f09b5-0771-4bb4-b90f-1e1bcc842967",
+        "buttons",
+        "icon_2",
+        "icon_1",
+        "divider_1",
+        "4d5dccc5-4dbe-473e-9713-d4e1627c7d22",
+        "cfd2fdfc-911c-449b-8cbd-35baf09631d2",
+        "c0f364d0-a292-4fef-b3fa-467452d234ca",
+        "pickup",
+        "tabs",
+        "upsell"
+      ],
+      "settings": {
+        "product_sticky_enable": false,
+        "image_layout": "grid-1",
+        "image_size": "normal",
+        "show_cart_bar": false,
+        "enable_zoom": true,
+        "enable_video_looping": false,
+        "mobile_image_style": "thumbs",
+        "padding_top": 72,
+        "padding_bottom": 70
+      }
+    },
+    "custom": {
+      "type": "section-custom-content",
+      "blocks": {
+        "316707c6-06b5-43c7-9f67-9c7486a399f7": {
+          "type": "video",
+          "settings": {
+            "video": "{{ product.metafields.custom.best_bits_video_.value }}",
+            "external_video_url_metafield": "",
+            "show_video_popup": false,
+            "video_popup_social": "",
+            "image": "{{ product.metafields.custom.best_bits_video_.value }}",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "show_overlay_text": false,
+            "title": "",
+            "heading_size": 7,
+            "description": "",
+            "text_size": 3,
+            "flex_align": "align--middle-center",
+            "link_text": "",
+            "link": "",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false,
+            "bg_color": "",
+            "color": "#ffffff"
+          }
+        },
+        "custom-1": {
+          "type": "text",
+          "settings": {
+            "subheading": "",
+            "subheading_size": 3,
+            "title": "Key Benefits",
+            "heading_size": 6,
+            "text": "",
+            "use_content_via_metafield": true,
+            "metafield_key": "custom_sections_items",
+            "text_size": 3,
+            "button_text": "",
+            "button_url": "",
+            "button_type": "btn--secondary",
+            "button_size": "btn--small",
+            "button_style": "btn--solid",
+            "show_arrow": false,
+            "show_social_links": false,
+            "text_columns": 1,
+            "align_text": "text-left",
+            "bg_color": "#fdffc1",
+            "color": "#212121"
+          }
+        }
+      },
+      "block_order": [
+        "316707c6-06b5-43c7-9f67-9c7486a399f7",
+        "custom-1"
+      ],
+      "settings": {
+        "height": "screen-height-full",
+        "mobile_height": "screen-height-three-quarters--mobile",
+        "width": "wrapper--full",
+        "borders": false,
+        "reverse_blocks": false,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "c972e37c-91d1-4656-8552-7d50e8d6bd33": {
+      "type": "section-custom-content",
+      "disabled": true,
+      "blocks": {
+        "b1b4f37a-b2c6-4fbb-9381-03d7863c1beb": {
+          "type": "text",
+          "settings": {
+            "subheading": "",
+            "subheading_size": 3,
+            "title": "{{ product.metafields.custom.routine_title_.value }}",
+            "heading_size": 7,
+            "text": "{{ product.metafields.custom.routine_content_ | metafield_tag }}",
+            "use_content_via_metafield": true,
+            "metafield_key": "custom_sections_items_2",
+            "text_size": 3,
+            "button_text": "",
+            "button_url": "",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false,
+            "show_social_links": false,
+            "text_columns": 1,
+            "align_text": "text-left",
+            "bg_color": "#f0e4ff",
+            "color": ""
+          }
+        },
+        "cfd1a8db-39f3-4755-9c34-77f41b78d306": {
+          "type": "video",
+          "settings": {
+            "external_video_url_metafield": "",
+            "show_video_popup": false,
+            "video_popup_social": "",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "show_overlay_text": false,
+            "title": "",
+            "heading_size": 7,
+            "description": "",
+            "text_size": 3,
+            "flex_align": "align--middle-center",
+            "link_text": "",
+            "link": "",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false,
+            "bg_color": "",
+            "color": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "b1b4f37a-b2c6-4fbb-9381-03d7863c1beb",
+        "cfd1a8db-39f3-4755-9c34-77f41b78d306"
+      ],
+      "settings": {
+        "height": "screen-height-full",
+        "mobile_height": "screen-height-one-half--mobile",
+        "width": "wrapper--full",
+        "borders": false,
+        "reverse_blocks": false,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "2cbac4d4-1a59-4447-aeee-ec774bcbca58": {
+      "type": "section-columns",
+      "disabled": true,
+      "blocks": {
+        "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-0": {
+          "type": "image",
+          "settings": {
+            "image": "{{ product.metafields.custom.influencer_image_1_.value }}",
+            "title": "{{ product.metafields.custom.influencer_handle_1_.value }}",
+            "heading_size": 4,
+            "text": "",
+            "text_size": 3,
+            "button_text": "",
+            "button_url": "",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
+          }
+        },
+        "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-1": {
+          "type": "image",
+          "settings": {
+            "image": "{{ product.metafields.custom.influencer_image_2_.value }}",
+            "title": "{{ product.metafields.custom.influencer_handle_2_.value }}",
+            "heading_size": 4,
+            "text": "",
+            "text_size": 3,
+            "button_text": "",
+            "button_url": "",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
+          }
+        },
+        "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-2": {
+          "type": "image",
+          "settings": {
+            "image": "{{ product.metafields.custom.influencer_image_3_.value }}",
+            "title": "{{ product.metafields.custom.influencer_handle_3_.value }}",
+            "heading_size": 4,
+            "text": "",
+            "text_size": 3,
+            "button_text": "",
+            "button_url": "",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
+          }
+        }
+      },
+      "block_order": [
+        "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-0",
+        "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-1",
+        "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-2"
+      ],
+      "settings": {
+        "title": "{{ product.metafields.custom.as_seen_on_title_.value }}",
+        "heading_size": 6,
+        "align_text": "text-left",
+        "align_columns": "flex-align-top",
+        "width": "wrapper--full-padded",
+        "image_aspect_ratio": 1,
+        "mobile_image_aspect_ratio": 1,
+        "bg_color": "#f0e4ff",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "layout_mobile": "carousel"
+      }
+    },
+    "reviews": {
+      "type": "reviews",
+      "settings": {
+        "enable_product_reviews": false,
+        "enable_accordion": true,
+        "width": "wrapper",
+        "padding_top": 0,
+        "padding_bottom": 30
+      }
+    },
+    "related": {
+      "type": "related",
+      "blocks": {
+        "related": {
+          "type": "related",
+          "settings": {
+            "product_recommendations_heading": "Related products",
+            "limit": 4
+          }
+        },
+        "recent": {
+          "type": "recent",
+          "settings": {
+            "product_recently_heading": "Recently viewed",
+            "product_recently_limit": 4
+          }
+        }
+      },
+      "block_order": [
+        "related",
+        "recent"
+      ],
+      "settings": {
+        "enable_tabs": true,
+        "bg_color": "",
+        "color": "",
+        "border_color": "",
+        "padding_top": 30,
+        "padding_bottom": 0
+      }
+    },
+    "49894eb0-2ccd-427d-b990-c76fc9a3b173": {
+      "type": "section-product",
+      "disabled": true,
+      "blocks": {
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-title-1": {
+          "type": "title",
+          "settings": {
+            "subheading_option": "none",
+            "show_rating": true,
+            "enable_star_rating": true,
+            "show_rating_count": false,
+            "padding_bottom": 8
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-price-1": {
+          "type": "price",
+          "settings": {
+            "padding_bottom": 16
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-variants-1": {
+          "type": "variants",
+          "settings": {
+            "info_page": "",
+            "subscriptions_enable_selectors": false,
+            "padding_bottom": 16
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-buttons-1": {
+          "type": "buttons",
+          "settings": {
+            "show_quantity": true,
+            "show_payment_button": true,
+            "padding_bottom": 32
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-tab_richtext-1": {
+          "type": "tab_richtext",
+          "settings": {
+            "show_read_more": true,
+            "style": "tabs",
+            "title_1": "Tab",
+            "raw_content_1": "<p>This content type will accept <strong>rich text<\/strong> to help with adding styles and links to additional pages or content. Use this to add supplementary information to help your buyers.<\/p>",
+            "title_2": "Info",
+            "raw_content_2": "<p>You can use product metafields to assign content to this tab that is unique to an individual product.  Use tabs to highlight unique features, sizing information, or other sales information.<\/p>",
+            "title_3": "",
+            "raw_content_3": "",
+            "title_4": "",
+            "raw_content_4": "",
+            "title_5": "",
+            "raw_content_5": "",
+            "padding_bottom": 0
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-divider-1": {
+          "type": "divider",
+          "settings": {
+            "show_line": true,
+            "padding_top": 30,
+            "padding_bottom": 20
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-upsell-1": {
+          "type": "upsell",
+          "settings": {
+            "upsell_product": "",
+            "bg_color": "",
+            "padding_bottom": 16
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-divider-2": {
+          "type": "divider",
+          "settings": {
+            "show_line": true,
+            "padding_top": 10,
+            "padding_bottom": 30
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-icon-1": {
+          "type": "icon",
+          "settings": {
+            "icon_name": "icon-email",
+            "icon_size": 20,
+            "icon_color": "#545454",
+            "title": "Free 30 Days Returns",
+            "width": "full",
+            "padding_bottom": 16
+          }
+        },
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-icon-2": {
+          "type": "icon",
+          "settings": {
+            "icon_name": "icon-truck",
+            "icon_size": 20,
+            "icon_color": "#545454",
+            "title": "Free shipping on orders over $100",
+            "width": "full",
+            "padding_bottom": 16
+          }
+        }
+      },
+      "block_order": [
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-title-1",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-price-1",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-variants-1",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-buttons-1",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-tab_richtext-1",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-divider-1",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-upsell-1",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-divider-2",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-icon-1",
+        "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-icon-2"
+      ],
+      "settings": {
+        "home_product": "",
+        "product_sticky_enable": true,
+        "image_layout": "thumbnails",
+        "image_size": "normal",
+        "enable_zoom": true,
+        "enable_video_looping": false,
+        "mobile_image_style": "thumbs",
+        "bg_color": "",
+        "color": "",
+        "border_color": "",
+        "block_padding": 20,
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    }
+  },
+  "order": [
+    "main",
+    "custom",
+    "c972e37c-91d1-4656-8552-7d50e8d6bd33",
+    "2cbac4d4-1a59-4447-aeee-ec774bcbca58",
+    "reviews",
+    "related",
+    "49894eb0-2ccd-427d-b990-c76fc9a3b173"
+  ]
+}

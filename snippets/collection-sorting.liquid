@@ -19,7 +19,7 @@
   <h2 class="visually-hidden" id="sort-heading">
     {{ sort_translation }}
   </h2>
-  <div class="popout{% if currently_selected.name %} popout--active{% endif %}" data-sort-enabled="{{ sort_by }}" data-popout>
+  <div class="popout{% if currently_selected.name %} is-active{% endif %}" data-sort-enabled="{{ sort_by }}" data-popout>
     <button type="button"
       class="popout__toggle"
       aria-expanded="false"
@@ -29,6 +29,8 @@
       <span class="popout__toggle__text">{{ sort_translation }}</span>
 
       <span class="popout__toggle__text" data-sort-button-text>{{ currently_selected.name }}</span>
+
+      {%- render 'icon-nav-arrow-down' -%}
     </button>
     <ul id="sort-list" class="popout-list" data-popout-list>
       {% for option in sort_options %}
@@ -36,7 +38,7 @@
         {%- if sort_by == option.value -%}
           {% assign active = true %}
         {%- endif -%}
-        <li class="popout-list__item {% if active %}popout-list__item--current{% endif %}">
+        <li class="popout-list__item{% if active %} is-active{% endif %}">
           <a class="popout-list__option"
             data-value="{{ option.value }}"
             href="#"

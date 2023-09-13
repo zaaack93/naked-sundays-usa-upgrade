@@ -8,17 +8,17 @@
     {%- render 'collection-tags-grouped' collection: collection -%}
 {% endcomment %}
 
-{%- assign collection_handle = 'all' -%}
-{%- if collection.handle -%}
-  {%- assign collection_handle = collection.handle -%}
+{%- assign collection_handle = collection.handle | default: 'all' -%}
+{%- assign collection_tags = collection.tags -%}
+
+{%- if collection_handle == 'all' -%}
+  {%- assign collection_tags = collection.all_tags -%}
 {%- endif -%}
 
 {%- assign sort_by_string = '' -%}
 {%- assign sort_by = search.sort_by | default: collection.sort_by -%}
-{%- assign string_connector = '?' -%}
 {%- if sort_by != blank -%}
   {%- assign sort_by_string = '?sort_by=' | append: sort_by -%}
-  {%- assign string_connector = '&' -%}
 {%- endif -%}
 {%- assign filters_url = collection_handle | append: sort_by_string -%}
 {%- assign filter_exist = false -%}
@@ -31,7 +31,7 @@
       {%- if current_tags.size > 1 -%}
         <a href="{{ routes.collections_url }}/{{ filters_url }}" class="active__filters__clear" data-filter-update-url><small>{{ 'collections.general.clear_filters' | t }}</small></a>
       {%- endif -%}
-      
+
       {%- for current_tag in current_tags -%}
         {%- assign current_tag_handleize = current_tag | handleize -%}
         {%- assign prev_string = current_tag_handleize | append: '+' -%}
@@ -39,7 +39,10 @@
         {%- assign current_tag_url = current_tags_string_handleize | replace: prev_string, '' | replace: next_string, '' | replace: current_tag_handleize, '' -%}
 
         <a class="active__filters__remove" href="{{ routes.collections_url }}/{{ collection_handle }}{% if current_tag_url != '' %}/{{ current_tag_url }}{% endif %}{{ sort_by_string }}" data-filter-update-url>
-          <small>{{ current_tag }}</small> <span class="filter__x">✕</span>
+          <small>{{ current_tag }}</small>
+          <span class="filter__x">
+            {%- render 'icon-cancel' -%}
+          </span>
         </a>
 
         {%- capture current_tags_url -%}{{ current_tags_url }}{{ current_tag | handleize }}+{%- endcapture -%}
@@ -48,7 +51,7 @@
   {%- endif -%}
 
   {%- capture shop_tags -%}
-  {%- for tag in collection.tags -%}{{ tag | handleize }}+{%- endfor -%}
+  {%- for tag in collection_tags -%}{{ tag | handleize }}+{%- endfor -%}
   {%- endcapture -%}
 
   {%- for block in section.blocks -%}
@@ -56,9 +59,9 @@
       {%- when 'group' -%}
         {%- if current_tags_url == '+' -%}{%- assign current_tags_url = '' -%}{%- endif -%}
         {% assign current_tags_compare = current_tags_url | prepend: '+' %}
-        
+
         {% assign shop_tags_compare = shop_tags | prepend: '+' %}
-        
+
         {%- assign settings_tag_array = block.settings.group_tags | split: ',' -%}
 
         {%- assign filter_links = '' -%}
@@ -88,7 +91,7 @@
 
             {%- capture filter_links -%}
               {{ filter_links }}
-              
+
               <li class="sidebar__item sidebar__item--active {{ link_style }}">
                 <a href="{{ routes.collections_url }}/{{ collection_handle }}{% if removed_tag_url != '' %}/{{ removed_tag_url }}{% endif %}{{ sort_by_string }}" title="✕ {{ settings_tag }}" data-filter-update-url>
                   {{ settings_tag }}
@@ -103,7 +106,7 @@
 
             {%- capture filter_links -%}
               {{ filter_links }}
-              
+
               <li class="sidebar__item {{ link_style }}">
                 <a href="{{ routes.collections_url }}/{{ collection_handle }}/{{ current_tags_url }}{{ settings_tag_handle }}{{ sort_by_string }}" title="+ {{ settings_tag }}" data-filter-update-url>
                   {{ settings_tag }}
@@ -112,16 +115,27 @@
             {%- endcapture -%}
           {%- endif -%}
         {%- endfor -%}
-        
+
         {%- unless filter_hide -%}
           {%- assign filter_exist = true -%}
         {%- endunless -%}
 
-        <div class="collection__sidebar__group{% if filter_hide %} collection__sidebar__group--hidden{% endif %}"{% if filter_hide %} style="display: none;"{% endif %} {{ block.shopify_attributes }}>
-          <p class="collection__sidebar__heading is-active" data-collection-sidebar-heading>{{ block.settings.title }}</p>
-          <ul class="collection-nav" data-collection-nav-grouped>
-            {{ filter_links }}
-          </ul>
+        <div class="filter-group{% if filter_hide %} filter-group--hidden{% endif %}"{% if filter_hide %} style="display: none;"{% endif %} {{ block.shopify_attributes }}>
+          <details class="collapsible" data-collapsible open="true">
+            <summary class="filter-group__heading" data-collapsible-trigger>
+              {{ block.settings.title }}
+
+              {%- render 'icon-plus' -%}
+              {%- render 'icon-minus' -%}
+            </summary>
+
+
+            <div class="collapsible-body" data-collapsible-body style="height: auto;">
+              <ul class="collection-nav collapsible-content" data-collapsible-content>
+                {{ filter_links }}
+              </ul>
+            </div>
+          </details>
         </div>
     {%- endcase -%}
   {%- endfor -%}
@@ -135,7 +149,7 @@
 
 {%- if current_tags -%}
   <div class="collection__sidebar__buttons">
-    <a class="btn btn--outline btn--full" href="{{ routes.collections_url }}/{{ filters_url }}" data-filter-update-url>
+    <a class="btn btn--primary btn--outline btn--full" href="{{ routes.collections_url }}/{{ filters_url }}" data-filter-update-url>
       <span>{{ 'collections.general.reset' | t }}</span>
     </a>
   </div>

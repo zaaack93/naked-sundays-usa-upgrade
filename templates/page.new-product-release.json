@@ -1,0 +1,61 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "subheading": "",
+        "subheading_size": 3,
+        "show_title": true,
+        "heading_size": 8,
+        "show_content": true,
+        "text_size": 4,
+        "align_text": "text-left",
+        "width": "wrapper",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "4d7864bd-f8be-4c15-9e7f-57dc7c95fd69": {
+      "type": "section-custom-code",
+      "settings": {
+        "code": "<div class=\"klaviyo-form-SFVGj9\"><\/div>",
+        "width": "wrapper--full-padded",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "b15f25a2-6315-4c39-9388-9b25d0ce1623": {
+      "type": "section-collection",
+      "settings": {
+        "heading": "Best Sellers",
+        "description": "",
+        "layout": "inline",
+        "link_text": "",
+        "link_url": "",
+        "button_type": "btn--primary",
+        "button_size": "",
+        "button_style": "btn--solid",
+        "show_arrow": false,
+        "featured_collection": "all",
+        "style": "grid",
+        "grid": 4,
+        "rows": 3,
+        "layout_mobile": "carousel",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    }
+  },
+  "order": [
+    "main",
+    "4d7864bd-f8be-4c15-9e7f-57dc7c95fd69",
+    "b15f25a2-6315-4c39-9388-9b25d0ce1623"
+  ]
+}

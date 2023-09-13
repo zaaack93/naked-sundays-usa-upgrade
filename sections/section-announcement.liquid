@@ -1,25 +1,9 @@
-{%- render 'announcement' section: section, is_top: false -%}
+{%- render 'announcement', is_top: false -%}
 
 {% schema %}
 {
-  "name": "Announcement bar",
+  "name": "Scrolling text",
   "settings": [
-    {
-      "type": "header",
-      "content": "Colors"
-    },
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background",
-      "default": "#f7f7f7"
-    },
-    {
-      "type": "color",
-      "id": "color",
-      "label": "Text",
-      "default": "#545454"
-    },
     {
       "type": "header",
       "content": "Layout"
@@ -46,13 +30,78 @@
     },
     {
       "type": "range",
-      "id": "speed",
+      "id": "slider_speed",
       "label": "Autoplay speed",
       "unit": "sec",
       "min": 5,
       "max": 20,
       "step": 1,
       "default": 7
+    },
+    {
+      "type": "header",
+      "content": "Marquee"
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed",
+      "label": "Autoplay speed",
+      "unit": "%",
+      "min": 50,
+      "max": 300,
+      "step": 25,
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Size",
+      "min": 1,
+      "max": 15,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Text"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 0
     }
   ],
   "blocks" : [
@@ -65,34 +114,6 @@
           "id": "text",
           "label": "Text",
           "default": "<p><strong>Make an announcement</strong> | More info</p>"
-        },
-        {
-          "type": "header",
-          "content": "Target page"
-        },
-        {
-          "id": "target_url_enabled",
-          "type": "checkbox",
-          "label": "Limit to specific page"
-        },
-        {
-          "id": "target_url",
-          "type": "url",
-          "label": "Targeted page"
-        },
-        {
-          "type": "header",
-          "content": "Target referrer"
-        },
-        {
-          "id": "target_referrer_enabled",
-          "type": "checkbox",
-          "label": "Limit to specific referrer path"
-        },
-        {
-          "id": "target_referrer",
-          "type": "text",
-          "label": "Targeted referrer"
         },
         {
           "type": "header",
@@ -131,39 +152,11 @@
           "id": "message",
           "label": "Message",
           "info": "Use ||amount|| to display progress towards free shipping.",
-          "default": "Spend ||amount|| more for free shipping."
+          "default": "You are ||amount|| away from free shipping."
         },
         {
           "type": "paragraph",
           "content": "Navigate to Theme settings -> \"Cart -> Free shipping message\" to set the amount."
-        },
-        {
-          "type": "header",
-          "content": "Target page"
-        },
-        {
-          "id": "target_url_enabled",
-          "type": "checkbox",
-          "label": "Limit to specific page"
-        },
-        {
-          "id": "target_url",
-          "type": "url",
-          "label": "Targeted page"
-        },
-        {
-          "type": "header",
-          "content": "Target referrer"
-        },
-        {
-          "id": "target_referrer_enabled",
-          "type": "checkbox",
-          "label": "Limit to specific referrer path"
-        },
-        {
-          "id": "target_referrer",
-          "type": "text",
-          "label": "Targeted referrer"
         },
         {
           "type": "header",
@@ -187,42 +180,14 @@
       ]
     },
     {
-      "type": "custom",
-      "name": "Custom HTML",
+      "type": "code",
+      "name": "Custom code",
       "settings": [
         {
-          "type": "html",
-          "id": "text",
-          "label": "Text",
-          "default": "<p>Custom HTML</p>"
-        },
-        {
-          "type": "header",
-          "content": "Target page"
-        },
-        {
-          "id": "target_url_enabled",
-          "type": "checkbox",
-          "label": "Limit to specific page"
-        },
-        {
-          "id": "target_url",
-          "type": "url",
-          "label": "Targeted page"
-        },
-        {
-          "type": "header",
-          "content": "Target referrer"
-        },
-        {
-          "id": "target_referrer_enabled",
-          "type": "checkbox",
-          "label": "Limit to specific referrer path"
-        },
-        {
-          "id": "target_referrer",
-          "type": "text",
-          "label": "Targeted referrer"
+          "type": "liquid",
+          "id": "code",
+          "label": "Code",
+          "default": "<p>Custom code</p>"
         },
         {
           "type": "header",
@@ -248,7 +213,7 @@
   ],
   "presets": [
     {
-      "name": "Announcement bar",
+      "name": "Scrolling text",
       "category": "Text",
       "blocks": [
         {
@@ -277,6 +242,9 @@
         }
       ]
     }
-  ]
+  ],
+  "disabled_on": {
+    "groups": ["header", "aside"]
+  }
 }
 {% endschema %}

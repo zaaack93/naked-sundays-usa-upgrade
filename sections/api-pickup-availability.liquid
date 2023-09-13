@@ -7,9 +7,9 @@
       assign closest_location = pick_up_availabilities.first
 
       if closest_location.available
-        render 'icon-in-stock'
+        render 'icon-check'
       else
-        render 'icon-out-of-stock'
+        render 'icon-cancel'
       endif
     -%}
 
@@ -37,25 +37,23 @@
     </div>
   </div>
 
-  <div tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="PickupAvailabilityHeading" class="pickup__drawer cart-dropdown" data-pickup-drawer>
-    <div class="pickup__content">
-
-      <div class="pickup__head cart-dropdown__head">
-        <h3 class="pickup__head__title" id="PickupAvailabilityHeading">
+  <div class="drawer" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="PickupAvailabilityHeading" data-pickup-drawer>
+    <div class="drawer__inner" data-scroll-lock-scrollable>
+      <div class="drawer__head">
+        <h3 id="PickupAvailabilityHeading">
           {{- 'products.product.pickup_availability.pickup_options' | t -}}
         </h3>
 
-        <button type="button" class="pickup__head__close cart-dropdown__close" data-pickup-drawer-close aria-label="{{ 'general.accessibility.close' | t }}">
-          {%- render 'icon-close' -%}
+        <button type="button" class="drawer__close" data-pickup-drawer-close aria-label="{{ 'general.accessibility.close' | t }}">
+          {%- render 'icon-cancel' -%}
         </button>
       </div>
-  
-      <div class="pickup__drawer__body" data-pickup-drawer-body>
 
+      <div class="drawer__body" data-pickup-drawer-body data-scroll-lock-scrollable>
         <div class="pickup__product__wrap">
           <p class="pickup__product__title">
             {{- product_variant.product.title | escape -}}
-          </p> 
+          </p>
           {%- unless product_variant.product.has_only_default_variant -%}
             <p class="pickup__variant">
               {%- for product_option in product_variant.product.options_with_values -%}
@@ -70,39 +68,42 @@
               {%- endfor -%}
             </p>
           {%- endunless -%}
-      </div>
-    
-      <ul class="pickup__list list-unstyled" role="list" data-store-availability-drawer-content>
-        {%- for availability in pick_up_availabilities -%}
-          <li class="pickup__list__item">
-            <p class="strong">
-              {%- if availability.available -%}
-                {% render 'icon-in-stock' %} 
-              {%- else -%}
-                {% render 'icon-out-of-stock' %} 
-              {%- endif -%}
-              {{ availability.location.name | escape }}
-            </p>
+        </div>
 
-            {%- if availability.available -%}
-              <p class="small">
-                <em>
-                  {{- 'products.product.pickup_availability.pick_up_available' | t }}, {{ availability.pick_up_time | downcase -}}
-                </em>
+        <ul class="pickup__list" role="list" data-store-availability-drawer-content>
+          {%- for availability in pick_up_availabilities -%}
+            <li class="pickup__list__item">
+              <p class="strong">
+                {%- if availability.available -%}
+                  {%- render 'icon-check' -%}
+                {%- else -%}
+                  {%- render 'icon-cancel' -%}
+                {%- endif -%}
+                {{ availability.location.name | escape }}
               </p>
-            {%- endif -%}
-  
-            {%- assign address = availability.location.address -%}
-            <address class="pickup__address">
-              {{ address | format_address }}
-  
-              {%- if address.phone.size > 0 -%}
-                <p>{{ address.phone }}</p>
+
+              {%- if availability.available -%}
+                <p class="small">
+                  <em>
+                    {{- 'products.product.pickup_availability.pick_up_available' | t }}, {{ availability.pick_up_time | downcase -}}
+                  </em>
+                </p>
               {%- endif -%}
-            </address>
-          </li>
-        {%- endfor -%}
-      </ul>
+
+              {%- assign address = availability.location.address -%}
+              <address class="pickup__address">
+                {{ address | format_address }}
+
+                {%- if address.phone.size > 0 -%}
+                  <p>{{ address.phone }}</p>
+                {%- endif -%}
+              </address>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
     </div>
+
+    <span class="drawer__underlay" data-drawer-underlay></span>
   </div>
 {%- endif -%}

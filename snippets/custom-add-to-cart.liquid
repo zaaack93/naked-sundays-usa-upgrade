@@ -1,0 +1,101 @@
+{%- liquid
+  assign current_variant = product.first_available_variant
+  assign is_preorder_meta_exist = false
+  assign is_preorder_tag_exist = false
+  assign sibling_property_name = 'general.siblings.label' | t | strip_html | escape
+  assign sibling_property_value = ''
+
+  if siblings_html != blank and product.variants.size == 1
+    assign title_down = product.title | downcase
+    assign cutline_default = product.metafields.theme.sibling_color.value
+    assign cutline_down = cutline_default | downcase
+    unless title_down contains cutline_down
+      assign sibling_property_value = cutline_default | strip_html | escape
+    endunless
+  endif
+
+  if current_variant.available and product.metafields.theme.preorder.type == 'boolean' and product.metafields.theme.preorder.value == true
+    assign is_preorder_meta_exist = true
+  endif
+
+  if current_variant.available and product.tags contains '_preorder'
+    assign is_preorder_tag_exist = true
+  endif
+
+  if is_preorder_meta_exist or is_preorder_tag_exist
+    assign preorder_name = 'products.product.sale_type' | t | strip_html | escape
+    assign preorder_value = 'products.product.pre_order' | t | strip_html | escape
+  endif
+
+  assign unique = section.id | append: '-' | append: product.id
+-%}
+<quick-add-product class="quick_add_tocart">
+    <div data-quick-add-holder="{{ product.id }}">
+      {%- if product.variants.size == 1 -%}
+        {%- assign product_form_id = 'ProductForm--' | append: unique -%}
+        {%- form 'product', product, id: product_form_id -%}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+          {%- if sibling_property_value != blank -%}
+            <input
+              type="hidden"
+              name="properties[{{ sibling_property_name }}]"
+              value="{{ sibling_property_value }}">
+          {%- endif -%}
+
+          {%- if preorder_value != blank -%}
+            <input
+              type="hidden"
+              name="properties[{{ preorder_name }}]"
+              value="{{ preorder_value }}">
+          {%- endif -%}
+          <button class="btn btn--outline btn--primary"
+            type="submit"
+            name="add"
+            data-add-to-cart
+          >
+            <span class="btn__text">
+              {% if preorder_value %}
+                {{preorder_value}}
+              {%else%}
+                {{ 'products.product.add_to_cart' | t }}
+              {%endif%}
+            </span>
+            <span class="btn__added">&nbsp;</span>
+            <span class="btn__loader">
+              <svg height="18" width="18" class="svg-loader">
+                <circle r="7" cx="9" cy="9" />
+                <circle stroke-dasharray="87.96459430051421 87.96459430051421" r="7" cx="9" cy="9" />
+              </svg>
+            </span>
+            <span class="btn__error" data-message-error>&nbsp;</span>
+          </button>
+        {%- endform -%}
+      {%- else -%}
+        <button class="btn btn--outline btn--primary"
+          type="button"
+          data-quick-add-btn
+          data-quick-add-modal-handle="{{ product.handle }}"
+        >
+          <span class="btn__text">
+            {% if preorder_value %}
+              {{preorder_value}}
+            {%else%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%endif%}
+          </span>
+          <span class="btn__added">&nbsp;</span>
+          <span class="btn__loader">
+            <svg height="18" width="18" class="svg-loader">
+              <circle r="7" cx="9" cy="9" />
+              <circle stroke-dasharray="87.96459430051421 87.96459430051421" r="7" cx="9" cy="9" />
+            </svg>
+          </span>
+        </button>
+      {%- endif -%}
+
+      {%- unless product.has_only_default_variant -%}
+        {%- render 'product-quick-add-modal-template', product_id: product.id, unique: unique -%}
+      {%- endunless -%}
+    </div>
+  </quick-add-product>

@@ -3,23 +3,8 @@
 {% schema %}
 {
   "name": "Announcement bar",
+  "class": "page-announcement",
   "settings": [
-    {
-      "type": "header",
-      "content": "Colors"
-    },
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background",
-      "default": "#f7f7f7"
-    },
-    {
-      "type": "color",
-      "id": "color",
-      "label": "Text",
-      "default": "#545454"
-    },
     {
       "type": "header",
       "content": "Layout"
@@ -45,13 +30,60 @@
     },
     {
       "type": "range",
-      "id": "speed",
+      "id": "slider_speed",
       "label": "Autoplay speed",
       "unit": "sec",
       "min": 5,
       "max": 20,
       "step": 1,
       "default": 7
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Marquee"
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed",
+      "label": "Autoplay speed",
+      "unit": "%",
+      "min": 50,
+      "max": 300,
+      "step": 25,
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Size",
+      "min": 1,
+      "max": 15,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Text"
     }
   ],
   "blocks" : [
@@ -63,7 +95,7 @@
           "type": "richtext",
           "id": "text",
           "label": "Text",
-          "default": "<p><strong>Make an announcement</strong> | More info</p>"
+          "default": "<p>New customers save 10% with code <strong>GET10</strong></p>"
         },
         {
           "type": "header",
@@ -123,14 +155,14 @@
           "type": "checkbox",
           "id": "show_wheel",
           "label": "Show progress wheel",
-          "default": true
+          "default": false
         },
         {
           "type": "textarea",
           "id": "message",
           "label": "Message",
           "info": "Use ||amount|| to display progress towards free shipping.",
-          "default": "Spend ||amount|| more for free shipping."
+          "default": "You are ||amount|| away from free shipping."
         },
         {
           "type": "paragraph",
@@ -186,14 +218,14 @@
       ]
     },
     {
-      "type": "custom",
-      "name": "Custom HTML",
+      "type": "code",
+      "name": "Custom code",
       "settings": [
         {
-          "type": "html",
-          "id": "text",
-          "label": "Text",
-          "default": "<p>Custom HTML</p>"
+          "type": "liquid",
+          "id": "code",
+          "label": "Code",
+          "default": "<p>Custom code</p>"
         },
         {
           "type": "header",
@@ -244,6 +276,9 @@
         }
       ]
     }
-  ]
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  }
 }
 {% endschema %}

@@ -47,20 +47,22 @@
       "link_title": "Navegue por {{ title }} nuestra colección",
       "sort": "Ordenar por",
       "filter_by": "Filtrar por",
-      "filter": "Filtrar",
+      "filters": "Filtros",
+      "show_filters": "Mostrar Filtros",
+      "hide_filters": "Ocultar Filtros",
       "clear_filters": "Borrar Filtros",
       "no_filters": "No hay filtros disponibles para esta colección",
       "all": "Todos",
       "reset": "Reiniciar",
+      "view_items_with_count": {
+        "one": "Ver {{ count }} artículo",
+        "other": "Ver {{ count }} artículos"
+      },
       "show_more": "Mas opciones",
       "items": {
         "heading": "Colección",
         "one": "artículo",
         "other": "artículos"
-      },
-      "items_with_count": {
-        "one": "{{ count }} artículo",
-        "other": "{{ count }} artículos"
       },
       "colors_with_count": {
         "one": "color",
@@ -210,7 +212,9 @@
       "no_description": "Esta es un ejemplo de la descripción de un producto. Una vez que agregue un producto, este texto cambiará.",
       "no_content": "Esta sección no tiene actualmente ningún contenido. Agregue contenido a esta sección usando la barra lateral.",
       "collection_image": "Imagen de la colección",
-      "collection_title": "Ejemplo de título de la colección"
+      "collection_title": "Ejemplo de título de la colección",
+      "size": "Talla",
+      "color": "Color"
     }
   },
   "layout": {
@@ -221,7 +225,10 @@
       "create_account": "Crear una cuenta"
     },
     "header": {
-      "menu": "Menú"
+      "menu": "Menú",
+      "search": "Búsqueda",
+      "account": "Cuenta",
+      "cart": "Carrito"
     },
     "footer": {
       "social_platform": "{{name}} en {{platform}}",
@@ -242,28 +249,32 @@
       "previous": "Anterior",
       "next": "Siguiente",
       "from": "Desde",
-      "quick_view": "Adición rápida",
-      "quick_view_added": "Agregado al carrito",
+      "quick_add": "Adición rápida",
+      "added_to_cart": "Agregado al carrito",
       "recently_viewed": "Recientemente visto",
       "view_space": "Ver en su espacio",
       "description": "Descripción",
       "read_more": "Leer más",
       "view_product": "Ver el producto",
       "reviews_with_count": {
-        "one": "Crítica",
-        "other": "Críticas"
+        "one": "{{ count }} Crítica",
+        "other": "{{ count }} Críticas"
       },
+      "add_review": "Añade una reseña",
       "see_all": "Ver todo",
       "to": "A",
-      "upsell_title": "Va con:",
+      "complementary_products_title": "Combina bien con",
+      "upsell_title": "Completa el look:",
       "upsell_add_to_cart": "Agregar",
       "upsell_out_of_stock": "Agotado",
-      "upsell_error_title": "ID de variante o producto no válido",
-      "upsell_error_info": "Verifique el identificador de la variante y el identificador del producto"
+      "upsell_error_title": "Elija un producto de venta adicional",
+      "upsell_error_info": "Use metacampos para mostrar un producto aquí. Las ventas adicionales vacías no se mostrarán en el sitio en vivo.",
+      "shop_now": "Compra ahora"
     },
     "product": {
       "regular_price": "Precio regular",
       "sold_out": "Agotado",
+      "sale_type": "Tipo de venta",
       "pre_order": "Hacer un pedido",
       "on_sale": "Oferta",
       "unavailable": "No disponible",
@@ -271,6 +282,7 @@
       "unit_price_label": "Precio por unidad",
       "subscription": "Suscripción",
       "save": "Ahorrar",
+      "off": "de descuento",
       "one_time_purchase": "Compra única",
       "quantity": "Cantidad",
       "add_to_cart": "Agregar al carrito",
@@ -283,7 +295,13 @@
       "configure": "Configurar",
       "select": "Seleccione",
       "select_value": "Selecciona valor",
+      "select_color": "Seleccionar el color",
       "each": "cada",
+      "in_stock": "El artículo está en stock",
+      "out_of_stock": "El artículo está agotado",
+      "item_unavailable": "El artículo no está disponible",
+      "remaining_html": "Date prisa, solo quedan {{ inventory }}!",
+      "remaining_no_count": "¡Date prisa! Bajo inventario",
       "pickup_availability": {
         "pickup_options": "Opciones de recogida",
         "view_store_info": "Ver información de la tienda",
@@ -306,6 +324,19 @@
       "redeem": "Use este código al momento de pagar para canjear su gift card",
       "shop_link": "Empiece a comprar",
       "print": "Print"
+    }
+  },
+  "recipient": {
+    "form": {
+      "checkbox": "Quiero enviar esto como un regalo.",
+      "email_label": "Correo electrónico de la persona destinataria",
+      "email": "Correo electrónico",
+      "name_label": "Nombre de la persona destinataria (opcional)",
+      "name": "Nombre",
+      "message_label": "Mensaje (opcional)",
+      "message": "Mensaje",
+      "max_characters": "{{ max_chars }} caracteres máx.",
+      "error_heading": "Por favor, ajusta lo siguiente:"
     }
   },
   "password": {
@@ -339,11 +370,15 @@
     "swatches": {
       "color": "Color"
     },
+    "siblings": {
+      "label": "Color"
+    },
     "products_with_count": {
       "one": "{{ count }} producto",
       "other": "{{ count }} productos"
     },
     "size_chart": {
+      "title": "Encuentra tu talla",
       "size": "Talla"
     },
     "meta": {
@@ -359,8 +394,8 @@
       "post_error": "Lo sentimos. Parece que algo salió mal. Vuelva a revisar y envíe de nuevo."
     },
     "newsletter_form": {
-      "newsletter_email": "e-mail@sitio.com",
-      "first_name": "Nombre de pila",
+      "newsletter_email": "Email",
+      "name": "Nombre",
       "submit": "Enviar",
       "placeholder": "Dirección de correo electrónico",
       "thank_you": "¡Gracias por registrarse!",
@@ -368,11 +403,45 @@
       "error_message": "¡Este cliente ya está suscrito!"
     },
     "search": {
-      "no_results_for": "No hay ningún resultado para",
-      "results_for": "Resultados para",
-      "title": "Buscar productos en la tienda",
+      "articles": "Artículos",
+      "no_results": "No se encontraron resultados para “{{ terms }}” Revisa la ortografía o usa una palabra o frase diferente.",
+      "results_with_count": {
+        "one": "{{ count }} resultado",
+        "other": "{{ count }} resultados",
+        "many": "{{ count }} resultados"
+      },
+      "title": "Resultados de búsqueda",
+      "page": "Página",
+      "products": "Productos",
+      "search_for": "Buscar “{{ terms }}”",
+      "reset": "Reiniciar",
+      "clear": "Limpiar",
+      "results_with_count_and_term": {
+        "one": "Se ha encontrado {{ count }} resultado para \"{{ terms }}\"",
+        "other": "Se han encontrado {{ count }} resultados para \"{{ terms }}\"",
+        "many": "Se han encontrado {{ count }} resultados para \"{{ terms }}\""
+      },
+      "results_pages_with_count": {
+        "one": "{{ count }} página",
+        "other": "{{ count }} páginas",
+        "many": "{{ count }} páginas"
+      },
+      "results_products_with_count": {
+        "one": "{{ count }} producto",
+        "other": "{{ count }} productos",
+        "many": "{{ count }} productos"
+      },
+      "results_suggestions_with_count": {
+        "one": "{{ count }} sugerencia",
+        "other": "{{ count }} sugerencias",
+        "many": "{{ count }} sugerencias"
+      },
+      "suggestions": "Sugerencias",
+      "pages": "Páginas",
       "placeholder": "Buscar en la tienda",
-      "submit": "Buscar en la tienda"
+      "search": "Buscar en la tienda",
+      "popular_searches": "Búsquedas populares",
+      "popular_products": "Productos populares"
     },
     "accessibility": {
       "skip_to_content": "Ir al contenido",
@@ -382,7 +451,10 @@
       "exit_menu": "Salir del menú",
       "total_reviews": "reseñas totales",
       "view": "Ver",
-      "star_reviews_info": "{{ rating_value }} de {{ rating_max }} estrellas"
+      "star_reviews_info": "{{ rating_value }} de {{ rating_max }} estrellas",
+      "scroll_to_top": "Volver al inicio",
+      "scroll_to_product": "Desplácese hasta el producto",
+      "scroll_to_logo": "Desplácese hasta el logotipo"
     },
     "cookies": {
       "title": "¿Podemos almacenar cookies?",
@@ -401,8 +473,21 @@
         "share_on_pinterest": "Compartir en Pinterest"
       }
     },
+    "share": {
+      "share": "Cuota",
+      "share_url": "Enlace",
+      "copy_to_clipboard": "Copiar link",
+      "success_message": "Link copiado al portapapeles"
+    },
     "money": {
       "free": "Gratis"
+    },
+    "pagination": {
+      "prev": "Anterior",
+      "next": "Siguiente"
+    },
+    "shop_the_look": {
+      "button": "Compra el look"
     }
   },
   "blogs": {
@@ -413,6 +498,7 @@
       "related_products": "Productos relacionados",
       "tags": "Etiquetas",
       "read_more": "Leer más",
+      "read_more_descriptive": "Haga clic aquí para leer el artículo completo",
       "no_articles": "No hay artículos para mostrar",
       "back_to": "Regresar a",
       "all": "Todo"
@@ -434,11 +520,6 @@
     "sidebar": {
       "see_more": "Ver más..."
     }
-  },
-  "cart_popover": {
-    "checkout": "Checkout",
-    "continue_shopping": "Continue Comprando",
-    "view_cart": "Ver el carrito"
   },
   "pagefly": {
     "products": {

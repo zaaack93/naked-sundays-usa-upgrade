@@ -1,866 +1,549 @@
 {
   "sections": {
-    "890f62e1-bad5-4398-9d5d-1f7c4c95352c": {
-      "type": "section-split-hero",
-      "disabled": true,
-      "settings": {
-        "image_height": "seven-fifty-height-hero",
-        "mobile_layout": "stacked",
-        "image_desktop_left": "shopify:\/\/shop_images\/NS_HOLI_WEB-15.jpg",
-        "bg_position_left": "center-center",
-        "image_desktop_right": "shopify:\/\/shop_images\/2_d5fd4f68-448a-40e4-abd5-13f9c02c39ad.png",
-        "bg_position_right": "center-center",
-        "overlay_color": "#000000",
-        "overlay_opacity": 10,
-        "title": "FREE SPF50 Mineral With every order",
-        "description": "USE CODE: FREEMINERAL",
-        "flex_align": "align--middle-center",
-        "text_color": "text-light",
-        "transparent": true,
-        "link_text": "SHOP ALL",
-        "link": "shopify:\/\/collections\/all-products",
-        "button_color": "btn--primary",
-        "button_style": "hero__btn btn btn--large caps"
-      }
-    },
-    "30f38ff2-66b5-46c4-96b7-9ae94ccf0cf2": {
-      "type": "section-split-hero",
-      "disabled": true,
-      "settings": {
-        "image_height": "screen-height-full",
-        "mobile_layout": "stacked",
-        "image_desktop_left": "shopify:\/\/shop_images\/Cabana_Glow-edit-36.jpg",
-        "bg_position_left": "center-center",
-        "image_desktop_right": "shopify:\/\/shop_images\/new_ml20.png",
-        "bg_position_right": "center-center",
-        "overlay_color": "#000000",
-        "overlay_opacity": 15,
-        "title": "FREE SPF50 100% Mineral (Travel Size)",
-        "description": "With orders over $50. Add to cart at checkout",
-        "flex_align": "align--bottom-left",
-        "text_color": "text-light",
-        "transparent": true,
-        "link_text": "SHOP NOW",
-        "link": "shopify:\/\/collections\/all",
-        "button_color": "btn--secondary",
-        "button_style": "hero__btn btn btn--large caps"
-      }
-    },
-    "164807645253ce09a9": {
-      "type": "section-slideshow",
+    "83124b63-b0c1-4821-b31e-281e19325e9a": {
+      "type": "section-hero",
       "blocks": {
-        "79e23601-269d-474e-9b76-366b5d59d151": {
-          "type": "image",
-          "disabled": true,
+        "template--16786981323010__83124b63-b0c1-4821-b31e-281e19325e9a-heading-1": {
+          "type": "heading",
           "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/NS_CHRISTMAS_WEB-18.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/NS_CHRISTMAS_WEB-18.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "'TIS THE SEASON FOR SPF",
-            "description": "100% Vegan & Cruelty Free",
-            "flex_align": "align--top-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP THE COLLECTION",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
+            "title": "It's World Makeup Day",
+            "heading_size": 8
           }
         },
-        "13fc75d6-bff1-41ee-b531-5210e310c50a": {
-          "type": "image",
-          "disabled": true,
+        "template--16786981323010__83124b63-b0c1-4821-b31e-281e19325e9a-text-1": {
+          "type": "text",
           "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/TGP_5427_Edit.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "AUSSIE SPF INNOVATION",
-            "description": "AUSTRALIAN MADE. VEGAN FRIENDLY. CRUELTY FREE",
-            "flex_align": "align--bottom-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "Shop All Products",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--large caps"
+            "description": "FREE SPF50 Glow Balm every purchase $60+ TODAY ONLY!",
+            "text_size": 5,
+            "text_style": "font-heading"
           }
         },
-        "807000fc-5bda-4eb2-8587-acd8da8acc06": {
-          "type": "image",
-          "disabled": true,
+        "template--16786981323010__83124b63-b0c1-4821-b31e-281e19325e9a-button-1": {
+          "type": "button",
           "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/TGP_6166_Edit.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/TGP_7278_Edit.jpg",
-            "overlay_opacity": 15,
-            "overlay_color": "#000000",
-            "title": "AWARD WINNING SPF FOR SKINCARE LOVERS",
-            "description": "Vegan friendly. Cruelty Free. Australian Made.",
-            "flex_align": "align--bottom-right",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "f55a0eca-3e70-403b-a445-078c7c4a8a3c": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/Model_holding_Naked_Sundays_Mist.jpg",
-            "overlay_opacity": 15,
-            "overlay_color": "#000000",
-            "title": "AUSTRALIAN MADE SPF50+ MIST FOR OVER YOUR MAKEUP!",
-            "description": "Vegan & Cruelty Free. Skincare-lovers approved.",
-            "flex_align": "align--bottom-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP THE MIST",
-            "link": "",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "6bee38c6-ee03-4b88-9ade-4ad7aaea894d": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/1080x1350px_0002_Ready-Est-Glow-Set.png",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "AFTERPAY DAY SALE ON NOW! 20% OFF STOREWIDE",
-            "description": "CODE: AFTERPAYDAY",
-            "flex_align": "align--top-right",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/collections\/all-products",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "7c0dc770-f63e-4932-8040-1c27f7b80744": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/NS_JUNE16_WEB-2.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/NS_JUNE16_WEB-2.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "",
-            "description": "",
-            "flex_align": "align--bottom-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "START YOUR HOT SPF SUMMER HERE!",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--input caps"
-          }
-        },
-        "bb9a959c-3886-4568-933a-c616d1c44f23": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/NS_JAN_BDAY_HIGHRES-3.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/NS_JAN_BDAY_HIGHRES-3.jpg",
-            "overlay_opacity": 10,
-            "overlay_color": "#000000",
-            "title": "IT'S OUR BIRTHDAY !",
-            "description": "FREE FULL SIZE SPF WITH EVERY ORDER",
-            "flex_align": "align--top-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--input caps"
-          }
-        },
-        "ad5f94c1-0882-40da-971a-5621ea7068d8": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/IMG_4420.jpg",
-            "overlay_opacity": 10,
-            "overlay_color": "#000000",
-            "title": "INVISIBLE VEGAN SPF FOR SKINCARE LOVERS",
-            "description": "FREE GIFTS WITH EVERY ORDER",
-            "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
             "link_text": "SHOP ALL",
             "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "3a985f9a-fbfb-451d-9db4-d420180c9690": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/IMG_2967.jpg",
-            "overlay_opacity": 10,
-            "overlay_color": "#000000",
-            "title": "NEW! SPF50 ANTIOXIDANT BODY CREME (PLUS FREE BODY BRUSH WITH EVERY ORDER)",
-            "description": "WHY SHOULD YOUR FACE HAVE ALL THE GOOD SPF?",
-            "flex_align": "align--bottom-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/products\/spf50-antioxidant-body-sunscreen-creme-spf50-antioxidant-body-sunscreen-creme-free-spf-body-buffing-brush",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--input caps"
-          }
-        },
-        "2b722607-0e7d-4610-bd97-1292af0116e0": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/NS_JAN3_RND2_HIGHRES-10.jpg",
-            "overlay_opacity": 10,
-            "overlay_color": "#000000",
-            "title": "NAKED SUNDAYS TURNS RAINBOW",
-            "description": "Celebrating PrideMonth. FREE Rainbow makeup bag with every purchase",
-            "flex_align": "align--top-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/collections\/all-products",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--input caps"
-          }
-        },
-        "17579f09-a97b-42c0-aca0-d637796edcd5": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/TGP_5427_Edit.jpg",
-            "overlay_opacity": 20,
-            "overlay_color": "#000000",
-            "title": "WE'RE CELEBRATING INTERNATIONAL WOMEN'S DAY ON MARCH 8TH",
-            "description": "FREE FULL SIZE PRODUCT FOR YOUR BESTIE WITH EVERY PURCHASE",
-            "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "15bb220a-9fc4-48e6-8c0e-0dd5cbed654c": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/WhatsApp_Image_2023-04-03_at_9.23.23_AM_1.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "SPF50 MEETS MAKEUP!",
-            "description": "SPF50 SHEER GLOW BALMS ARE HERE!",
-            "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/products\/spf50-sheer-glow-balm-sticks-trio-set-rose-champagne-espresso-martini",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "300ec1c9-4ac3-4191-8a37-6d3ab36dba1c": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/TGP_8236_Lowresvcrop.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/TGP_8236_Lowresvcrop.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "IT'S NATIONAL SUNSCREEN DAY!",
-            "description": "FREE GIFT WITH EVERY ORDER AT CHECKOUT",
-            "flex_align": "align--bottom-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/collections\/all-products",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "ecd18d9c-12bf-476b-8efb-b6e4a84796fd": {
-          "type": "image",
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/NS_JULY14_HIGHRES-2_2.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "AWARD-WINNING, VEGAN SPF FOR EVERY DAY.",
-            "description": "",
-            "flex_align": "align--top-right",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP THE COLLECTION",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--link",
-            "button_style": "hero__btn btn btn--input caps"
-          }
-        },
-        "2c3b7ac3-604f-4c18-84cd-706516a7cc95": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/TGP_5469_E_Cropped.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/TGP_5469_E_Cropped.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "THE FIRST SPF50 SPRAY FOR OVER MAKEUP!",
-            "description": "SO GOOD YOU'LL WANT TO WEAR IT EVERY SINGLE DAY.",
-            "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/collections\/all-products",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "e1809ab5-aed8-4804-82fa-f8b9520b501b": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-top",
-            "image": "shopify:\/\/shop_images\/NS_MAY2_HIGHRES-2.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "FREE SPF50+ BODY MIST",
-            "description": "WITH EVERY ORDER $50+",
-            "flex_align": "align--top-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "ENDS TUESDAY (VALUE $34)",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "3238e1f8-88cf-4792-b218-ed959f0ccf03": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/GROUP_212e9b64-1d3e-4a9d-b62c-cd8b06bf1bad.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/GROUP_212e9b64-1d3e-4a9d-b62c-cd8b06bf1bad.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "WORLD FIRST SPF50 LIP OILS ARE HERE",
-            "description": "With a New and Improved Formula",
-            "flex_align": "align--middle-right",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "Shop now",
-            "link": "shopify:\/\/collections\/lip-oil-collection-new",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "3049682c-60f6-442a-91a4-034df2975fc1": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/2000x_2000.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/2000x_2000.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "AWARD WINNING SPF FOR SKINCARE LOVERS",
-            "description": "Vegan & Cruelty Free. Skincare-lovers approved.",
-            "flex_align": "align--top-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "Shop now",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "ff86c927-183c-4276-8485-daa31697b235": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/NS_JUNE30_HIGHRES-2.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/NS_JUNE30_HIGHRES-2.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "Be QUEEN for a Day!",
-            "description": "Get ready to 'glow and save' with our new SPF Queen Bundle.",
-            "flex_align": "align--top-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/collections\/bundles",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "a3292f14-b5f2-4968-a6ab-1ffd5b711fc6": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/TGP_8236_Lowres.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/TGP_8236_Lowres.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "FREE SHIPPING ON EVERYTHING STOREWIDE!",
-            "description": "24 HOURS ONLY. RUN, DON'T WALK.",
-            "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP NOW",
-            "link": "shopify:\/\/collections\/all",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "3e8dacc8-736a-4fcf-b449-9c086b48fda3": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/NS_JULY26_WEB-4.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/NS_JULY26_WEB-4.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "IT'S NATIONAL WATERMELON DAY!",
-            "description": "FREE FULL SIZE WATERMELON-INFUSED SPF WITH EVERY PURCHASE OVER $50",
-            "flex_align": "align--top-left",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "Shop now",
-            "link": "shopify:\/\/collections\/summer-bundles",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        },
-        "22358e28-556e-4b5b-b4c5-9bb7df2ba38d": {
-          "type": "image",
-          "disabled": true,
-          "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/CabanaGlow_Naked_Sundays_banner.jpg",
-            "mobile_image": "shopify:\/\/shop_images\/CabanaGlow_Naked_Sundays_banner.jpg",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "NEW! Meet CabanaGlow™ - Tinted Mineral Glow Serum Drops",
-            "description": "World First SPF-infused Mineral Bronze & Illuminating Drops. PRE-ORDER NOW. Already SOLD OUT GLOBALLY!!",
-            "flex_align": "align--top-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "SHOP CABANAGLOW",
-            "link": "shopify:\/\/collections\/cabanaglow",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
           }
         }
       },
       "block_order": [
-        "79e23601-269d-474e-9b76-366b5d59d151",
-        "13fc75d6-bff1-41ee-b531-5210e310c50a",
-        "807000fc-5bda-4eb2-8587-acd8da8acc06",
-        "f55a0eca-3e70-403b-a445-078c7c4a8a3c",
-        "6bee38c6-ee03-4b88-9ade-4ad7aaea894d",
-        "7c0dc770-f63e-4932-8040-1c27f7b80744",
-        "bb9a959c-3886-4568-933a-c616d1c44f23",
-        "ad5f94c1-0882-40da-971a-5621ea7068d8",
-        "3a985f9a-fbfb-451d-9db4-d420180c9690",
-        "2b722607-0e7d-4610-bd97-1292af0116e0",
-        "17579f09-a97b-42c0-aca0-d637796edcd5",
-        "15bb220a-9fc4-48e6-8c0e-0dd5cbed654c",
-        "300ec1c9-4ac3-4191-8a37-6d3ab36dba1c",
-        "ecd18d9c-12bf-476b-8efb-b6e4a84796fd",
-        "2c3b7ac3-604f-4c18-84cd-706516a7cc95",
-        "e1809ab5-aed8-4804-82fa-f8b9520b501b",
-        "3238e1f8-88cf-4792-b218-ed959f0ccf03",
-        "3049682c-60f6-442a-91a4-034df2975fc1",
-        "ff86c927-183c-4276-8485-daa31697b235",
-        "a3292f14-b5f2-4968-a6ab-1ffd5b711fc6",
-        "3e8dacc8-736a-4fcf-b449-9c086b48fda3",
-        "22358e28-556e-4b5b-b4c5-9bb7df2ba38d"
+        "template--16786981323010__83124b63-b0c1-4821-b31e-281e19325e9a-heading-1",
+        "template--16786981323010__83124b63-b0c1-4821-b31e-281e19325e9a-text-1",
+        "template--16786981323010__83124b63-b0c1-4821-b31e-281e19325e9a-button-1"
       ],
       "settings": {
-        "height": "screen-height-full",
-        "transition": "slide",
-        "arrows_style": false,
-        "dots_style": "hidden",
-        "autoplay": false,
-        "autoplay_speed": 4
+        "height": "screen-height-three-quarters",
+        "width": "wrapper--full",
+        "image_1": "shopify:\/\/shop_images\/NEW__NS.png",
+        "image_2": "shopify:\/\/shop_images\/tali-cherry_copy.jpg",
+        "mobile_height": "screen-height-one-half--mobile",
+        "flex_align": "align--bottom-center",
+        "overlay_opacity": 35,
+        "overlay_color": "#000000",
+        "show_overlay_text": true,
+        "bg_color": "",
+        "color": "#ffffff"
       }
     },
-    "e53c3822-475f-466e-bb34-d9d6958d510d": {
+    "fd49954c-cda8-4fbc-ba64-e29bcf47d6cf": {
+      "type": "section-slideshow-v2",
+      "blocks": {
+        "62dec9c9-23ad-479f-a08b-012711a64e3b": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/NS_JUNE29_WEB-6.jpg",
+            "mobile_image": "shopify:\/\/shop_images\/NS_JUNE29_WEB-6.jpg",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "show_overlay_text": false,
+            "title": "It's World Coconut Day!",
+            "heading_size": 8,
+            "description": "FREE SPF50 Coconut Lip Oil with EVERY Purchase",
+            "text_size": 5,
+            "flex_align": "align--top-left",
+            "flex_align_mobile": "align--center",
+            "bg_color": "",
+            "color": "#ffffff",
+            "first_button_text": "SHOP NOW",
+            "first_button_link": "shopify:\/\/collections\/all",
+            "first_button_type": "btn--primary",
+            "first_button_size": "",
+            "first_button_style": "btn--solid",
+            "first_button_show_arrow": false,
+            "second_button_text": "",
+            "second_button_link": "",
+            "second_button_type": "btn--white",
+            "second_button_size": "",
+            "second_button_style": "btn--solid",
+            "second_button_show_arrow": false
+          }
+        }
+      },
+      "block_order": [
+        "62dec9c9-23ad-479f-a08b-012711a64e3b"
+      ],
+      "disabled": true,
+      "settings": {
+        "height": "screen-height-full",
+        "mobile_height": "image-height--mobile",
+        "width": "wrapper--full",
+        "transition": "slide",
+        "show_arrows": true,
+        "autoplay": false,
+        "autoplay_speed": 8
+      }
+    },
+    "a05a9ad7-3143-416c-a3c0-6c5d2fabdcf8": {
+      "type": "section-custom-content",
+      "blocks": {
+        "f8d7f7b5-90c4-490a-b88f-cdb7d732cf33": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "image": "shopify:\/\/shop_images\/CabanaPair.jpg",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "show_overlay_text": false,
+            "title": "NEW! CabanaGlow™",
+            "heading_size": 7,
+            "description": "ILLUMINATING SOLD OUT. PRE ORDER OUR NEXT DROP!",
+            "text_size": 5,
+            "flex_align": "align--middle-center",
+            "bg_color": "",
+            "color": "#ffffff",
+            "link_text": "",
+            "link": "",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
+          }
+        },
+        "ebc4f854-d523-4045-a792-1b51475aa4a4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/CabanaGlow_Naked_Sundays_banner.jpg",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "show_overlay_text": false,
+            "title": "Mineral SPF meets Makeup",
+            "heading_size": 7,
+            "description": "BRONZE & ILLUMINATING SOLD OUT IN MINUTES!",
+            "text_size": 5,
+            "flex_align": "align--top-center",
+            "bg_color": "",
+            "color": "#ffffff",
+            "link_text": "CABANAGLOW COLLECTION",
+            "link": "shopify:\/\/collections\/cabana-glow",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
+          }
+        }
+      },
+      "block_order": [
+        "f8d7f7b5-90c4-490a-b88f-cdb7d732cf33",
+        "ebc4f854-d523-4045-a792-1b51475aa4a4"
+      ],
+      "settings": {
+        "height": "screen-height-two-thirds",
+        "mobile_height": "screen-height-one-half--mobile",
+        "width": "wrapper--full",
+        "borders": true,
+        "reverse_blocks": true,
+        "padding_top": 46,
+        "padding_bottom": 45
+      }
+    },
+    "f4c05f15-1150-4673-bda8-90fb3bb0e155": {
       "type": "section-video",
       "disabled": true,
       "settings": {
-        "video_link_bg": "https:\/\/cdn.shopify.com\/videos\/c\/o\/v\/24cc9ba3c18a40e79fe04b2baaac2c78.mp4",
-        "video_link": "",
-        "bg_position": "center-bottom",
-        "height": "screen-height-full",
-        "overlay_opacity": 15,
-        "overlay_color": "#000000",
-        "title": "Mix & Match Your Way",
-        "description": "",
-        "flex_align": "align--middle-center",
-        "text_color": "text-light",
-        "transparent": true,
-        "link_text": "SHOP THE COLLECTION",
-        "link": "shopify:\/\/collections\/cabanaglow",
-        "button_color": "btn--white",
-        "button_style": "hero__btn btn btn--large btn--outline caps"
-      }
-    },
-    "7d260bce-5764-4940-a634-6d29bc58b05a": {
-      "type": "section-collection",
-      "disabled": true,
-      "settings": {
-        "heading": "Meet CabanaGlow™ ",
-        "description": "",
-        "text_alignment": "center",
-        "link_text": "",
-        "link_url": "",
-        "button_color": "btn--black",
-        "button_style": "hero__btn btn btn--input btn--outline caps",
-        "featured_collection": "cabana-singles",
-        "grid": 3,
-        "rows": 1,
-        "layout_mobile": "1"
-      }
-    },
-    "82ed1398-aacc-4d0a-aeea-9d5843fdd194": {
-      "type": "section-hero",
-      "disabled": true,
-      "settings": {
-        "image": "shopify:\/\/shop_images\/NS_MAY_HIGHRES-13.jpg",
-        "bg_position": "center-center",
-        "height": "screen-height-three-quarters",
+        "video": "shopify:\/\/files\/videos\/CABANAGLOWweb2.mp4",
+        "show_video_popup": false,
+        "video_popup_social": "",
+        "desktop_height": "screen-height-three-quarters",
+        "mobile_height": "screen-height-three-quarters--mobile",
+        "width": "wrapper--full",
         "overlay_opacity": 0,
         "overlay_color": "#000000",
-        "title": "GET GOLDEN! FIRMING + HYDRATING + SPF",
-        "description": "FREE BRUSH WITH EVERY GOLDEN GLOW AT CHECKOUT",
-        "flex_align": "align--bottom-right",
-        "text_color": "text-light",
-        "transparent": true,
-        "link_text": "SHOP NOW",
-        "link": "shopify:\/\/products\/golden-glow",
-        "button_color": "btn--secondary",
-        "button_style": "hero__btn btn btn--large caps"
-      }
-    },
-    "28a5e99b-deab-4b2a-bba0-fddb9cd29a9d": {
-      "type": "section-collection",
-      "disabled": true,
-      "settings": {
-        "heading": "LIMITED EDITION SUMMER BUNDLES",
+        "show_overlay_text": false,
+        "title": "Mix & Match Your Way",
+        "heading_size": 8,
         "description": "",
-        "text_alignment": "center",
-        "link_text": "SHOP THE BUNDLES",
-        "link_url": "shopify:\/\/collections\/summer-bundles",
-        "button_color": "btn--primary",
-        "button_style": "hero__btn btn btn--large caps",
-        "featured_collection": "summer-bundles",
-        "grid": 5,
-        "rows": 1,
-        "layout_mobile": "2"
+        "text_size": 3,
+        "flex_align": "align--middle-center",
+        "bg_color": "",
+        "color": "#ffffff",
+        "link_text": "SHOP CABANAGLOW",
+        "link": "shopify:\/\/collections\/cabana-glow",
+        "button_type": "btn--primary",
+        "button_size": "",
+        "button_style": "btn--solid",
+        "show_arrow": false
       }
     },
-    "8904577e-2216-4efc-bd44-d5fa64e6b352": {
-      "type": "section-collection",
-      "disabled": true,
-      "settings": {
-        "heading": "Get Golden!",
-        "description": "<p>Meet Golden Glow: Tinted Body SPF with firming properties and natural Green Tea Extract<\/p>",
-        "text_alignment": "center",
-        "link_text": "",
-        "link_url": "",
-        "button_color": "btn--black",
-        "button_style": "hero__btn btn btn--input btn--outline caps",
-        "featured_collection": "get-golden",
-        "grid": 4,
-        "rows": 1,
-        "layout_mobile": "carousel"
-      }
-    },
-    "16522430815651a765": {
-      "type": "section-announcement",
+    "9457ff80-1865-48c2-b163-cc1304a9431b": {
+      "type": "section-double",
       "blocks": {
-        "165224308134718a83-3": {
+        "template--16795569979650__9457ff80-1865-48c2-b163-cc1304a9431b-heading-1": {
+          "type": "heading",
+          "settings": {
+            "title": "Choose your shade",
+            "text_size": 8
+          }
+        },
+        "template--16795569979650__9457ff80-1865-48c2-b163-cc1304a9431b-text-1": {
           "type": "text",
           "settings": {
-            "text": "<p>\"NAKED SUNDAYS GLOW MIST IS A GENIUS PRODUCT.\" - <em>Harpers Bazaar Magazine<\/em><\/p>",
-            "target_url_enabled": false,
-            "target_url": "",
-            "target_referrer_enabled": false,
-            "target_referrer": "",
+            "text": "<p>✨ Available in Bronze, Pearl & Illuminating serum drops with buildable pigment  <\/p><p>✨ Helps perfect uneven skin tone, can be worn under makeup or on its own for \"lit from within\" skin <\/p><p>✨ Packed with antioxidants including Pink Algae, Hyaluronic Acid & Wild Rosella to help increase firmness and elasticity<\/p><p>✨Mix & Match for your perfect shade<\/p><p>✨UVA+UVB Broad Spectrum SPF50<\/p><p>✨For all skin types & tones<\/p>",
+            "text_size": 3,
+            "text_style": "font-body"
+          }
+        },
+        "template--16795569979650__9457ff80-1865-48c2-b163-cc1304a9431b-buttons-1": {
+          "type": "buttons",
+          "settings": {
+            "button_text": "Learn more",
+            "button_url": "shopify:\/\/collections\/cabana-glow",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
+          }
+        }
+      },
+      "block_order": [
+        "template--16795569979650__9457ff80-1865-48c2-b163-cc1304a9431b-heading-1",
+        "template--16795569979650__9457ff80-1865-48c2-b163-cc1304a9431b-text-1",
+        "template--16795569979650__9457ff80-1865-48c2-b163-cc1304a9431b-buttons-1"
+      ],
+      "disabled": true,
+      "settings": {
+        "layout": "",
+        "height": "screen-height-three-quarters",
+        "mobile_height": "screen-height-one-half--mobile",
+        "width": "wrapper--full",
+        "image_1": "shopify:\/\/shop_images\/CabanaGlow_Naked_sundays_swatches.jpg",
+        "image_width": "one-half",
+        "text_alignment": "text-left",
+        "bg_color": "#ffffff",
+        "color": "",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "slideshow": {
+      "type": "section-slideshow",
+      "blocks": {
+        "slideshow-0": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/NS_JUNE14_HIGHRES-11_255c720c-6e92-47e7-9efb-61911c28d5ef.jpg",
+            "overlay_opacity": 25,
+            "overlay_color": "#000000",
+            "show_overlay_text": true,
+            "title": "Award-winning SPF for skincare lovers.",
+            "heading_size": 8,
+            "description": "Award-winning SPF for skincare lovers.",
+            "text_size": 5,
+            "flex_align": "align--top-left",
+            "bg_color": "",
+            "color": "#ffffff",
+            "first_button_text": "SHOP NOW",
+            "first_button_link": "shopify:\/\/collections\/all",
+            "first_button_type": "btn--primary",
+            "first_button_size": "btn--large",
+            "first_button_style": "btn--solid",
+            "first_button_show_arrow": true,
+            "second_button_text": "",
+            "second_button_link": "",
+            "second_button_type": "btn--white",
+            "second_button_size": "",
+            "second_button_style": "btn--solid",
+            "second_button_show_arrow": false
+          }
+        }
+      },
+      "block_order": [
+        "slideshow-0"
+      ],
+      "disabled": true,
+      "settings": {
+        "height": "seven-fifty-height-hero",
+        "mobile_height": "screen-height-full--mobile",
+        "width": "wrapper--full",
+        "transition": "slide",
+        "show_arrows": true,
+        "autoplay": false,
+        "autoplay_speed": 8
+      }
+    },
+    "logos": {
+      "type": "section-press-logos",
+      "blocks": {
+        "logos-0": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/Untitled_design-40.png",
+            "logo_width": 100,
+            "link": "",
+            "description": "<p>AS SEEN IN… <\/p>",
+            "heading_size": 6
+          }
+        },
+        "logos-2": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/Harpers_Bazaar_logo_logotype.png",
+            "logo_width": 130,
+            "link": "",
+            "description": "",
+            "heading_size": 6
+          }
+        },
+        "fb1d6ce0-99a3-4247-8ba8-d382a7833858": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/Vanity_Fair_Logo_svg.png",
+            "logo_width": 150,
+            "link": "",
+            "description": "",
+            "heading_size": 6
+          }
+        },
+        "logos-1": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/Untitled_design-38.png",
+            "logo_width": 100,
+            "link": "",
+            "description": "",
+            "heading_size": 6
+          }
+        },
+        "3df55dfd-ae08-4de1-9edf-d7a8ba3913ce": {
+          "type": "logo-item",
+          "settings": {
+            "logo": "shopify:\/\/shop_images\/vogue_ad2cba07-192e-413f-aef8-d9bef36547eb.png",
+            "logo_width": 120,
+            "link": "",
+            "description": "",
+            "heading_size": 6
+          }
+        }
+      },
+      "block_order": [
+        "logos-0",
+        "logos-2",
+        "fb1d6ce0-99a3-4247-8ba8-d382a7833858",
+        "logos-1",
+        "3df55dfd-ae08-4de1-9edf-d7a8ba3913ce"
+      ],
+      "settings": {
+        "title": "",
+        "enable_heading_slider": false,
+        "text_style": "font-body",
+        "logo_opacity": 100,
+        "bg_color": "#ffdcfc",
+        "color": "",
+        "padding_top": 28,
+        "padding_bottom": 29
+      }
+    },
+    "e14f32e8-0f6b-4bae-b341-f5a7e9e7e90f": {
+      "type": "section-collection",
+      "disabled": true,
+      "settings": {
+        "heading": "Bundle & Save!",
+        "description": "",
+        "layout": "center",
+        "link_text": "Shop Now",
+        "link_url": "shopify:\/\/collections\/summer-bundle-save",
+        "button_type": "btn--primary",
+        "button_size": "",
+        "button_style": "btn--solid",
+        "show_arrow": false,
+        "featured_collection": "summer-bundle-save",
+        "style": "grid",
+        "grid": 4,
+        "rows": 1,
+        "layout_mobile": "2",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "featured-collection": {
+      "type": "section-collection",
+      "settings": {
+        "heading": "Bestsellers & New Releases",
+        "description": "",
+        "layout": "center",
+        "link_text": "SHOP ALL",
+        "link_url": "shopify:\/\/collections\/all",
+        "button_type": "btn--primary",
+        "button_size": "btn--large",
+        "button_style": "btn--solid",
+        "show_arrow": true,
+        "featured_collection": "all",
+        "style": "grid",
+        "grid": 4,
+        "rows": 5,
+        "layout_mobile": "2",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 42,
+        "padding_bottom": 40
+      }
+    },
+    "3016d4e0-07d5-4d53-b25e-68a66b9a693b": {
+      "type": "section-announcement",
+      "blocks": {
+        "template--16759576101122__3016d4e0-07d5-4d53-b25e-68a66b9a693b-16858636439ac03715-0": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>100% VEGAN<\/strong><\/p>",
+            "target_device_enabled": false,
+            "target_device": "mobile"
+          }
+        },
+        "template--16759576101122__3016d4e0-07d5-4d53-b25e-68a66b9a693b-16858636439ac03715-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>CRUELTY FREE<\/strong><\/p>",
+            "target_device_enabled": false,
+            "target_device": "mobile"
+          }
+        },
+        "template--16759576101122__3016d4e0-07d5-4d53-b25e-68a66b9a693b-16858636439ac03715-2": {
+          "type": "message",
+          "disabled": true,
+          "settings": {
+            "show_wheel": false,
+            "message": "You are ||amount|| away from free shipping.",
+            "target_device_enabled": false,
+            "target_device": "mobile"
+          }
+        },
+        "template--16759576101122__3016d4e0-07d5-4d53-b25e-68a66b9a693b-16858636439ac03715-3": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>High Performance SPF<\/strong><\/p>",
             "target_device_enabled": false,
             "target_device": "mobile"
           }
         }
       },
       "block_order": [
-        "165224308134718a83-3"
+        "template--16759576101122__3016d4e0-07d5-4d53-b25e-68a66b9a693b-16858636439ac03715-0",
+        "template--16759576101122__3016d4e0-07d5-4d53-b25e-68a66b9a693b-16858636439ac03715-1",
+        "template--16759576101122__3016d4e0-07d5-4d53-b25e-68a66b9a693b-16858636439ac03715-2",
+        "template--16759576101122__3016d4e0-07d5-4d53-b25e-68a66b9a693b-16858636439ac03715-3"
       ],
       "settings": {
-        "bg_color": "#fbffc9",
-        "color": "#545454",
         "layout": "marquee",
-        "speed": 7
+        "slider_speed": 7,
+        "marquee_speed": 100,
+        "text_size": 2,
+        "bg_color": "#fdffda",
+        "color": "",
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     },
-    "166460077433f572cf": {
-      "type": "section-logo-list",
+    "082d642f-3dbe-44ff-8dc0-9ee1a1f51592": {
+      "type": "section-double",
       "blocks": {
-        "da330b54-a163-490a-8116-f8f93cfc8055": {
-          "type": "logo-item",
+        "template--16759576101122__082d642f-3dbe-44ff-8dc0-9ee1a1f51592-16858638921283acd0-0": {
+          "type": "heading",
           "settings": {
-            "logo": "shopify:\/\/shop_images\/2_658fbf30-33bf-4afa-bc91-7f7578e4740b.png",
-            "logo_width": 130,
-            "link": ""
+            "title": "Meet Naked Sundays",
+            "text_size": 8
           }
         },
-        "d5ad15d5-a82d-4d7f-a2e3-6dd872fbbc8f": {
-          "type": "logo-item",
-          "disabled": true,
-          "settings": {
-            "logo_width": 120,
-            "link": ""
-          }
-        },
-        "16646007740b1a3746-1": {
-          "type": "logo-item",
-          "settings": {
-            "logo": "shopify:\/\/shop_images\/4_41abaed2-84bb-4a0d-bd9e-2a0950e620f9.png",
-            "logo_width": 130,
-            "link": ""
-          }
-        },
-        "16646007740b1a3746-2": {
-          "type": "logo-item",
-          "settings": {
-            "logo": "shopify:\/\/shop_images\/1_ace75741-d3e7-44fe-b962-1143ff646f18.png",
-            "logo_width": 130,
-            "link": ""
-          }
-        },
-        "16646007740b1a3746-0": {
-          "type": "logo-item",
-          "settings": {
-            "logo": "shopify:\/\/shop_images\/3_7eb83b9b-2846-48b5-9888-7386a07e0f05.png",
-            "logo_width": 130,
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "da330b54-a163-490a-8116-f8f93cfc8055",
-        "d5ad15d5-a82d-4d7f-a2e3-6dd872fbbc8f",
-        "16646007740b1a3746-1",
-        "16646007740b1a3746-2",
-        "16646007740b1a3746-0"
-      ],
-      "settings": {
-        "title": "AS SEEN IN...",
-        "text_color": "text-dark",
-        "bg_color": "#ffffff"
-      }
-    },
-    "165069400179a562cd": {
-      "type": "section-collection",
-      "settings": {
-        "heading": "NEW ARRIVALS AND BESTSELLERS",
-        "description": "<p>1000+ 5-STAR REVIEWS ★★★★★<\/p>",
-        "text_alignment": "center",
-        "link_text": "SHOP ALL",
-        "link_url": "shopify:\/\/collections\/all-products",
-        "button_color": "btn--primary",
-        "button_style": "hero__btn btn btn--large caps",
-        "featured_collection": "all",
-        "grid": 4,
-        "rows": 2,
-        "layout_mobile": "2"
-      }
-    },
-    "1654677293f9a6de5a": {
-      "type": "section-columns",
-      "blocks": {
-        "ba4d2113-dbe6-4a0b-9369-d413214a35aa": {
-          "type": "text_block",
-          "settings": {
-            "image": "shopify:\/\/shop_images\/Untitled_design-36.png",
-            "bg_position": "center-center",
-            "title": "\"I Don’t Need to Wear Any Additional Makeup With This SPF\"",
-            "text": "<p>\"I wanted this Naked Sundays product to streamline my moisturizer, primer, and sunscreen products into one tidy package — it did\"<\/p>",
-            "button_text": "Read more",
-            "button_url": "https:\/\/www.instyle.com\/naked-sundays-collagen-glow-sunscreen-primer-review-7497275",
-            "button_color": "btn--neutral",
-            "button_style": "caps--large",
-            "enable_video": false,
-            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
-          }
-        },
-        "165467729361153b9f-0": {
-          "type": "text_block",
-          "settings": {
-            "image": "shopify:\/\/shop_images\/Copy_of_PRESS-2.png",
-            "bg_position": "center-center",
-            "title": "\"Naked Sundays is a genius product\"",
-            "text": "<p>\"Naked Sundays Glow Mist is a genius product that solves the problem of reapplying once you’ve got your makeup on\"<\/p>",
-            "button_text": "",
-            "button_url": "",
-            "button_color": "btn--neutral",
-            "button_style": "caps--large",
-            "enable_video": false,
-            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
-          }
-        },
-        "165467729361153b9f-1": {
-          "type": "text_block",
-          "settings": {
-            "image": "shopify:\/\/shop_images\/Copy_of_PRESS.png",
-            "bg_position": "center-center",
-            "title": "\"Practibility & brilliance come together\"",
-            "text": "<p>\"The hemisphere is completely changed with Naked Sundays, a transparent & antioxidant serum that comes from Australia ... where practicality & brilliance come together.\"<\/p>",
-            "button_text": "",
-            "button_url": "",
-            "button_color": "btn--neutral",
-            "button_style": "caps--large",
-            "enable_video": false,
-            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
-          }
-        },
-        "165467729361153b9f-2": {
-          "type": "text_block",
-          "settings": {
-            "image": "shopify:\/\/shop_images\/Copy_of_PRESS-3.png",
-            "bg_position": "center-center",
-            "title": "\"Lazy girl beauty products recommended by TikTokers\"",
-            "text": "<p>\"\"I'm someone who has gone from never wearing sunscreen to freaking out if I haven't applied this glorious product under my makeup every <br\/>morning!\"<\/p>",
-            "button_text": "",
-            "button_url": "",
-            "button_color": "btn--neutral",
-            "button_style": "caps--large",
-            "enable_video": false,
-            "video_link": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc"
-          }
-        }
-      },
-      "block_order": [
-        "ba4d2113-dbe6-4a0b-9369-d413214a35aa",
-        "165467729361153b9f-0",
-        "165467729361153b9f-1",
-        "165467729361153b9f-2"
-      ],
-      "settings": {
-        "title": "IN THE PRESS ...",
-        "bg_color": "#f0f0f0",
-        "align_text": "text-left",
-        "width": "wrapper",
-        "equalize_height": true,
-        "photo_aspect_ratio": 0.6,
-        "enable_image": true
-      }
-    },
-    "image-with-text": {
-      "type": "section-custom-content",
-      "blocks": {
-        "image": {
-          "type": "image",
-          "settings": {
-            "image": "shopify:\/\/shop_images\/NS_63.jpg",
-            "bg_position": "center-center",
-            "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "",
-            "description": "",
-            "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "",
-            "link": "\/collections\/all",
-            "button_color": "btn--white",
-            "button_style": "hero__btn btn btn--large btn--outline caps"
-          }
-        },
-        "text": {
+        "template--16759576101122__082d642f-3dbe-44ff-8dc0-9ee1a1f51592-16858638921283acd0-1": {
           "type": "text",
           "settings": {
-            "subheading": "",
-            "title": "WELCOME TO NAKED SUNDAYS",
-            "text": "<p>Welcome to the home of award-winning, 100% Vegan, hydrating, skincare SPF for face & body. Naked Sundays is formulated by world-leading R&D chemists, and is created by women, for women. <\/p><p>Naked Sundays is made in Australia, where melanoma rates are some of the highest in the world and SPF regulations are the strictest on the planet!  <\/p><p>That's why all Naked Sundays products are not only high performance SPF50 but are multi-purpose, packed with antioxidants and with cute packaging to boot.<\/p><p>Think of us are your primer, collagen-booster, Vitamin serum & SPF all in one. <\/p><p>Founded by former breaking news reporter Samantha Brett, who was outside all day in the blazing sun with a full face of makeup, she saw a huge gap in the market when it came to SPF specifically designed to be reapplied OVER makeup, something never done in Australia before. <\/p><p>Samantha also was alarmed by the statistics that 16-30 year olds are most at risk of melanoma and yet 70% don't wear SPF everyday. <\/p><p>Naked Sundays mission is simple; to make sunscreen fun, simple, easy to use, multi-tasking and to create world-first formulas that will have you actually enjoying wearing your SPF every single day.<\/p><p><em>Don't leave home without us!<\/em><\/p>",
-            "text_size": 2,
-            "text_columns": 1,
-            "align_text": "text-left",
-            "text_color": "text-dark",
-            "bg_color": "#f9dee5",
-            "button_text": "LEARN MORE",
-            "button_url": "shopify:\/\/pages\/faq",
-            "button_color": "btn--secondary",
-            "button_style": "hero__btn btn btn--large caps"
+            "text": "<p>Welcome to the home of skin-loving, multi-tasking SPF skincare. <\/p><p>Our multi-purpose, world-first, award-winning formulas are formulated in Australia, combining powerful Aussie botanicals and antioxidants, with high performance, science-backed SPF.<\/p><p><em>It's Makeup meets SPF meets Skincare.  <\/em><\/p><p>Our mission is simple: decrease the rates of skin cancers and melanoma with sunscreens you love to wear. <\/p><p>Don't leave home without us!  <\/p>",
+            "text_size": 4,
+            "text_style": "font-body"
+          }
+        },
+        "template--16759576101122__082d642f-3dbe-44ff-8dc0-9ee1a1f51592-16858638921283acd0-2": {
+          "type": "buttons",
+          "settings": {
+            "button_text": "Learn more",
+            "button_url": "shopify:\/\/pages\/our-story-1",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
           }
         }
       },
       "block_order": [
-        "image",
-        "text"
+        "template--16759576101122__082d642f-3dbe-44ff-8dc0-9ee1a1f51592-16858638921283acd0-0",
+        "template--16759576101122__082d642f-3dbe-44ff-8dc0-9ee1a1f51592-16858638921283acd0-1",
+        "template--16759576101122__082d642f-3dbe-44ff-8dc0-9ee1a1f51592-16858638921283acd0-2"
       ],
       "settings": {
-        "height": "screen-height-two-thirds",
-        "padding": false,
-        "borders": false,
-        "wrapper": false
+        "layout": "",
+        "height": "image-height",
+        "mobile_height": "screen-height-two-thirds--mobile",
+        "width": "wrapper--full",
+        "image_1": "shopify:\/\/shop_images\/ScreenShot2023-05-22at10.33.38am.png",
+        "image_width": "one-half",
+        "text_alignment": "text-left",
+        "bg_color": "#f5eefe",
+        "color": "",
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     },
     "icons": {
       "type": "section-text-row",
       "blocks": {
         "icon-0": {
-          "type": "text-item",
+          "type": "icon",
           "settings": {
-            "icon_name": "icon-animal",
-            "icon_color": "#545454",
-            "title": "Vegan Friendly & Cruelty Free",
-            "text": "We are passionate about our furry friends and will only ever test our SPFs on skincare-loving (willing) humans."
+            "icon_name": "icon-leaf",
+            "icon_size": 45,
+            "icon_color": "#ff81f5",
+            "title": "Vegan",
+            "heading_size": 4,
+            "text": "<p>We fight to ensure that our products are 100% vegan and of course, cruelty free. We are only tested on SPF-loving humans and all our ingredients are sustainably sourced.<\/p>",
+            "text_size": 3
           }
         },
         "icon-1": {
-          "type": "text-item",
+          "type": "icon",
           "settings": {
-            "icon_name": "icon-leaf",
-            "icon_color": "#545454",
-            "title": "Oxybenzone & Paraben Free",
-            "text": "We only use the safest, most rigorously tested SPF filters in all our SPFs. We are also free from PEGs, sulfates (SLS\/SLES), GMOs, mineral oils, petrolatum, and synthetic colours."
+            "icon_name": "icon-lightening",
+            "icon_size": 45,
+            "icon_color": "#ff81f5",
+            "title": "High Performance",
+            "heading_size": 4,
+            "text": "<p>Our science-backed products adhere to worldwide SPF standards <br\/>with rigorous testing of every single batch we put out into the world. <\/p>",
+            "text_size": 3
           }
         },
         "icon-2": {
-          "type": "text-item",
+          "type": "icon",
           "settings": {
-            "icon_name": "icon-lock-card",
-            "icon_color": "#545454",
-            "title": "Zero Whitecast, SPF50",
-            "text": "We create Naked Sundays to stand apart and offer transparent formulations that were still high performance SPF50. NO easy feat!"
+            "icon_name": "icon-gift",
+            "icon_size": 45,
+            "icon_color": "#ff81f5",
+            "title": "Our Mission",
+            "heading_size": 4,
+            "text": "<p>We are dedicated to the mission of lowering melanoma rates for <br\/>the next generation, with a percentage of all profits going towards melanoma research and finding a cure<\/p>",
+            "text_size": 3
           }
         }
       },
@@ -870,128 +553,153 @@
         "icon-2"
       ],
       "settings": {
-        "text_alignment": "left",
-        "icon_size": "icon--large",
+        "title": "WE ARE...",
+        "heading_size": 4,
+        "align_text": "text-center",
         "icon_alignment": "icon--top",
-        "text_color": "text-dark",
-        "heading_size": "h5",
-        "height": "margin--medium",
-        "bg_color": "#e2def9"
+        "align_columns": "flex-align-top",
+        "width": "wrapper",
+        "bg_color": "#fafafa",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "layout_mobile": "carousel"
       }
     },
-    "16465660169bc4f795": {
-      "type": "section-custom-content",
-      "blocks": {
-        "d7475e47-fcb0-4278-b579-ada886eab9ab": {
-          "type": "product",
-          "settings": {
-            "title": "",
-            "product": "spf-50-hydrating-glow-mist-top-up",
-            "text_color": "text-dark",
-            "bg_color": "#ffffff"
-          }
-        },
-        "3c9d203e-65a5-4917-a211-a8539fec1f19": {
-          "type": "text",
-          "settings": {
-            "subheading": "WINNER 2022 MECCA BEAUTY ELECTION",
-            "title": "Beauty Innovation Award Winner!",
-            "text": "<p>“Love the glow it gives my skin, and love that I can reapply it over makeup!”<\/p><p>MECCA CUSTOMER<\/p>",
-            "text_size": 2,
-            "text_columns": 1,
-            "align_text": "text-left",
-            "text_color": "text-dark",
-            "bg_color": "#ffffff",
-            "button_text": "SHOP MIST",
-            "button_url": "shopify:\/\/products\/spf-50-hydrating-glow-mist-top-up",
-            "button_color": "btn--primary",
-            "button_style": "hero__btn btn btn--large caps"
-          }
-        }
-      },
-      "block_order": [
-        "d7475e47-fcb0-4278-b579-ada886eab9ab",
-        "3c9d203e-65a5-4917-a211-a8539fec1f19"
-      ],
-      "disabled": true,
-      "settings": {
-        "height": "screen-height-one-half",
-        "padding": false,
-        "borders": true,
-        "wrapper": false
-      }
-    },
-    "1648006137d6af4c61": {
+    "f570aed3-2b78-4321-b0e3-ad873e239119": {
       "type": "section-blog",
       "settings": {
         "blog_name": "how-to-spf-with-naked-sundays",
-        "title": "BLOG: How to SPF! With Naked Sundays",
+        "title": "HOW TO SPF with Naked Sundays",
         "grid": 4,
         "rows": 1,
-        "aspect_ratio": 0.6,
+        "aspect_ratio": 1,
         "show_tags": false,
         "show_author": false,
         "show_date": false,
         "show_button": true,
-        "show_comments": false
+        "show_comments": false,
+        "bg_color": "#ffffff",
+        "color": "",
+        "padding_top": 32,
+        "padding_bottom": 0
       }
     },
-    "newsletter": {
-      "type": "section-newsletter",
-      "disabled": true,
-      "settings": {
-        "title": "We send out the BEST emails (promise!)",
-        "richtext": "<p>Subscribe to get special offers, exceptional giveaways, and be first to learn about our new SPF drops. <\/p>",
-        "enable_name": false,
-        "flex_align": "align--middle-stacked",
-        "text_color": "dark",
-        "button_color": "btn--secondary",
-        "height": "three-fifty-height-hero",
-        "width": "default",
-        "bg_image": "shopify:\/\/shop_images\/Naked_Sundays_Mobile_-_Slideshow_750_x_1100_px_10.jpg",
-        "bg_position": "center-center",
-        "overlay_opacity": 0,
-        "overlay_color": "#000000"
-      }
-    },
-    "16553786449264b4c0": {
+    "168653592307a5567c": {
       "type": "apps",
       "blocks": {
-        "163fdf5d-9559-4811-9b83-7af56349fcbc": {
-          "type": "shopify:\/\/apps\/instafeed\/blocks\/app-block\/c447db20-095d-4a10-9725-b5977662c9d5",
+        "7c5262d1-c668-4272-9091-c56d5b7329ea": {
+          "type": "shopify:\/\/apps\/stamped-product-reviews-ugc\/blocks\/star-rating-badge\/a103faaf-2125-4b0e-89fa-de5149736723",
           "settings": {
-            "heading_size": 30,
-            "feed_width": 100,
-            "html_area": ""
+            "use_metafields": false,
+            "sku_tagtype": "sku",
+            "is_featured_product": false,
+            "featured_product_handle": ""
           }
         }
       },
       "block_order": [
-        "163fdf5d-9559-4811-9b83-7af56349fcbc"
+        "7c5262d1-c668-4272-9091-c56d5b7329ea"
       ],
+      "disabled": true,
       "settings": {
         "include_margins": false
+      }
+    },
+    "704b5bae-5014-48c8-adee-e5d746a60d28": {
+      "type": "section-slideshow-v2",
+      "blocks": {
+        "template--16795569979650__704b5bae-5014-48c8-adee-e5d746a60d28-image-1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/CabanaGlow_Naked_Sundays_banner.jpg",
+            "mobile_image": "shopify:\/\/shop_images\/CabanaGlow_Naked_Sundays_banner.jpg",
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "show_overlay_text": false,
+            "title": "NEW! Meet CabanaGlow™",
+            "heading_size": 8,
+            "description": "Get Lit-From-Within Skin\nWith World First SPF50-powered Bronze & Illuminating Serum Drops",
+            "text_size": 6,
+            "flex_align": "align--top-center",
+            "flex_align_mobile": "align--center",
+            "bg_color": "",
+            "color": "#ffffff",
+            "first_button_text": "SHOP CABANAGLOWS",
+            "first_button_link": "shopify:\/\/collections\/cabana-glow",
+            "first_button_type": "btn--primary",
+            "first_button_size": "",
+            "first_button_style": "btn--solid",
+            "first_button_show_arrow": false,
+            "second_button_text": "",
+            "second_button_link": "",
+            "second_button_type": "btn--white",
+            "second_button_size": "",
+            "second_button_style": "btn--solid",
+            "second_button_show_arrow": false
+          }
+        },
+        "template--16795569979650__704b5bae-5014-48c8-adee-e5d746a60d28-image-2": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "overlay_opacity": 0,
+            "overlay_color": "#000000",
+            "show_overlay_text": false,
+            "title": "",
+            "heading_size": 11,
+            "description": "",
+            "text_size": 5,
+            "flex_align": "align--middle-center",
+            "flex_align_mobile": "align--center",
+            "bg_color": "",
+            "color": "#ffffff",
+            "first_button_text": "View products",
+            "first_button_link": "",
+            "first_button_type": "btn--primary",
+            "first_button_size": "",
+            "first_button_style": "btn--solid",
+            "first_button_show_arrow": false,
+            "second_button_text": "",
+            "second_button_link": "",
+            "second_button_type": "btn--white",
+            "second_button_size": "",
+            "second_button_style": "btn--solid",
+            "second_button_show_arrow": false
+          }
+        }
+      },
+      "block_order": [
+        "template--16795569979650__704b5bae-5014-48c8-adee-e5d746a60d28-image-1",
+        "template--16795569979650__704b5bae-5014-48c8-adee-e5d746a60d28-image-2"
+      ],
+      "disabled": true,
+      "settings": {
+        "height": "screen-height-full",
+        "mobile_height": "screen-height-three-quarters--mobile",
+        "width": "wrapper--full",
+        "transition": "slide",
+        "show_arrows": true,
+        "autoplay": false,
+        "autoplay_speed": 8
       }
     }
   },
   "order": [
-    "890f62e1-bad5-4398-9d5d-1f7c4c95352c",
-    "30f38ff2-66b5-46c4-96b7-9ae94ccf0cf2",
-    "164807645253ce09a9",
-    "e53c3822-475f-466e-bb34-d9d6958d510d",
-    "7d260bce-5764-4940-a634-6d29bc58b05a",
-    "82ed1398-aacc-4d0a-aeea-9d5843fdd194",
-    "28a5e99b-deab-4b2a-bba0-fddb9cd29a9d",
-    "8904577e-2216-4efc-bd44-d5fa64e6b352",
-    "16522430815651a765",
-    "166460077433f572cf",
-    "165069400179a562cd",
-    "1654677293f9a6de5a",
-    "image-with-text",
+    "83124b63-b0c1-4821-b31e-281e19325e9a",
+    "fd49954c-cda8-4fbc-ba64-e29bcf47d6cf",
+    "a05a9ad7-3143-416c-a3c0-6c5d2fabdcf8",
+    "f4c05f15-1150-4673-bda8-90fb3bb0e155",
+    "9457ff80-1865-48c2-b163-cc1304a9431b",
+    "slideshow",
+    "logos",
+    "e14f32e8-0f6b-4bae-b341-f5a7e9e7e90f",
+    "featured-collection",
+    "3016d4e0-07d5-4d53-b25e-68a66b9a693b",
+    "082d642f-3dbe-44ff-8dc0-9ee1a1f51592",
     "icons",
-    "16465660169bc4f795",
-    "1648006137d6af4c61",
-    "newsletter",
-    "16553786449264b4c0"
+    "f570aed3-2b78-4321-b0e3-ad873e239119",
+    "168653592307a5567c",
+    "704b5bae-5014-48c8-adee-e5d746a60d28"
   ]
 }

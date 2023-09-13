@@ -1,0 +1,38 @@
+<div
+  class="cart__item"
+  data-itemdata-animation="{{ animation_name }}"
+  data-animation-duration="500"
+  data-animation-delay="{{ animation_delay }}"
+  {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}>
+  <div class="cart__item__image">
+    <a href="{{ line_item.url }}" aria-label="{{ line_item.title | escape }}">
+      <div class="lazy-image is-loading">
+        {{ line_item.product.featured_media.preview_image | image_url: width: line_item.product.featured_media.preview_image.width | image_tag: sizes: '150px', class: 'is-loading', loading: loading, fetchpriority: fetchpriority }}
+      </div>
+    </a>
+  </div>
+  <div class="cart__item__content">
+    <div class="cart__item__content-inner">
+      <h4 class="cart__item__title">
+        <a href="{{ line_item.url }}">
+          {{- line_item.product.title | strip_html -}}
+        </a>
+      </h4>
+      <div class="cart__item__meta">
+        {%- unless line_item.product.has_only_default_variant -%}
+          {%- for option in line_item.options -%}
+            <p class="cart__item__selected-options">
+              <span>{{ line_item.product.options[forloop.index0] }}:</span>
+
+              <span>{{ option }}</span>
+            </p>
+          {%- endfor -%}
+        {%- endunless -%}
+
+      </div>
+      <p class="short_description">
+        {{ description }}
+      </p>
+    </div>
+  </div>
+</div>

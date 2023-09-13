@@ -5,12 +5,9 @@
       "blocks": {
         "feat": {
           "type": "featured_post",
-          "disabled": true,
           "settings": {
-            "featured_post": "how-to-spf-with-naked-sundays\/all-your-naked-sundays-spf50-clear-glow-questions-answered",
-            "subheading": "Featured post",
-            "image": "shopify:\/\/shop_images\/TGP_6460_Edit.jpg",
-            "bg_position": "center-center"
+            "featured_post": "how-to-spf-with-naked-sundays\/kylie-jenners-makeup-artist-ariel-x-naked-sundays",
+            "subheading": "Featured post"
           }
         }
       },
@@ -18,14 +15,20 @@
         "feat"
       ],
       "settings": {
+        "height": "five-fifty-height-hero",
+        "mobile_height": "screen-height-one-half--mobile",
+        "width": "wrapper--full",
         "show_author": false,
         "show_date": false,
-        "show_button": true
+        "show_button": true,
+        "bg_color": "",
+        "color": "",
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     },
     "main": {
       "type": "blog",
-      "disabled": true,
       "settings": {
         "show_title": true,
         "show_rss": false,
@@ -37,28 +40,14 @@
         "show_author": false,
         "show_date": false,
         "show_button": false,
-        "show_comments": false
-      }
-    },
-    "1646565774e9109657": {
-      "type": "section-blog",
-      "settings": {
-        "blog_name": "how-to-spf-with-naked-sundays",
-        "title": "The Naked Sundays Blog: How to SPF!",
-        "grid": 2,
-        "rows": 4,
-        "aspect_ratio": 1,
-        "show_tags": false,
-        "show_author": false,
-        "show_date": false,
-        "show_button": true,
-        "show_comments": false
+        "show_comments": false,
+        "padding_top": 32,
+        "padding_bottom": 0
       }
     }
   },
   "order": [
     "featured",
-    "main",
-    "1646565774e9109657"
+    "main"
   ]
 }

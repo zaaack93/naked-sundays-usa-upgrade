@@ -23,14 +23,8 @@
         <div class="pswp__counter"></div>
 
         <button class="pswp__button pswp__button--close pswp__custom-close pswp__ui-over-close" title="Close (Esc)">
-          {% render 'icon-close' %}
+          {%- render 'icon-cancel' -%}
         </button>
-
-        <button class="pswp__button pswp__button--share" title="Share"></button>
-
-        <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-        <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
 
         <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
         <!-- element will get class pswp__preloader--active when preloader is running -->
@@ -48,11 +42,13 @@
       </div>
 
       <button class="pswp__button pswp__button--arrow--left" title="{{ 'products.general.previous' | t }}">
-          <span class="visually-hidden">{{ 'products.general.previous' | t }}</span>
+        {%- render 'icon-nav-arrow-left' -%}
+        <span class="visually-hidden">{{ 'products.general.previous' | t }}</span>
       </button>
 
       <button class="pswp__button pswp__button--arrow--right" title="{{ 'products.general.next' | t }}">
-          <span class="visually-hidden">{{ 'products.general.next' | t }}</span>
+        {%- render 'icon-nav-arrow-right' -%}
+        <span class="visually-hidden">{{ 'products.general.next' | t }}</span>
       </button>
 
       <div class="pswp__thumbs"></div>
@@ -61,6 +57,7 @@
         <div class="pswp__caption__center"></div>
 
         <a href="#" class="pswp__caption-close">
+          {%- render 'icon-nav-arrow-left' -%}
           <span class="visually-hidden">{{ 'general.accessibility.close' | t }}</span>
         </a>
       </div>

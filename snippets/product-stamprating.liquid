@@ -1,0 +1,17 @@
+<div class="product__block product__head"
+  {{ block_style }}
+  {% if animation_name %}
+    data-animation="{{ animation_name }}"
+    data-animation-duration="{{ animation_duration }}"
+    data-animation-delay="{{ animation_delay }}"
+  {% endif %}>
+<span 
+            class="stamped-product-reviews-badge" 
+            data-id="{{ product.id }}"
+            data-product-sku="{{ product.handle }}" 
+            data-product-type="{{product.type}}" 
+            data-product-title="{{product.title}}" 
+            style="display:block;">
+            
+</span>
+</div>

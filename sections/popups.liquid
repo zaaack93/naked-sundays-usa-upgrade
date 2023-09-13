@@ -3,46 +3,83 @@
 {%- if section.blocks.size > 0 -%}
   <div data-section-id="{{ section.id }}" data-section-type="popups">
     {%- for block in section.blocks -%}
-      {%- assign classes = '' -%}
+      {%- liquid
+        assign classes = ''
 
-      {%- if block.type == 'text' or block.type == 'cookie' -%}
-        {%- assign classes = 'popup-cookies ' | append: block.settings.position -%}
-      {%- endif -%}
-      
-      {%- if block.settings.target_device_enabled -%}
-        {%- if block.settings.target_device == 'mobile' -%}
-          {%- assign classes = classes | append: ' mobile' -%}
-        {%- endif -%}
-      
-        {%- if block.settings.target_device == 'desktop' -%}
-          {%- assign classes = classes | append: ' desktop' -%}
-        {%- endif -%}
-      {%- endif -%}
+        if block.type == 'text' or block.type == 'cookie'
+          assign classes = 'popup-cookies ' | append: block.settings.position
+        endif
 
-      {%- assign show_popup = true -%}
+        if block.type == 'newsletter'
+          assign classes = 'popup-small-newsletter'
+        endif
 
-      {%- if block.settings.target_url_enabled or block.settings.target_referrer_enabled -%}
-        {%- assign show_popup = false -%}
-      {%- endif -%}
+        if block.type == 'popup'
+          assign classes = 'popup-large-promo'
+        endif
 
-      {%- if block.settings.target_url_enabled and block.settings.target_url != blank -%}  
-        {%- if block.settings.target_url == request.path -%}
-          {%- assign show_popup = true -%}
-        {%- endif -%}
-      {%- endif -%}
-      
-      {%- if block.settings.target_referrer_enabled and block.settings.target_referrer != blank -%}
-        {%- capture target_refferer_attribute -%}
-          data-target-referrer="{{ block.settings.target_referrer }}"
-        {%- endcapture -%}
-        
-        {%- assign show_popup = true -%}
-      {%- endif -%}
+        if block.settings.target_device_enabled
+          if block.settings.target_device == 'mobile'
+            assign classes = classes | append: ' mobile'
+          endif
+
+          if block.settings.target_device == 'desktop'
+            assign classes = classes | append: ' desktop'
+          endif
+        endif
+
+        assign show_popup = true
+
+        if block.settings.target_url_enabled and block.settings.target_url != blank
+          assign show_popup = false
+        endif
+
+        if block.settings.target_referrer_enabled and block.settings.target_referrer != blank
+          assign show_popup = false
+        endif
+
+        if block.settings.target_url_enabled and block.settings.target_url != blank
+          assign request_path = request.path
+
+          if request.page_type == 'product'
+            assign request_path = request_path | split: '/products/' | last | prepend: '/products/'
+          endif
+
+          if block.settings.target_url == request_path
+            assign show_popup = true
+          endif
+        endif
+
+        if block.settings.target_referrer_enabled and block.settings.target_referrer != blank
+          capture target_refferer_attribute
+            echo 'data-target-referrer="' | append: block.settings.target_referrer | append: '"'
+          endcapture
+
+          assign show_popup = true
+        endif
+
+        assign bg_color = block.settings.bg_color
+        assign text_color = block.settings.color
+      -%}
+
+      {%- unless block.type == 'cookie' -%}
+        {%- style -%}
+          #Popup--{{ block.id }} {
+            {%- unless bg_color == 'rgba(0,0,0,0)' or bg_color == blank -%}
+              --bg: {{ bg_color }};
+            {%- endunless -%}
+
+            {%- unless text_color == 'rgba(0,0,0,0)' or text_color == blank -%}
+              --text: {{ text_color }};
+            {%- endunless -%}
+          }
+        {%- endstyle -%}
+      {%- endunless -%}
 
       {%- capture block_attributes -%}
+        id="Popup--{{ block.id }}"
         data-block-id="{{ block.id }}"
         data-popup-delay="{{ block.settings.trigger }}"
-        style="--bg: {{ block.settings.bg_color | default: '#fff' }}; --text-newsletter: {{ block.settings.text }};"
         data-enable="{{ block.settings.show_cookies_popup }}"
         data-cookie-name="{{- block.type -}}-{{- forloop.index -}}-{{- section.id -}}"
         {{ target_refferer_attribute }}
@@ -56,10 +93,10 @@
         {%- case block.type -%}
           {%- when 'popup' -%}
             <div data-large-promo {{ block_attributes }}>
-              <div data-large-promo-inner class="modal__overlay modal__overlay--newsletter modal-text--{{ block.settings.text_color }} block-scope-{{ block.id }}{% unless block.settings.newsletter_enable %} is-visible{% endunless %}">
+              <div data-large-promo-inner class="modal__overlay modal__overlay--default modal__overlay--newsletter block-scope-{{ block.id }}{% unless block.settings.newsletter_enable %} is-visible{% endunless %}">
                 <section class="modal__outer">
                   <div class="modal__wrapper">
-                    <div class="modal__body modal--newsletter{% if block.settings.image%} modal-wrapper--has-image{% endif %}" data-modal-body>
+                    <div class="modal__body modal--default modal--newsletter{% if block.settings.image %} modal-wrapper--has-image{% endif %}" data-modal-body>
                       <div class="modal-section">
                         <div class="modal-wrapper modal-wrapper--reverse{% if block.settings.image == blank %} modal-wrapper--no-image{% endif %}">
                           <div class="modal__text">
@@ -71,59 +108,27 @@
                               {%- unless block.settings.title == '' -%}
                                 <h2 class="modal__title">{{ block.settings.title | strip_html | escape }}</h2>
                               {%- endunless -%}
-                              
+
                               {%- unless block.settings.text == '' -%}
                                 <div class="modal__description rte">{{ block.settings.text }}</div>
                               {%- endunless -%}
-                              
+
                               {%- if block.settings.newsletter_enable -%}
-                                {%- assign button_text = block.settings.button_text -%}
-
-                                {%- if button_text == blank -%}
-                                  {%- assign button_text = 'general.newsletter_form.submit' | t -%}
-                                {%- endif -%}
-
-                                {%- assign field_id = 'email_input_modal-' | append: section.id -%}
-                                {%- assign button_id = 'subscribe-modal-' | append: section.id -%}
-                                {%- assign form_id = 'contact-newsletter-modal-' | append: section.id | append: forloop.index -%}
-
-                                {%- assign button_type = block.settings.button_color -%}
-
-                                {%- render 'newsletter-form'
-                                  form_id: form_id,
-                                  show_name: block.settings.enable_name,
-                                  field_id: field_id,
-                                  button_id: button_id,
-                                  button_text: button_text,
-                                  button_type: button_type,
-                                  show_discount_message: true -%}
+                                {%- render 'newsletter-form' block: block, show_discount_message: true -%}
                               {%- endif -%}
                             </div>
                           </div>
 
                           {%- if block.settings.image -%}
                             <div class="modal__image">
-                              {%- assign img_api = block.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
-
-                              <div class="modal__image-img lazyload"
-                                data-bgset="{{ img_api }}"
-                                data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048, 2450, 2700, 3000, 3350, 3750, 4100]"
-                                data-aspectratio="{{ block.settings.image.aspect_ratio }}"
-                                data-sizes="auto">
-                              </div>
-
-                              <noscript>
-                                <div class="modal__image-img no-js-image"
-                                  style="background-image:url('{{ block.settings.image | img_url: '1080x' }}'); background-size: cover; background-position: center center; background-repeat: no-repeat;">
-                                </div>
-                              </noscript>
+                              {%- render 'image' image: block.settings.image, width: 1000, sizes: '(min-width: 1400px) 500px, calc(75vw / 2)', cover: true -%}
                             </div>
                           {%- endif -%}
                         </div>
                       </div>
 
                       <button data-close-modal class="close" title="{{ 'general.accessibility.close' | t }}">
-                        {%- render 'icon-close' -%}
+                        {%- render 'icon-cancel' -%}
                       </button>
                     </div>
 
@@ -134,8 +139,14 @@
             </div>
 
           {%- when 'text' -%}
+            {%- liquid
+              assign button_style = block.settings.button_style
+              if button_style == 'btn--text' and block.settings.show_arrow
+                assign button_style = button_style | append: ' btn--text-no-underline'
+              endif
+            -%}
             <div data-promo-text {{ block_attributes }}>
-              <div class="popup__tracking {{ block.settings.text_color }}">
+              <div class="popup__tracking">
                 {%- if block.settings.title != blank -%}
                   <p class="popup__title">{{ block.settings.title | escape }}</p>
                 {%- endif -%}
@@ -145,41 +156,32 @@
                 {%- endif -%}
 
                 {%- if block.settings.button_text != blank -%}
-                  <a href="{{ block.settings.button_url }}" class="standard__cta {{ block.settings.button_style }} {{ block.settings.button_color }}">
-                    {{ block.settings.button_text }}
+                  <a href="{{ block.settings.button_url }}" class="btn {{ button_style }} {{ block.settings.button_type }} {{ block.settings.button_size }}">
+                    <span>{{ block.settings.button_text }}</span>
+
+                    {%- if block.settings.show_arrow -%}
+                      {%- render 'icon-arrow-right' -%}
+                    {%- endif -%}
                   </a>
                 {%- endif -%}
 
                 <button data-close-modal class="close" title="{{ 'general.accessibility.close' | t }}">
-                  {%- render 'icon-close' -%}
+                  {%- render 'icon-cancel' -%}
                 </button>
               </div>
             </div>
 
           {%- when 'newsletter' -%}
             <div data-newsletter {{ block_attributes }}>
-              <div class="newsletter-outer">
-                <div class="newsletter {{ block.settings.position }}" data-newsletter-holder>
+              <div class="newsletter__outer">
+                <div class="small-newsletter {{ block.settings.position }}" data-newsletter-holder>
                   {%- if block.settings.heading != blank -%}
-                    <div class="newsletter__heading" data-newsletter-heading>{{ block.settings.heading }}</div>
+                    <div class="newsletter__heading" data-newsletter-heading tabindex="0">{{ block.settings.heading }}</div>
 
-                    {%- assign field_id = 'newsletter_input_modal-' | append: section.id -%}
-                    {%- assign button_id = 'newsletter-modal-' | append: section.id -%}
-                    {%- assign form_id = 'newsletter-modal-form-' | append: section.id | append: forloop.index -%}
-                    {%- assign placeholder = 'general.newsletter_form.placeholder' | t -%}
-
-                    {%- render 'newsletter-form'
-                      form_id: form_id,
-                      show_name: block.settings.enable_name,
-                      field_id: field_id,
-                      button_id: button_id,
-                      show_arrow: true,
-                      placeholder: placeholder,
-                      show_discount_message: true,
-                      success_text: block.settings.success %}
+                    {%- render 'newsletter-form' block: block, show_discount_message: true, success_text: block.settings.success, small_newsletter: true -%}
 
                     <button data-newsletter-close class="newsletter__close" title="{{ 'general.accessibility.close' | t }}">
-                      {%- render 'icon-close' -%}
+                      {%- render 'icon-cancel' -%}
                     </button>
                   {%- endif -%}
                 </div>
@@ -189,23 +191,21 @@
           {%- when 'cookie' -%}
             <div data-tracking-consent {{ block_attributes }}>
               {%- assign markup = 'general.cookies.cookies_link' | t -%}
-              
+
               {%- if shop.privacy_policy -%}
                 {%- capture markup -%}
-                  <a href="{{ shop.privacy_policy.url }}">{{ 'general.cookies.cookies_link' | t }}</a> 
+                  <a href="{{ shop.privacy_policy.url }}">{{ 'general.cookies.cookies_link' | t }}</a>
                 {%- endcapture -%}
               {%- endif -%}
 
               <div data-tracking-consent-inner class="popup__tracking">
-                <p class="popup__title--cookies">{{- 'general.cookies.title' | t -}}</p>
-                
-                <p>{{- 'general.cookies.text_html' | t: cookies: markup -}}</p>
+                <div class="popup__tracking__text">
+                  <p class="popup__title--cookies">{{- 'general.cookies.title' | t -}}</p>
 
-                <button data-confirm-cookies>{{- 'general.cookies.access' | t -}}</button>
+                  <p>{{- 'general.cookies.text_html' | t: cookies: markup -}}</p>
+                </div>
 
-                <button data-close-modal class="close" title="{{ 'general.accessibility.close' | t }}">
-                  {%- render 'icon-close' -%}
-                </button>
+                <button class="text-link" data-confirm-cookies>{{- 'general.cookies.access' | t -}}</button>
               </div>
             </div>
         {%- endcase -%}
@@ -217,6 +217,7 @@
 {% schema %}
 {
   "name": "Popups",
+  "class": "shopify-section-popups",
   "settings": [],
   "blocks" : [
     {
@@ -249,47 +250,17 @@
         },
         {
           "type": "header",
-          "content": "Button"
-        },
-        {
-          "type": "text",
-          "id": "button_text",
-          "label": "Button text",
-          "default": "Join"
-        },
-        {
-          "type": "select",
-          "id": "button_color",
-          "label": "Color",
-          "default": "btn--neutral",
-          "options": [
-            {"value": "btn--primary", "label": "Bright accent"},
-            {"value": "btn--secondary", "label": "Secondary accent"},
-            {"value": "btn--link", "label": "Link color"},
-            {"value": "btn--neutral", "label": "Text color"},
-            {"value": "btn--black", "label": "Black"},
-            {"value": "btn--white", "label": "White"}
-          ]
-        },
-        {
-          "type": "header",
           "content": "Colors"
         },
         {
           "type": "color",
           "id": "bg_color",
-          "label": "Background",
-          "default": "#fff"
+          "label": "Background"
         },
         {
-          "type": "select",
-          "id": "text_color",
-          "label": "Text",
-          "default": "dark",
-          "options": [
-            { "value": "light", "label": "Light" },
-            { "value": "dark", "label": "Dark" }
-          ]
+          "type": "color",
+          "id": "color",
+          "label": "Text"
         },
         {
           "type": "header",
@@ -298,14 +269,72 @@
         {
           "type": "checkbox",
           "id": "newsletter_enable",
-          "label": "Enable newsletter form",
+          "label": "Show newsletter form",
           "default": true
         },
         {
           "type": "checkbox",
-          "id": "enable_name",
+          "id": "show_name",
           "label": "Show name field",
           "default": false
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button text",
+          "default": "Join"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_arrow",
+          "label": "Show arrow",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "terms",
+          "label": "Show reCAPTCHA terms",
+          "default": true,
+          "info": "Recommended if your online store preferences have spam protection enabled."
+        },
+        {
+          "type": "header",
+          "content": "Button",
+          "info": "Applies if \"Show name field\" is enabled."
+        },
+        {
+          "type": "select",
+          "id": "button_type",
+          "label": "Color",
+          "default": "btn--primary",
+          "options": [
+            {"value": "btn--primary", "label": "Primary"},
+            {"value": "btn--secondary", "label": "Secondary"},
+            {"value": "btn--white", "label": "White"},
+            {"value": "btn--black", "label": "Black"}
+          ]
+        },
+        {
+          "type": "select",
+          "id": "button_size",
+          "label": "Size",
+          "default": "",
+          "options": [
+            { "label": "Small", "value": "btn--small" },
+            { "label": "Medium", "value": "" },
+            { "label": "Large", "value": "btn--large" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Style",
+          "default": "btn--solid",
+          "options": [
+            { "label": "Solid", "value": "btn--solid" },
+            { "label": "Outline", "value": "btn--outline" },
+            { "label": "Text", "value": "btn--text" }
+          ]
         },
         {
           "type": "header",
@@ -393,20 +422,14 @@
           "content": "Colors"
         },
         {
-          "type": "select",
-          "id": "text_color",
-          "label": "Text color",
-          "default": "text-dark",
-          "options": [
-            { "value": "text-light", "label": "White"},
-            { "value": "text-dark", "label": "Dark"}
-          ]
+          "type": "color",
+          "id": "color",
+          "label": "Text"
         },
         {
           "type": "color",
           "id": "bg_color",
-          "label": "Background",
-          "default": "#ffffff"
+          "label": "Background"
         },
         {
           "type": "header",
@@ -425,30 +448,43 @@
         },
         {
           "type": "select",
-          "id": "button_color",
+          "id": "button_type",
           "label": "Color",
-          "default": "btn--neutral",
+          "default": "btn--primary",
           "options": [
-            {"value": "btn--primary", "label": "Bright accent"},
-            {"value": "btn--secondary", "label": "Secondary accent"},
-            {"value": "btn--link", "label": "Link color"},
-            {"value": "btn--neutral", "label": "Text color"},
-            {"value": "btn--black", "label": "Black"},
-            {"value": "btn--white", "label": "White"}
+            {"value": "btn--primary", "label": "Primary"},
+            {"value": "btn--secondary", "label": "Secondary"},
+            {"value": "btn--white", "label": "White"},
+            {"value": "btn--black", "label": "Black"}
+          ]
+        },
+        {
+          "type": "select",
+          "id": "button_size",
+          "label": "Size",
+          "default": "",
+          "options": [
+            { "label": "Small", "value": "btn--small" },
+            { "label": "Medium", "value": "" },
+            { "label": "Large", "value": "btn--large" }
           ]
         },
         {
           "type": "select",
           "id": "button_style",
           "label": "Style",
-          "default": "hero__btn btn btn--large btn--outline caps",
+          "default": "btn--solid",
           "options": [
-            {"value": "caps--large", "label": "Capitalized text"},
-            {"value": "hero__btn btn btn--input caps", "label": "Small button"},
-            {"value": "hero__btn btn btn--large caps", "label": "Large button"},
-            {"value": "hero__btn btn btn--input btn--outline caps", "label": "Small outline button"},
-            {"value": "hero__btn btn btn--large btn--outline caps", "label": "Large outline button"}
+            { "label": "Solid", "value": "btn--solid" },
+            { "label": "Outline", "value": "btn--outline" },
+            { "label": "Text", "value": "btn--text" }
           ]
+        },
+        {
+          "type": "checkbox",
+          "id": "show_arrow",
+          "label": "Show arrow",
+          "default": false
         },
         {
           "type": "header",
@@ -557,14 +593,12 @@
         {
           "type": "color",
           "id": "bg_color",
-          "label": "Background",
-          "default": "#B79352"
+          "label": "Background"
         },
         {
           "type": "color",
-          "id": "text",
-          "label": "Text",
-          "default": "#fff"
+          "id": "color",
+          "label": "Text"
         },
         {
           "type": "header",
@@ -574,22 +608,22 @@
           "type": "select",
           "id": "position",
           "label": "Position",
-          "default": "newsletter--top-right",
+          "default": "small-newsletter--top-right",
           "options": [
             {
-              "value": "newsletter--top-left",
+              "value": "small-newsletter--top-left",
               "label": "Top left"
             },
             {
-              "value": "newsletter--top-right",
+              "value": "small-newsletter--top-right",
               "label": "Top right"
             },
             {
-              "value": "newsletter--bottom-left",
+              "value": "small-newsletter--bottom-left",
               "label": "Bottom left"
             },
             {
-              "value": "newsletter--bottom-right",
+              "value": "small-newsletter--bottom-right",
               "label": "Bottom right"
             }
           ]
@@ -689,6 +723,9 @@
         }
       ]
     }
-  ]
+  ],
+  "enabled_on": {
+    "groups": ["aside"]
+  }
 }
 {% endschema %}

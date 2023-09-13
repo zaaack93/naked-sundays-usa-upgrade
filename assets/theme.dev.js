@@ -4,18 +4,20 @@
 * Broadcast Theme (c) Invisible Themes
 *
 * This file is included for advanced development by
-* Shopify Agencies.  Modified versions of the theme 
-* code are not supported by Shopify or Invisible.
+* Shopify Agencies.  Modified versions of the theme
+* code are not supported by Shopify or Invisible Themes.
 *
-* In order to use this file you will need to change 
+* In order to use this file you will need to change
 * theme.js to theme.dev.js in /layout/theme.liquid
 *
 */
 
-(function (bodyScrollLock, themeAddresses, themeCurrency, Sqrl, themeImages, Flickity, FlickityFade, Rellax, ellipsed, AOS) {
+(function (scrollLock, themeAddresses, themeCurrency, Rellax, Flickity, FlickityFade, themeImages) {
   'use strict';
 
   window.theme = window.theme || {};
+
+  window.theme.subscribers = {};
 
   window.theme.sizes = {
     mobile: 480,
@@ -25,12 +27,12 @@
   };
 
   window.theme.keyboardKeys = {
-    TAB: 9,
-    ENTER: 13,
-    ESCAPE: 27,
-    SPACE: 32,
-    LEFTARROW: 37,
-    RIGHTARROW: 39,
+    TAB: 'Tab',
+    ENTER: 'Enter',
+    ESCAPE: 'Escape',
+    SPACE: 'Space',
+    LEFTARROW: 'ArrowLeft',
+    RIGHTARROW: 'ArrowRight',
   };
 
   window.theme.focusable = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -55,15 +57,19 @@
     });
   }
 
+  let screenOrientation = getScreenOrientation();
+  window.initialWindowHeight = Math.min(window.screen.height, window.innerHeight);
+
   function readHeights() {
     const h = {};
-    h.windowHeight = window.innerHeight;
+    h.windowHeight = Math.min(window.screen.height, window.innerHeight);
     h.announcementHeight = getHeight('[data-section-type*="announcement"] [data-bar-top]');
     h.footerHeight = getHeight('[data-section-type*="footer"]');
     h.menuHeight = getHeight('[data-header-height]');
     h.headerHeight = h.menuHeight + h.announcementHeight;
     h.collectionNavHeight = getHeight('[data-collection-nav]');
     h.logoHeight = getFooterLogoWithPadding();
+
     return h;
   }
 
@@ -74,11 +80,6 @@
 
   function setVars() {
     const {windowHeight, announcementHeight, headerHeight, logoHeight, menuHeight, footerHeight, collectionNavHeight} = readHeights();
-    const newsletterSmallLeft = document.querySelector('[data-newsletter-holder].newsletter--top-left');
-    const announcementHigh = document.querySelector('#MainContent > .shopify-section:first-child > [data-announcement-wrapper]');
-    const cookiePopup = document.querySelector('[data-tracking-consent]');
-    const articleSocials = document.querySelector('[data-article-socials]');
-    let defaultOuter = 16;
 
     document.documentElement.style.setProperty('--full-screen', `${windowHeight}px`);
     document.documentElement.style.setProperty('--three-quarters', `${windowHeight * (3 / 4)}px`);
@@ -99,28 +100,25 @@
       document.documentElement.style.setProperty('--cookie-bar-height', `${document.querySelector('[data-tracking-consent].popup-cookies--bottom').offsetHeight}px`);
     }
 
-    document.documentElement.style.setProperty('--newsletter-small-height', newsletterSmallLeft ? `${newsletterSmallLeft.offsetHeight}px` : '0px');
-    document.documentElement.style.setProperty('--announcement-height-high', announcementHigh ? `${announcementHigh.offsetHeight}px` : '0px');
-
     document.documentElement.style.setProperty('--scrollbar-width', `${getScrollbarWidth()}px`);
-
-    if (cookiePopup && cookiePopup.offsetHeight > 0) {
-      defaultOuter = cookiePopup.offsetHeight + Number(getComputedStyle(cookiePopup).bottom.replace('px', ''));
-    } else if (articleSocials && articleSocials.offsetHeight > 0) {
-      defaultOuter += articleSocials.offsetHeight;
-    }
-
-    document.documentElement.style.setProperty('--mobile-newsletter-with-cookie-height', `${defaultOuter}px`);
   }
 
   function resizeVars() {
     // restrict the heights that are changed on resize to avoid iOS jump when URL bar is shown and hidden
     const {windowHeight, announcementHeight, headerHeight, logoHeight, menuHeight, footerHeight, collectionNavHeight} = readHeights();
-    const newsletterSmallLeft = document.querySelector('[data-newsletter-holder].newsletter--top-left');
-    const announcementHigh = document.querySelector('#MainContent > .shopify-section:first-child > [data-announcement-wrapper]');
-    const cookiePopup = document.querySelector('[data-tracking-consent]');
-    const articleSocials = document.querySelector('[data-article-socials]');
-    let defaultOuter = 16;
+    const currentScreenOrientation = getScreenOrientation();
+
+    if (currentScreenOrientation !== screenOrientation) {
+      // Only update the heights on screen orientation change
+      document.documentElement.style.setProperty('--full-screen', `${windowHeight}px`);
+      document.documentElement.style.setProperty('--three-quarters', `${windowHeight * (3 / 4)}px`);
+      document.documentElement.style.setProperty('--two-thirds', `${windowHeight * (2 / 3)}px`);
+      document.documentElement.style.setProperty('--one-half', `${windowHeight / 2}px`);
+      document.documentElement.style.setProperty('--one-third', `${windowHeight / 3}px`);
+
+      // Update the screen orientation state
+      screenOrientation = currentScreenOrientation;
+    }
 
     document.documentElement.style.setProperty('--menu-height', `${menuHeight}px`);
     document.documentElement.style.setProperty('--announcement-height', `${announcementHeight}px`);
@@ -134,17 +132,16 @@
     if (document.querySelector('[data-tracking-consent].popup-cookies--bottom')) {
       document.documentElement.style.setProperty('--cookie-bar-height', `${document.querySelector('[data-tracking-consent].popup-cookies--bottom').offsetHeight}px`);
     }
+  }
 
-    document.documentElement.style.setProperty('--newsletter-small-height', newsletterSmallLeft ? `${newsletterSmallLeft.offsetHeight}px` : '0px');
-    document.documentElement.style.setProperty('--announcement-height-high', announcementHigh ? `${announcementHigh.offsetHeight}px` : '0px');
-
-    if (cookiePopup && cookiePopup.offsetHeight > 0) {
-      defaultOuter = cookiePopup.offsetHeight + Number(getComputedStyle(cookiePopup).bottom.replace('px', ''));
-    } else if (articleSocials && articleSocials.offsetHeight > 0) {
-      defaultOuter += articleSocials.offsetHeight;
+  function getScreenOrientation() {
+    if (window.matchMedia('(orientation: portrait)').matches) {
+      return 'portrait';
     }
 
-    document.documentElement.style.setProperty('--mobile-newsletter-with-cookie-height', `${defaultOuter}px`);
+    if (window.matchMedia('(orientation: landscape)').matches) {
+      return 'landscape';
+    }
   }
 
   function getHeight(selector) {
@@ -186,82 +183,38 @@
     return scrollbarWidth;
   }
 
-  function singles(frame, wrappers) {
-    // sets the height of any frame passed in with the
-    // tallest preventOverflowContent as well as any image in that frame
-    let padding = 64;
-    let tallest = 0;
+  let isCompleted = false;
+  let docComplete = false;
 
-    wrappers.forEach((wrap) => {
-      if (wrap.offsetHeight > tallest) {
-        const getMarginTop = parseInt(window.getComputedStyle(wrap).marginTop);
-        const getMarginBottom = parseInt(window.getComputedStyle(wrap).marginBottom);
-        const getMargin = getMarginTop + getMarginBottom;
-        if (getMargin > padding) {
-          padding = getMargin;
-        }
-
-        tallest = wrap.offsetHeight;
+  function preloadImages() {
+    document.onreadystatechange = () => {
+      if (document.readyState === 'complete') {
+        docComplete = true;
+        initImagesPreloader();
       }
-    });
-    const images = frame.querySelectorAll('[data-overflow-background]');
-    const frames = [frame, ...images];
-    frames.forEach((el) => {
-      el.style.setProperty('min-height', `calc(${tallest + padding}px + var(--header-padding)`);
-    });
+    };
+
+    requestIdleCallback(initImagesPreloader);
   }
 
-  function doubles(section) {
-    if (window.innerWidth < window.theme.sizes.small) {
-      // if we are below the small breakpoint, the double section acts like two independent
-      // single frames
-      let singleFrames = section.querySelectorAll('[data-overflow-frame]');
-      singleFrames.forEach((singleframe) => {
-        const wrappers = singleframe.querySelectorAll('[data-overflow-content]');
-        singles(singleframe, wrappers);
-      });
-      return;
-    }
+  function initImagesPreloader() {
+    setTimeout(() => {
+      if (isCompleted) return;
 
-    const padding = parseInt(getComputedStyle(section).getPropertyValue('--outer')) * 2;
-    let tallest = 0;
-
-    const frames = section.querySelectorAll('[data-overflow-frame]');
-    const contentWrappers = section.querySelectorAll('[data-overflow-content]');
-    contentWrappers.forEach((content) => {
-      if (content.offsetHeight > tallest) {
-        tallest = content.offsetHeight;
+      if (!docComplete) {
+        initImagesPreloader();
+        return;
       }
-    });
-    const images = section.querySelectorAll('[data-overflow-background]');
-    let applySizes = [...frames, ...images];
-    applySizes.forEach((el) => {
-      el.style.setProperty('min-height', `${tallest + padding}px`);
-    });
-    section.style.setProperty('min-height', `${tallest + padding + 2}px`);
-  }
 
-  function preventOverflow(container) {
-    const singleFrames = container.querySelectorAll('.js-overflow-container');
-    if (singleFrames) {
-      singleFrames.forEach((frame) => {
-        const wrappers = frame.querySelectorAll('.js-overflow-content');
-        singles(frame, wrappers);
-        document.addEventListener('theme:resize', () => {
-          singles(frame, wrappers);
+      const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+      if (lazyImages.length) {
+        lazyImages.forEach((image) => {
+          image.setAttribute('loading', 'eager');
         });
-      });
-    }
+      }
 
-    const doubleSections = container.querySelectorAll('[data-overflow-wrapper]');
-    if (doubleSections) {
-      doubleSections.forEach((section) => {
-        doubles(section);
-        document.addEventListener('theme:resize', () => {
-          doubles(section);
-        });
-      });
-    }
+      isCompleted = true;
+    }, 3000);
   }
 
   function debounce(fn, time) {
@@ -276,19 +229,58 @@
     };
   }
 
-  function dispatch() {
+  function getWindowWidth() {
+    return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  }
+
+  function getWindowHeight() {
+    return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  }
+
+  function isDesktop() {
+    return getWindowWidth() >= window.theme.sizes.small;
+  }
+
+  function isMobile() {
+    return getWindowWidth() < window.theme.sizes.small;
+  }
+
+  let lastWindowWidth = getWindowWidth();
+  let lastWindowHeight = getWindowHeight();
+
+  function dispatch$1() {
     document.dispatchEvent(
       new CustomEvent('theme:resize', {
         bubbles: true,
       })
     );
+
+    if (lastWindowWidth !== getWindowWidth()) {
+      document.dispatchEvent(
+        new CustomEvent('theme:resize:width', {
+          bubbles: true,
+        })
+      );
+
+      lastWindowWidth = getWindowWidth();
+    }
+
+    if (lastWindowHeight !== getWindowHeight()) {
+      document.dispatchEvent(
+        new CustomEvent('theme:resize:height', {
+          bubbles: true,
+        })
+      );
+
+      lastWindowHeight = getWindowHeight();
+    }
   }
 
   function resizeListener() {
     window.addEventListener(
       'resize',
       debounce(function () {
-        dispatch();
+        dispatch$1();
       }, 50)
     );
   }
@@ -298,9 +290,9 @@
   let down = null;
   let wasUp = null;
   let wasDown = null;
-  let scrollLockTimeout = 0;
+  let scrollLockTimer = 0;
 
-  function dispatch$1() {
+  function dispatch() {
     const position = window.pageYOffset;
     if (position > prev) {
       down = true;
@@ -344,32 +336,34 @@
   }
 
   function lock(e) {
-    bodyScrollLock.disableBodyScroll(e.detail, {
-      allowTouchMove: (el) => el.tagName === 'TEXTAREA',
-    });
-    document.documentElement.setAttribute('data-scroll-locked', '');
-  }
-
-  function unlock() {
     // Prevent body scroll lock race conditions
-    scrollLockTimeout = setTimeout(() => {
-      document.body.removeAttribute('data-drawer-closing');
-    }, 20);
-
-    if (document.body.hasAttribute('data-drawer-closing')) {
-      document.body.removeAttribute('data-drawer-closing');
-
-      if (scrollLockTimeout) {
-        clearTimeout(scrollLockTimeout);
+    setTimeout(() => {
+      if (scrollLockTimer) {
+        clearTimeout(scrollLockTimer);
       }
 
-      return;
-    } else {
-      document.body.setAttribute('data-drawer-closing', '');
-    }
+      scrollLock.disablePageScroll(e.detail, {
+        allowTouchMove: (el) => el.tagName === 'TEXTAREA',
+      });
 
+      document.documentElement.setAttribute('data-scroll-locked', '');
+    });
+  }
+
+  function unlock(e) {
+    const timeout = e.detail;
+
+    if (timeout) {
+      scrollLockTimer = setTimeout(removeScrollLock, timeout);
+    } else {
+      removeScrollLock();
+    }
+  }
+
+  function removeScrollLock() {
+    scrollLock.clearQueueScrollLocks();
+    scrollLock.enablePageScroll();
     document.documentElement.removeAttribute('data-scroll-locked');
-    bodyScrollLock.clearAllBodyScrollLocks();
   }
 
   function scrollListener() {
@@ -381,7 +375,7 @@
           window.cancelAnimationFrame(timeout);
         }
         timeout = window.requestAnimationFrame(function () {
-          dispatch$1();
+          dispatch();
         });
       },
       {passive: true}
@@ -414,26 +408,17 @@
     });
   }
 
-  function wasTouched() {
-    window.theme.touched = true;
-    document.removeEventListener('touchstart', wasTouched, {passive: true});
-    document.querySelector('body').classList.add('supports-touch');
-    document.dispatchEvent(
-      new CustomEvent('theme:touch', {
-        bubbles: true,
-      })
-    );
+  function isTouchDevice() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
   }
 
-  document.addEventListener('touchstart', wasTouched, {passive: true});
-
-  function lazyImageBackgrounds() {
-    document.addEventListener('lazyloaded', function (e) {
-      const lazyImage = e.target.parentNode;
-      if (lazyImage.classList.contains('lazy-image')) {
-        lazyImage.style.backgroundImage = 'none';
-      }
-    });
+  function isTouch() {
+    if (isTouchDevice()) {
+      document.documentElement.className = document.documentElement.className.replace('no-touch', 'supports-touch');
+      window.theme.touch = true;
+    } else {
+      window.theme.touch = false;
+    }
   }
 
   function ariaToggle(container) {
@@ -445,75 +430,903 @@
           const currentTarget = event.currentTarget;
           currentTarget.setAttribute('aria-expanded', currentTarget.getAttribute('aria-expanded') == 'false' ? 'true' : 'false');
           const toggleID = currentTarget.getAttribute('aria-controls');
+          const toggleElement = document.querySelector(`#${toggleID}`);
+          const removeExpandingClass = () => {
+            toggleElement.classList.remove('expanding');
+            toggleElement.removeEventListener('transitionend', removeExpandingClass);
+          };
+          const addExpandingClass = () => {
+            toggleElement.classList.add('expanding');
+            toggleElement.removeEventListener('transitionstart', addExpandingClass);
+          };
 
-          document.querySelector(`#${toggleID}`).classList.toggle('expanding');
-          document.querySelector(`#${toggleID}`).classList.toggle('expanded');
+          toggleElement.addEventListener('transitionstart', addExpandingClass);
+          toggleElement.addEventListener('transitionend', removeExpandingClass);
 
-          setTimeout(function () {
-            document.querySelector(`#${toggleID}`).classList.remove('expanding');
-          }, 500);
+          toggleElement.classList.toggle('expanded');
         });
       });
     }
   }
 
+  function loading() {
+    document.body.classList.add('is-loaded');
+  }
+
+  const classes$K = {
+    loading: 'is-loading',
+  };
+
+  const selectors$_ = {
+    img: 'img.is-loading',
+  };
+
+  /*
+    Catch images loaded events and add class "is-loaded" to them and their containers
+  */
+  function loadedImagesEventHook() {
+    document.addEventListener(
+      'load',
+      (e) => {
+        if (e.target.tagName == 'IMG' && e.target.classList.contains(classes$K.loading)) {
+          e.target.classList.remove(classes$K.loading);
+          e.target.parentNode.classList.remove(classes$K.loading);
+        }
+      },
+      true
+    );
+  }
+
+  /*
+    Remove "is-loading" class to the loaded images and their containers
+  */
+  function removeLoadingClassFromLoadedImages(container) {
+    container.querySelectorAll(selectors$_.img).forEach((img) => {
+      if (img.complete) {
+        img.classList.remove(classes$K.loading);
+        img.parentNode.classList.remove(classes$K.loading);
+      }
+    });
+  }
+
+  function isVisible(el) {
+    var style = window.getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden';
+  }
+
+  /**
+   * A11y Helpers
+   * -----------------------------------------------------------------------------
+   * A collection of useful functions that help make your theme more accessible
+   */
+
+  /**
+   * Moves focus to an HTML element
+   * eg for In-page links, after scroll, focus shifts to content area so that
+   * next `tab` is where user expects. Used in bindInPageLinks()
+   * eg move focus to a modal that is opened. Used in trapFocus()
+   *
+   * @param {Element} container - Container DOM element to trap focus inside of
+   * @param {Object} options - Settings unique to your theme
+   * @param {string} options.className - Class name to apply to element on focus.
+   */
+  function forceFocus(element, options) {
+    options = options || {};
+
+    var savedTabIndex = element.tabIndex;
+
+    element.tabIndex = -1;
+    element.dataset.tabIndex = savedTabIndex;
+    element.focus();
+    if (typeof options.className !== 'undefined') {
+      element.classList.add(options.className);
+    }
+    element.addEventListener('blur', callback);
+
+    function callback(event) {
+      event.target.removeEventListener(event.type, callback);
+
+      element.tabIndex = savedTabIndex;
+      delete element.dataset.tabIndex;
+      if (typeof options.className !== 'undefined') {
+        element.classList.remove(options.className);
+      }
+    }
+  }
+
+  /**
+   * If there's a hash in the url, focus the appropriate element
+   * This compensates for older browsers that do not move keyboard focus to anchor links.
+   * Recommendation: To be called once the page in loaded.
+   *
+   * @param {Object} options - Settings unique to your theme
+   * @param {string} options.className - Class name to apply to element on focus.
+   * @param {string} options.ignore - Selector for elements to not include.
+   */
+
+  function focusHash(options) {
+    options = options || {};
+    var hash = window.location.hash;
+    var element = document.getElementById(hash.slice(1));
+
+    // if we are to ignore this element, early return
+    if (element && options.ignore && element.matches(options.ignore)) {
+      return false;
+    }
+
+    if (hash && element) {
+      forceFocus(element, options);
+    }
+  }
+
+  /**
+   * When an in-page (url w/hash) link is clicked, focus the appropriate element
+   * This compensates for older browsers that do not move keyboard focus to anchor links.
+   * Recommendation: To be called once the page in loaded.
+   *
+   * @param {Object} options - Settings unique to your theme
+   * @param {string} options.className - Class name to apply to element on focus.
+   * @param {string} options.ignore - CSS selector for elements to not include.
+   */
+
+  function bindInPageLinks(options) {
+    options = options || {};
+    var links = Array.prototype.slice.call(document.querySelectorAll('a[href^="#"]'));
+
+    function queryCheck(selector) {
+      return document.getElementById(selector) !== null;
+    }
+
+    return links.filter(function (link) {
+      if (link.hash === '#' || link.hash === '') {
+        return false;
+      }
+
+      if (options.ignore && link.matches(options.ignore)) {
+        return false;
+      }
+
+      if (!queryCheck(link.hash.substr(1))) {
+        return false;
+      }
+
+      var element = document.querySelector(link.hash);
+
+      if (!element) {
+        return false;
+      }
+
+      link.addEventListener('click', function () {
+        forceFocus(element, options);
+      });
+
+      return true;
+    });
+  }
+
+  function focusable(container) {
+    var elements = Array.prototype.slice.call(
+      container.querySelectorAll('[tabindex],' + '[draggable],' + 'a[href],' + 'area,' + 'button:enabled,' + 'input:not([type=hidden]):enabled,' + 'object,' + 'select:enabled,' + 'textarea:enabled')
+    );
+
+    // Filter out elements that are not visible.
+    // Copied from jQuery https://github.com/jquery/jquery/blob/2d4f53416e5f74fa98e0c1d66b6f3c285a12f0ce/src/css/hiddenVisibleSelectors.js
+    return elements.filter(function (element) {
+      return !!((element.offsetWidth || element.offsetHeight || element.getClientRects().length) && isVisible(element));
+    });
+  }
+
+  /**
+   * Traps the focus in a particular container
+   *
+   * @param {Element} container - Container DOM element to trap focus inside of
+   * @param {Element} elementToFocus - Element to be focused on first
+   * @param {Object} options - Settings unique to your theme
+   * @param {string} options.className - Class name to apply to element on focus.
+   */
+
+  var trapFocusHandlers = {};
+
+  function trapFocus(container, options) {
+    options = options || {};
+    var elements = focusable(container);
+    var elementToFocus = options.elementToFocus || container;
+    var first = elements[0];
+    var last = elements[elements.length - 1];
+
+    removeTrapFocus();
+
+    trapFocusHandlers.focusin = function (event) {
+      if (container !== event.target && !container.contains(event.target) && first && first === event.target) {
+        first.focus();
+      }
+
+      if (event.target !== container && event.target !== last && event.target !== first) return;
+      document.addEventListener('keydown', trapFocusHandlers.keydown);
+    };
+
+    trapFocusHandlers.focusout = function () {
+      document.removeEventListener('keydown', trapFocusHandlers.keydown);
+    };
+
+    trapFocusHandlers.keydown = function (event) {
+      if (event.code !== window.theme.keyboardKeys.TAB) return; // If not TAB key
+
+      // On the last focusable element and tab forward, focus the first element.
+      if (event.target === last && !event.shiftKey) {
+        event.preventDefault();
+        first.focus();
+      }
+
+      //  On the first focusable element and tab backward, focus the last element.
+      if ((event.target === container || event.target === first) && event.shiftKey) {
+        event.preventDefault();
+        last.focus();
+      }
+    };
+
+    document.addEventListener('focusout', trapFocusHandlers.focusout);
+    document.addEventListener('focusin', trapFocusHandlers.focusin);
+
+    forceFocus(elementToFocus, options);
+  }
+
+  /**
+   * Removes the trap of focus from the page
+   */
+  function removeTrapFocus() {
+    document.removeEventListener('focusin', trapFocusHandlers.focusin);
+    document.removeEventListener('focusout', trapFocusHandlers.focusout);
+    document.removeEventListener('keydown', trapFocusHandlers.keydown);
+  }
+
+  /**
+   * Add a preventive message to external links and links that open to a new window.
+   * @param {string} elements - Specific elements to be targeted
+   * @param {object} options.messages - Custom messages to overwrite with keys: newWindow, external, newWindowExternal
+   * @param {string} options.messages.newWindow - When the link opens in a new window (e.g. target="_blank")
+   * @param {string} options.messages.external - When the link is to a different host domain.
+   * @param {string} options.messages.newWindowExternal - When the link is to a different host domain and opens in a new window.
+   * @param {object} options.prefix - Prefix to namespace "id" of the messages
+   */
+  function accessibleLinks(elements, options) {
+    if (typeof elements !== 'string') {
+      throw new TypeError(elements + ' is not a String.');
+    }
+
+    elements = document.querySelectorAll(elements);
+
+    if (elements.length === 0) {
+      return;
+    }
+
+    options = options || {};
+    options.messages = options.messages || {};
+
+    var messages = {
+      newWindow: options.messages.newWindow || 'Opens in a new window.',
+      external: options.messages.external || 'Opens external website.',
+      newWindowExternal: options.messages.newWindowExternal || 'Opens external website in a new window.',
+    };
+
+    var prefix = options.prefix || 'a11y';
+
+    var messageSelectors = {
+      newWindow: prefix + '-new-window-message',
+      external: prefix + '-external-message',
+      newWindowExternal: prefix + '-new-window-external-message',
+    };
+
+    function generateHTML(messages) {
+      var container = document.createElement('ul');
+      var htmlMessages = Object.keys(messages).reduce(function (html, key) {
+        return (html += '<li id=' + messageSelectors[key] + '>' + messages[key] + '</li>');
+      }, '');
+
+      container.setAttribute('hidden', true);
+      container.innerHTML = htmlMessages;
+
+      document.body.appendChild(container);
+    }
+
+    function externalSite(link) {
+      return link.hostname !== window.location.hostname;
+    }
+
+    elements.forEach(function (link) {
+      var target = link.getAttribute('target');
+      var rel = link.getAttribute('rel');
+      var isExternal = externalSite(link);
+      var isTargetBlank = target === '_blank';
+      var missingRelNoopener = rel === null || rel.indexOf('noopener') === -1;
+
+      if (isTargetBlank && missingRelNoopener) {
+        var relValue = rel === null ? 'noopener' : rel + ' noopener';
+        link.setAttribute('rel', relValue);
+      }
+
+      if (isExternal && isTargetBlank) {
+        link.setAttribute('aria-describedby', messageSelectors.newWindowExternal);
+      } else if (isExternal) {
+        link.setAttribute('aria-describedby', messageSelectors.external);
+      } else if (isTargetBlank) {
+        link.setAttribute('aria-describedby', messageSelectors.newWindow);
+      }
+    });
+
+    generateHTML(messages);
+  }
+
+  var a11y = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    forceFocus: forceFocus,
+    focusHash: focusHash,
+    bindInPageLinks: bindInPageLinks,
+    focusable: focusable,
+    trapFocus: trapFocus,
+    removeTrapFocus: removeTrapFocus,
+    accessibleLinks: accessibleLinks
+  });
+
+  const selectors$Z = {
+    inputSearch: 'input[type="search"]',
+    focusedElements: '[aria-selected="true"] a',
+    resetButton: 'button[type="reset"]',
+  };
+
+  const classes$J = {
+    hidden: 'hidden',
+  };
+
+  class HeaderSearchForm extends HTMLElement {
+    constructor() {
+      super();
+
+      this.input = this.querySelector(selectors$Z.inputSearch);
+      this.resetButton = this.querySelector(selectors$Z.resetButton);
+
+      if (this.input) {
+        this.input.form.addEventListener('reset', this.onFormReset.bind(this));
+        this.input.addEventListener(
+          'input',
+          debounce((event) => {
+            this.onChange(event);
+          }, 300).bind(this)
+        );
+      }
+    }
+
+    toggleResetButton() {
+      const resetIsHidden = this.resetButton.classList.contains(classes$J.hidden);
+      if (this.input.value.length > 0 && resetIsHidden) {
+        this.resetButton.classList.remove(classes$J.hidden);
+      } else if (this.input.value.length === 0 && !resetIsHidden) {
+        this.resetButton.classList.add(classes$J.hidden);
+      }
+    }
+
+    onChange() {
+      this.toggleResetButton();
+    }
+
+    shouldResetForm() {
+      return !document.querySelector(selectors$Z.focusedElements);
+    }
+
+    onFormReset(event) {
+      // Prevent default so the form reset doesn't set the value gotten from the url on page load
+      event.preventDefault();
+      // Don't reset if the user has selected an element on the predictive search dropdown
+      if (this.shouldResetForm()) {
+        this.input.value = '';
+        this.toggleResetButton();
+        event.target.querySelector(selectors$Z.inputSearch).focus();
+      }
+    }
+  }
+
+  customElements.define('header-search-form', HeaderSearchForm);
+
+  const selectors$Y = {
+    allVisibleElements: '[role="option"]',
+    ariaSelected: '[aria-selected="true"]',
+    header: '[data-header-height]',
+    popularSearches: '[data-popular-searches]',
+    predictiveSearch: 'predictive-search',
+    predictiveSearchResults: '[data-predictive-search-results]',
+    predictiveSearchStatus: '[data-predictive-search-status]',
+    searchInput: 'input[type="search"]',
+    searchPopdown: '[data-popdown]',
+    searchResultsLiveRegion: '[data-predictive-search-live-region-count-value]',
+    searchResultsGroupsWrapper: '[data-search-results-groups-wrapper]',
+    searchForText: '[data-predictive-search-search-for-text]',
+    sectionPredictiveSearch: '#shopify-section-predictive-search',
+    selectedLink: '[aria-selected="true"] a',
+    selectedOption: '[aria-selected="true"] a, button[aria-selected="true"]',
+  };
+
+  class PredictiveSearch extends HeaderSearchForm {
+    constructor() {
+      super();
+      this.a11y = a11y;
+      this.abortController = new AbortController();
+      this.allPredictiveSearchInstances = document.querySelectorAll(selectors$Y.predictiveSearch);
+      this.cachedResults = {};
+      this.input = this.querySelector(selectors$Y.searchInput);
+      this.isOpen = false;
+      this.predictiveSearchResults = this.querySelector(selectors$Y.predictiveSearchResults);
+      this.searchPopdown = this.closest(selectors$Y.searchPopdown);
+      this.popularSearches = this.searchPopdown?.querySelector(selectors$Y.popularSearches);
+      this.searchTerm = '';
+    }
+
+    connectedCallback() {
+      this.input.addEventListener('focus', this.onFocus.bind(this));
+      this.input.form.addEventListener('submit', this.onFormSubmit.bind(this));
+
+      this.addEventListener('focusout', this.onFocusOut.bind(this));
+      this.addEventListener('keyup', this.onKeyup.bind(this));
+      this.addEventListener('keydown', this.onKeydown.bind(this));
+    }
+
+    getQuery() {
+      return this.input.value.trim();
+    }
+
+    onChange() {
+      super.onChange();
+      const newSearchTerm = this.getQuery();
+
+      if (!this.searchTerm || !newSearchTerm.startsWith(this.searchTerm)) {
+        // Remove the results when they are no longer relevant for the new search term
+        // so they don't show up when the dropdown opens again
+        this.querySelector(selectors$Y.searchResultsGroupsWrapper)?.remove();
+      }
+
+      // Update the term asap, don't wait for the predictive search query to finish loading
+      this.updateSearchForTerm(this.searchTerm, newSearchTerm);
+
+      this.searchTerm = newSearchTerm;
+
+      if (!this.searchTerm.length) {
+        this.reset();
+        return;
+      }
+
+      this.getSearchResults(this.searchTerm);
+    }
+
+    onFormSubmit(event) {
+      if (!this.getQuery().length || this.querySelector(selectors$Y.selectedLink)) event.preventDefault();
+    }
+
+    onFormReset(event) {
+      super.onFormReset(event);
+      if (super.shouldResetForm()) {
+        this.searchTerm = '';
+        this.abortController.abort();
+        this.abortController = new AbortController();
+        this.closeResults(true);
+      }
+    }
+
+    shouldResetForm() {
+      return !document.querySelector(selectors$Y.selectedLink);
+    }
+
+    onFocus() {
+      const currentSearchTerm = this.getQuery();
+
+      if (!currentSearchTerm.length) return;
+
+      if (this.searchTerm !== currentSearchTerm) {
+        // Search term was changed from other search input, treat it as a user change
+        this.onChange();
+      } else if (this.getAttribute('results') === 'true') {
+        this.open();
+      } else {
+        this.getSearchResults(this.searchTerm);
+      }
+    }
+
+    onFocusOut() {
+      setTimeout(() => {
+        if (!this.contains(document.activeElement)) this.close();
+      });
+    }
+
+    onKeyup(event) {
+      if (!this.getQuery().length) this.close(true);
+      event.preventDefault();
+
+      switch (event.code) {
+        case 'ArrowUp':
+          this.switchOption('up');
+          break;
+        case 'ArrowDown':
+          this.switchOption('down');
+          break;
+        case 'Enter':
+          this.selectOption();
+          break;
+      }
+    }
+
+    onKeydown(event) {
+      // Prevent the cursor from moving in the input when using the up and down arrow keys
+      if (event.code === 'ArrowUp' || event.code === 'ArrowDown') {
+        event.preventDefault();
+      }
+    }
+
+    updateSearchForTerm(previousTerm, newTerm) {
+      const searchForTextElement = this.querySelector(selectors$Y.searchForText);
+      const currentButtonText = searchForTextElement?.innerText;
+
+      if (currentButtonText) {
+        if (currentButtonText.match(new RegExp(previousTerm, 'g'))?.length > 1) {
+          // The new term matches part of the button text and not just the search term, do not replace to avoid mistakes
+          return;
+        }
+        const newButtonText = currentButtonText.replace(previousTerm, newTerm);
+        searchForTextElement.innerText = newButtonText;
+      }
+    }
+
+    switchOption(direction) {
+      if (!this.getAttribute('open')) return;
+
+      const moveUp = direction === 'up';
+      const selectedElement = this.querySelector(selectors$Y.ariaSelected);
+
+      // Filter out hidden elements (duplicated page and article resources) thanks
+      // to this https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
+      const allVisibleElements = Array.from(this.querySelectorAll(selectors$Y.allVisibleElements)).filter((element) => element.offsetParent !== null);
+
+      let activeElementIndex = 0;
+
+      if (moveUp && !selectedElement) return;
+
+      let selectedElementIndex = -1;
+      let i = 0;
+
+      while (selectedElementIndex === -1 && i <= allVisibleElements.length) {
+        if (allVisibleElements[i] === selectedElement) {
+          selectedElementIndex = i;
+        }
+        i++;
+      }
+
+      this.statusElement.textContent = '';
+
+      if (!moveUp && selectedElement) {
+        activeElementIndex = selectedElementIndex === allVisibleElements.length - 1 ? 0 : selectedElementIndex + 1;
+      } else if (moveUp) {
+        activeElementIndex = selectedElementIndex === 0 ? allVisibleElements.length - 1 : selectedElementIndex - 1;
+      }
+
+      if (activeElementIndex === selectedElementIndex) return;
+
+      const activeElement = allVisibleElements[activeElementIndex];
+
+      activeElement.setAttribute('aria-selected', true);
+      if (selectedElement) selectedElement.setAttribute('aria-selected', false);
+
+      this.input.setAttribute('aria-activedescendant', activeElement.id);
+    }
+
+    selectOption() {
+      const selectedOption = this.querySelector(selectors$Y.selectedOption);
+
+      if (selectedOption) selectedOption.click();
+    }
+
+    getSearchResults(searchTerm) {
+      const queryKey = searchTerm.replace(' ', '-').toLowerCase();
+      this.setLiveRegionLoadingState();
+
+      if (this.cachedResults[queryKey]) {
+        this.renderSearchResults(this.cachedResults[queryKey]);
+        return;
+      }
+
+      fetch(`${theme.routes.predictive_search_url}?q=${encodeURIComponent(searchTerm)}&section_id=predictive-search`, {signal: this.abortController.signal})
+        .then((response) => {
+          if (!response.ok) {
+            var error = new Error(response.status);
+            this.close();
+            throw error;
+          }
+
+          return response.text();
+        })
+        .then((text) => {
+          const resultsMarkup = new DOMParser().parseFromString(text, 'text/html').querySelector(selectors$Y.sectionPredictiveSearch).innerHTML;
+          // Save bandwidth keeping the cache in all instances synced
+          this.allPredictiveSearchInstances.forEach((predictiveSearchInstance) => {
+            predictiveSearchInstance.cachedResults[queryKey] = resultsMarkup;
+          });
+          this.renderSearchResults(resultsMarkup);
+        })
+        .catch((error) => {
+          if (error?.code === 20) {
+            // Code 20 means the call was aborted
+            return;
+          }
+          this.close();
+          throw error;
+        });
+    }
+
+    setLiveRegionLoadingState() {
+      this.statusElement = this.statusElement || this.querySelector(selectors$Y.predictiveSearchStatus);
+      this.loadingText = this.loadingText || this.getAttribute('data-loading-text');
+
+      this.setLiveRegionText(this.loadingText);
+      this.setAttribute('loading', true);
+    }
+
+    setLiveRegionText(statusText) {
+      this.statusElement.setAttribute('aria-hidden', 'false');
+      this.statusElement.textContent = statusText;
+
+      setTimeout(() => {
+        this.statusElement.setAttribute('aria-hidden', 'true');
+      }, 1000);
+    }
+
+    renderSearchResults(resultsMarkup) {
+      this.predictiveSearchResults.innerHTML = resultsMarkup;
+
+      this.setAttribute('results', true);
+
+      this.setLiveRegionResults();
+      this.open();
+    }
+
+    setLiveRegionResults() {
+      this.removeAttribute('loading');
+      this.setLiveRegionText(this.querySelector(selectors$Y.searchResultsLiveRegion).textContent);
+    }
+
+    open() {
+      this.setAttribute('open', true);
+      this.input.setAttribute('aria-expanded', true);
+      this.isOpen = true;
+    }
+
+    close(clearSearchTerm = false) {
+      this.closeResults(clearSearchTerm);
+      this.isOpen = false;
+    }
+
+    closeResults(clearSearchTerm = false) {
+      if (clearSearchTerm) {
+        this.input.value = '';
+        this.removeAttribute('results');
+      }
+      const selected = this.querySelector(selectors$Y.ariaSelected);
+
+      if (selected) selected.setAttribute('aria-selected', false);
+
+      this.input.setAttribute('aria-activedescendant', '');
+      this.removeAttribute('loading');
+      this.removeAttribute('open');
+      this.input.setAttribute('aria-expanded', false);
+      this.resultsMaxHeight = false;
+      this.predictiveSearchResults?.removeAttribute('style');
+    }
+
+    reset() {
+      this.predictiveSearchResults.innerHTML = '';
+
+      this.input.val = '';
+      this.a11y.removeTrapFocus();
+
+      if (this.popularSearches) {
+        this.input.dispatchEvent(new Event('blur', {bubbles: false}));
+        this.a11y.trapFocus(this.searchPopdown, {
+          elementToFocus: this.input,
+        });
+      }
+    }
+  }
+
+  customElements.define('predictive-search', PredictiveSearch);
+
+  const selectors$X = {
+    aos: '[data-aos]:not(.aos-animate)',
+    aosAnchor: '[data-aos-anchor]',
+  };
+
+  const classes$I = {
+    aosAnimate: 'aos-animate',
+  };
+
+  const observerConfig = {
+    attributes: false,
+    childList: true,
+    subtree: true,
+  };
+
+  const mutationCallback = (mutationList) => {
+    for (const mutation of mutationList) {
+      if (mutation.type === 'childList') {
+        const element = mutation.target;
+        const elementsToAnimate = element.querySelectorAll(selectors$X.aos);
+        const anchors = element.querySelectorAll(selectors$X.aosAnchor);
+
+        if (elementsToAnimate.length) {
+          elementsToAnimate.forEach((element) => {
+            aosItemObserver.observe(element);
+          });
+        }
+
+        if (anchors.length) {
+          // Get all anchors and attach observers
+          initAnchorObservers(anchors);
+        }
+      }
+    }
+  };
+
+  /*
+    Observe each element that needs to be animated
+  */
+  const aosItemObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add(classes$I.aosAnimate);
+
+          // Stop observing element after it was animated
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      root: null,
+      rootMargin: '0px',
+      threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+    }
+  );
+
+  /*
+    Observe anchor elements
+  */
+  const aosAnchorObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.intersectionRatio > 0.1) {
+          const elementsToAnimate = entry.target.querySelectorAll(selectors$X.aos);
+
+          if (elementsToAnimate.length) {
+            elementsToAnimate.forEach((item) => {
+              item.classList.add(classes$I.aosAnimate);
+            });
+          }
+
+          // Stop observing anchor element after inner elements were animated
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      root: null,
+      rootMargin: '0px',
+      threshold: [0.1, 0.25, 0.5, 0.75, 1],
+    }
+  );
+
+  /*
+    Watch for mutations in the body and start observing the newly added animated elements and anchors
+  */
+  function bodyMutationObserver() {
+    const bodyObserver = new MutationObserver(mutationCallback);
+    bodyObserver.observe(document.body, observerConfig);
+  }
+
+  /*
+    Observe animated elements that have attribute [data-aos]
+  */
+  function elementsIntersectionObserver() {
+    const elementsToAnimate = document.querySelectorAll(selectors$X.aos);
+
+    if (elementsToAnimate.length) {
+      elementsToAnimate.forEach((element) => {
+        aosItemObserver.observe(element);
+      });
+    }
+  }
+
+  /*
+    Observe animated elements that have attribute [data-aos]
+  */
+  function anchorsIntersectionObserver() {
+    const anchors = document.querySelectorAll(selectors$X.aosAnchor);
+
+    if (anchors.length) {
+      // Get all anchors and attach observers
+      initAnchorObservers(anchors);
+    }
+  }
+
+  function initAnchorObservers(anchors) {
+    let anchorContainers = [];
+
+    if (!anchors.length) return;
+
+    anchors.forEach((anchor) => {
+      const containerId = anchor.dataset.aosAnchor;
+
+      // Avoid adding multiple observers to the same element
+      if (containerId && anchorContainers.indexOf(containerId) === -1) {
+        const container = document.querySelector(containerId);
+
+        if (container) {
+          aosAnchorObserver.observe(container);
+          anchorContainers.push(containerId);
+        }
+      }
+    });
+  }
+
+  function initAnimations() {
+    elementsIntersectionObserver();
+    anchorsIntersectionObserver();
+    bodyMutationObserver();
+  }
+
+  // Safari requestIdleCallback polyfill
+  window.requestIdleCallback =
+    window.requestIdleCallback ||
+    function (cb) {
+      var start = Date.now();
+      return setTimeout(function () {
+        cb({
+          didTimeout: false,
+          timeRemaining: function () {
+            return Math.max(0, 50 - (Date.now() - start));
+          },
+        });
+      }, 1);
+    };
+  window.cancelIdleCallback =
+    window.cancelIdleCallback ||
+    function (id) {
+      clearTimeout(id);
+    };
+
+  if (window.theme.settings.enableAnimations) {
+    initAnimations();
+  }
+
   resizeListener();
   scrollListener();
-  lazyImageBackgrounds();
-  ariaToggle(document);
+  isTouch();
+  setVars();
+  loadedImagesEventHook();
 
-  window.addEventListener('load', () => {
+  window.addEventListener('DOMContentLoaded', () => {
     setVarsOnResize();
+    ariaToggle(document);
     floatLabels(document);
-    preventOverflow(document);
     wrapElements(document);
+    removeLoadingClassFromLoadedImages(document);
+    loading();
+
+    if (window.fastNetworkAndCPU) {
+      preloadImages();
+    }
   });
 
   document.addEventListener('shopify:section:load', (e) => {
     const container = e.target;
     floatLabels(container);
-    preventOverflow(container);
     wrapElements(container);
     ariaToggle(document);
+    setVarsOnResize();
   });
-
-  (function () {
-    function n(n) {
-      var i = window.innerWidth || document.documentElement.clientWidth,
-        r = window.innerHeight || document.documentElement.clientHeight,
-        t = n.getBoundingClientRect();
-      return t.top >= 0 && t.bottom <= r && t.left >= 0 && t.right <= i;
-    }
-    function t(n) {
-      var i = window.innerWidth || document.documentElement.clientWidth,
-        r = window.innerHeight || document.documentElement.clientHeight,
-        t = n.getBoundingClientRect(),
-        u = (t.left >= 0 && t.left <= i) || (t.right >= 0 && t.right <= i),
-        f = (t.top >= 0 && t.top <= r) || (t.bottom >= 0 && t.bottom <= r);
-      return u && f;
-    }
-    function i(n, i) {
-      function r() {
-        var r = t(n);
-        r != u && ((u = r), typeof i == 'function' && i(r, n));
-      }
-      var u = t(n);
-      window.addEventListener('load', r);
-      window.addEventListener('resize', r);
-      window.addEventListener('scroll', r);
-    }
-    function r(t, i) {
-      function r() {
-        var r = n(t);
-        r != u && ((u = r), typeof i == 'function' && i(r, t));
-      }
-      var u = n(t);
-      window.addEventListener('load', r);
-      window.addEventListener('resize', r);
-      window.addEventListener('scroll', r);
-    }
-    window.visibilityHelper = {isElementTotallyVisible: n, isElementPartiallyVisible: t, inViewportPartially: i, inViewportTotally: r};
-  })();
 
   const showElement = (elem, removeProp = false, prop = 'block') => {
     if (elem) {
@@ -548,21 +1361,27 @@
     let wrapper = null;
     let howManyToShowItems = null;
 
+    const today = new Date();
+    const expiresDate = new Date();
+    const daysToExpire = 90;
+    expiresDate.setTime(today.getTime() + 3600000 * 24 * daysToExpire);
+
     const cookie = {
       configuration: {
-        expires: 90,
+        expires: expiresDate.toGMTString(),
         path: '/',
         domain: window.location.hostname,
+        sameSite: 'none',
+        secure: true,
       },
       name: 'shopify_recently_viewed',
       write: function (recentlyViewed) {
         const recentlyViewedString = recentlyViewed.join(' ');
-        document.cookie = `${this.name}=${recentlyViewedString}; expires=${this.configuration.expires}; path=${this.configuration.path}; domain=${this.configuration.domain}`;
+        document.cookie = `${this.name}=${recentlyViewedString}; expires=${this.configuration.expires}; path=${this.configuration.path}; domain=${this.configuration.domain}; sameSite=${this.configuration.sameSite}; secure=${this.configuration.secure}`;
       },
       read: function () {
         let recentlyViewed = [];
         let cookieValue = null;
-        const templateProduct = document.querySelector('#template-product');
 
         if (document.cookie.indexOf('; ') !== -1 && document.cookie.split('; ').find((row) => row.startsWith(this.name))) {
           cookieValue = document.cookie
@@ -573,16 +1392,6 @@
 
         if (cookieValue !== null) {
           recentlyViewed = cookieValue.split(' ');
-        }
-
-        if (templateProduct) {
-          const currentProduct = templateProduct.getAttribute('data-product-handle');
-
-          // Remove current product from the array
-          if (recentlyViewed.indexOf(currentProduct) != -1) {
-            const currentProductIndex = recentlyViewed.indexOf(currentProduct);
-            recentlyViewed.splice(currentProductIndex, 1);
-          }
         }
 
         return recentlyViewed;
@@ -638,14 +1447,14 @@
         try {
           config.onComplete(wrapper, section);
         } catch (error) {
-          console.log('error');
+          console.log(error);
         }
       }
     };
 
     const moveAlong = (shown, productHandleQueue, wrapper, section) => {
       if (productHandleQueue.length && shown < config.howManyToShow) {
-        fetch('/products/' + productHandleQueue[0] + '?section_id=api-product-grid-item')
+        fetch(`${window.theme.routes.root}products/${productHandleQueue[0]}?section_id=api-product-grid-item`)
           .then((response) => response.text())
           .then((product) => {
             const aosDelay = shown * 150;
@@ -721,11 +1530,16 @@
         // If we are on a product page.
         if (window.location.pathname.indexOf('/products/') !== -1) {
           // What is the product handle on this page.
-          const productHandle = decodeURIComponent(window.location.pathname)
+          let productHandle = decodeURIComponent(window.location.pathname)
             .match(
               /\/products\/([a-z0-9\-]|[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|[\u203B]|[\w\u0430-\u044f]|[\u0400-\u04FF]|[\u0900-\u097F]|[\u0590-\u05FF\u200f\u200e]|[\u0621-\u064A\u0660-\u0669 ])+/
             )[0]
             .split('/products/')[1];
+
+          if (config.handle) {
+            productHandle = config.handle;
+          }
+
           // In what position is that product in memory.
           const position = recentlyViewed.indexOf(productHandle);
 
@@ -793,6 +1607,7 @@
   const fadeIn = (el, display, callback = null) => {
     el.style.opacity = 0;
     el.style.display = display || 'block';
+    let flag = true;
 
     (function fade() {
       let val = parseFloat(el.style.opacity);
@@ -801,7 +1616,8 @@
         requestAnimationFrame(fade);
       }
 
-      if (val === 1 && typeof callback === 'function') {
+      if (parseInt(val) === 1 && flag && typeof callback === 'function') {
+        flag = false;
         callback();
       }
     })();
@@ -892,7 +1708,7 @@
           shipping_address: shipping_address,
         })
       );
-      const url = `${window.theme.routes.cart}/shipping_rates.json?${encodedShippingAddressData}`;
+      const url = `${theme.routes.cart_url}/shipping_rates.json?${encodedShippingAddressData}`;
       const request = new XMLHttpRequest();
       request.open('GET', url, true);
 
@@ -1045,350 +1861,11 @@
         return _config;
       },
       formatRate: function (cents) {
-        const price = cents === 0 ? window.theme.strings.free : themeCurrency.formatMoney(cents, theme.moneyFormat);
+        const price = cents === '0.00' ? window.theme.strings.free : themeCurrency.formatMoney(cents, theme.moneyFormat);
         return price;
       },
     };
   })();
-
-  /**
-   * A11y Helpers
-   * -----------------------------------------------------------------------------
-   * A collection of useful functions that help make your theme more accessible
-   */
-
-  /**
-   * Moves focus to an HTML element
-   * eg for In-page links, after scroll, focus shifts to content area so that
-   * next `tab` is where user expects. Used in bindInPageLinks()
-   * eg move focus to a modal that is opened. Used in trapFocus()
-   *
-   * @param {Element} container - Container DOM element to trap focus inside of
-   * @param {Object} options - Settings unique to your theme
-   * @param {string} options.className - Class name to apply to element on focus.
-   */
-  function forceFocus(element, options) {
-    options = options || {};
-
-    var savedTabIndex = element.tabIndex;
-
-    element.tabIndex = -1;
-    element.dataset.tabIndex = savedTabIndex;
-    element.focus();
-    if (typeof options.className !== 'undefined') {
-      element.classList.add(options.className);
-    }
-    element.addEventListener('blur', callback);
-
-    function callback(event) {
-      event.target.removeEventListener(event.type, callback);
-
-      element.tabIndex = savedTabIndex;
-      delete element.dataset.tabIndex;
-      if (typeof options.className !== 'undefined') {
-        element.classList.remove(options.className);
-      }
-    }
-  }
-
-  /**
-   * If there's a hash in the url, focus the appropriate element
-   * This compensates for older browsers that do not move keyboard focus to anchor links.
-   * Recommendation: To be called once the page in loaded.
-   *
-   * @param {Object} options - Settings unique to your theme
-   * @param {string} options.className - Class name to apply to element on focus.
-   * @param {string} options.ignore - Selector for elements to not include.
-   */
-
-  function focusHash(options) {
-    options = options || {};
-    var hash = window.location.hash;
-    var element = document.getElementById(hash.slice(1));
-
-    // if we are to ignore this element, early return
-    if (element && options.ignore && element.matches(options.ignore)) {
-      return false;
-    }
-
-    if (hash && element) {
-      forceFocus(element, options);
-    }
-  }
-
-  /**
-   * When an in-page (url w/hash) link is clicked, focus the appropriate element
-   * This compensates for older browsers that do not move keyboard focus to anchor links.
-   * Recommendation: To be called once the page in loaded.
-   *
-   * @param {Object} options - Settings unique to your theme
-   * @param {string} options.className - Class name to apply to element on focus.
-   * @param {string} options.ignore - CSS selector for elements to not include.
-   */
-
-  function bindInPageLinks(options) {
-    options = options || {};
-    var links = Array.prototype.slice.call(document.querySelectorAll('a[href^="#"]'));
-
-    function queryCheck(selector) {
-      return document.getElementById(selector) !== null;
-    }
-
-    return links.filter(function (link) {
-      if (link.hash === '#' || link.hash === '') {
-        return false;
-      }
-
-      if (options.ignore && link.matches(options.ignore)) {
-        return false;
-      }
-
-      if (!queryCheck(link.hash.substr(1))) {
-        return false;
-      }
-
-      var element = document.querySelector(link.hash);
-
-      if (!element) {
-        return false;
-      }
-
-      link.addEventListener('click', function () {
-        forceFocus(element, options);
-      });
-
-      return true;
-    });
-  }
-
-  function focusable(container) {
-    var elements = Array.prototype.slice.call(
-      container.querySelectorAll('[tabindex],' + '[draggable],' + 'a[href],' + 'area,' + 'button:enabled,' + 'input:not([type=hidden]):enabled,' + 'object,' + 'select:enabled,' + 'textarea:enabled')
-    );
-
-    // Filter out elements that are not visible.
-    // Copied from jQuery https://github.com/jquery/jquery/blob/2d4f53416e5f74fa98e0c1d66b6f3c285a12f0ce/src/css/hiddenVisibleSelectors.js
-    return elements.filter(function (element) {
-      return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
-    });
-  }
-
-  /**
-   * Traps the focus in a particular container
-   *
-   * @param {Element} container - Container DOM element to trap focus inside of
-   * @param {Element} elementToFocus - Element to be focused on first
-   * @param {Object} options - Settings unique to your theme
-   * @param {string} options.className - Class name to apply to element on focus.
-   */
-
-  var trapFocusHandlers = {};
-
-  function trapFocus(container, options) {
-    options = options || {};
-    var elements = focusable(container);
-    var elementToFocus = options.elementToFocus || container;
-    var first = elements[0];
-    var last = elements[elements.length - 1];
-
-    removeTrapFocus();
-
-    trapFocusHandlers.focusin = function (event) {
-      if (container !== event.target && !container.contains(event.target)) {
-        first.focus();
-      }
-
-      if (event.target !== container && event.target !== last && event.target !== first) return;
-      document.addEventListener('keydown', trapFocusHandlers.keydown);
-    };
-
-    trapFocusHandlers.focusout = function () {
-      document.removeEventListener('keydown', trapFocusHandlers.keydown);
-    };
-
-    trapFocusHandlers.keydown = function (event) {
-      if (event.keyCode !== window.theme.keyboardKeys.TAB) return; // If not TAB key
-
-      // On the last focusable element and tab forward, focus the first element.
-      if (event.target === last && !event.shiftKey) {
-        event.preventDefault();
-        first.focus();
-      }
-
-      //  On the first focusable element and tab backward, focus the last element.
-      if ((event.target === container || event.target === first) && event.shiftKey) {
-        event.preventDefault();
-        last.focus();
-      }
-    };
-
-    document.addEventListener('focusout', trapFocusHandlers.focusout);
-    document.addEventListener('focusin', trapFocusHandlers.focusin);
-
-    forceFocus(elementToFocus, options);
-  }
-
-  /**
-   * Removes the trap of focus from the page
-   */
-  function removeTrapFocus() {
-    document.removeEventListener('focusin', trapFocusHandlers.focusin);
-    document.removeEventListener('focusout', trapFocusHandlers.focusout);
-    document.removeEventListener('keydown', trapFocusHandlers.keydown);
-  }
-
-  /**
-   * Add a preventive message to external links and links that open to a new window.
-   * @param {string} elements - Specific elements to be targeted
-   * @param {object} options.messages - Custom messages to overwrite with keys: newWindow, external, newWindowExternal
-   * @param {string} options.messages.newWindow - When the link opens in a new window (e.g. target="_blank")
-   * @param {string} options.messages.external - When the link is to a different host domain.
-   * @param {string} options.messages.newWindowExternal - When the link is to a different host domain and opens in a new window.
-   * @param {object} options.prefix - Prefix to namespace "id" of the messages
-   */
-  function accessibleLinks(elements, options) {
-    if (typeof elements !== 'string') {
-      throw new TypeError(elements + ' is not a String.');
-    }
-
-    elements = document.querySelectorAll(elements);
-
-    if (elements.length === 0) {
-      return;
-    }
-
-    options = options || {};
-    options.messages = options.messages || {};
-
-    var messages = {
-      newWindow: options.messages.newWindow || 'Opens in a new window.',
-      external: options.messages.external || 'Opens external website.',
-      newWindowExternal: options.messages.newWindowExternal || 'Opens external website in a new window.',
-    };
-
-    var prefix = options.prefix || 'a11y';
-
-    var messageSelectors = {
-      newWindow: prefix + '-new-window-message',
-      external: prefix + '-external-message',
-      newWindowExternal: prefix + '-new-window-external-message',
-    };
-
-    function generateHTML(messages) {
-      var container = document.createElement('ul');
-      var htmlMessages = Object.keys(messages).reduce(function (html, key) {
-        return (html += '<li id=' + messageSelectors[key] + '>' + messages[key] + '</li>');
-      }, '');
-
-      container.setAttribute('hidden', true);
-      container.innerHTML = htmlMessages;
-
-      document.body.appendChild(container);
-    }
-
-    function externalSite(link) {
-      return link.hostname !== window.location.hostname;
-    }
-
-    elements.forEach(function (link) {
-      var target = link.getAttribute('target');
-      var rel = link.getAttribute('rel');
-      var isExternal = externalSite(link);
-      var isTargetBlank = target === '_blank';
-      var missingRelNoopener = rel === null || rel.indexOf('noopener') === -1;
-
-      if (isTargetBlank && missingRelNoopener) {
-        var relValue = rel === null ? 'noopener' : rel + ' noopener';
-        link.setAttribute('rel', relValue);
-      }
-
-      if (isExternal && isTargetBlank) {
-        link.setAttribute('aria-describedby', messageSelectors.newWindowExternal);
-      } else if (isExternal) {
-        link.setAttribute('aria-describedby', messageSelectors.external);
-      } else if (isTargetBlank) {
-        link.setAttribute('aria-describedby', messageSelectors.newWindow);
-      }
-    });
-
-    generateHTML(messages);
-  }
-
-  var a11y = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    forceFocus: forceFocus,
-    focusHash: focusHash,
-    bindInPageLinks: bindInPageLinks,
-    focusable: focusable,
-    trapFocus: trapFocus,
-    removeTrapFocus: removeTrapFocus,
-    accessibleLinks: accessibleLinks
-  });
-
-  const slideDown = (target, duration = 500, showDisplay = 'block', checkHidden = true) => {
-    let display = window.getComputedStyle(target).display;
-    if (checkHidden && display !== 'none') {
-      return;
-    }
-    target.style.removeProperty('display');
-    if (display === 'none') display = showDisplay;
-    target.style.display = display;
-    let height = target.offsetHeight;
-    target.style.overflow = 'hidden';
-    target.style.height = 0;
-    target.style.paddingTop = 0;
-    target.style.paddingBottom = 0;
-    target.style.marginTop = 0;
-    target.style.marginBottom = 0;
-    target.offsetHeight;
-    target.style.boxSizing = 'border-box';
-    target.style.transitionProperty = 'height, margin, padding';
-    target.style.transitionDuration = duration + 'ms';
-    target.style.height = height + 'px';
-    target.style.removeProperty('padding-top');
-    target.style.removeProperty('padding-bottom');
-    target.style.removeProperty('margin-top');
-    target.style.removeProperty('margin-bottom');
-    window.setTimeout(() => {
-      target.style.removeProperty('height');
-      target.style.removeProperty('overflow');
-      target.style.removeProperty('transition-duration');
-      target.style.removeProperty('transition-property');
-    }, duration);
-  };
-
-  const slideUp = (target, duration = 500) => {
-    target.style.transitionProperty = 'height, margin, padding';
-    target.style.transitionDuration = duration + 'ms';
-    target.style.boxSizing = 'border-box';
-    target.style.height = target.offsetHeight + 'px';
-    target.offsetHeight;
-    target.style.overflow = 'hidden';
-    target.style.height = 0;
-    target.style.paddingTop = 0;
-    target.style.paddingBottom = 0;
-    target.style.marginTop = 0;
-    target.style.marginBottom = 0;
-    window.setTimeout(() => {
-      target.style.display = 'none';
-      target.style.removeProperty('height');
-      target.style.removeProperty('padding-top');
-      target.style.removeProperty('padding-bottom');
-      target.style.removeProperty('margin-top');
-      target.style.removeProperty('margin-bottom');
-      target.style.removeProperty('overflow');
-      target.style.removeProperty('transition-duration');
-      target.style.removeProperty('transition-property');
-    }, duration);
-  };
-
-  const slideToggle = (target, duration = 500, showDisplay = 'block') => {
-    if (window.getComputedStyle(target).display === 'none') {
-      return slideDown(target, duration, showDisplay);
-    } else {
-      return slideUp(target, duration);
-    }
-  };
 
   function FetchError(object) {
     this.status = object.status || null;
@@ -1398,241 +1875,29 @@
   }
   FetchError.prototype = Error.prototype;
 
-  function fetchProduct(handle) {
-    const requestRoute = `${window.theme.routes.root}products/${handle}.js`;
+  function subscribe(eventName, callback) {
+    if (window.theme.subscribers[eventName] === undefined) {
+      window.theme.subscribers[eventName] = [];
+    }
 
-    return window
-      .fetch(requestRoute)
-      .then((response) => {
-        return response.json();
-      })
-      .catch((e) => {
-        console.error(e);
+    window.theme.subscribers[eventName] = [...window.theme.subscribers[eventName], callback];
+
+    return function unsubscribe() {
+      window.theme.subscribers[eventName] = window.theme.subscribers[eventName].filter((cb) => {
+        return cb !== callback;
       });
-  }
-
-  const selectors = {
-    saleClass: 'sale',
-    soldClass: 'sold-out',
-    doubleImage: 'double__image',
-  };
-
-  function formatPrices(product) {
-    // Apprend classes for on sale and sold out
-    const on_sale = product.price <= product.compare_at_price_min;
-    let classes = on_sale ? selectors.saleClass : '';
-    classes += product.available ? '' : selectors.soldClass;
-    // Add 'from' before min price if price varies
-    product.price = product.price === 0 ? window.theme.strings.free : themeCurrency.formatMoney(product.price, theme.moneyFormat);
-    product.price_with_from = product.price;
-    if (product.price_varies) {
-      const min = product.price_min === 0 ? window.theme.strings.free : themeCurrency.formatMoney(product.price_min, theme.moneyFormat);
-      product.price_with_from = `<small>${window.theme.strings.from}</small> ${min}`;
-    }
-
-    // add a class if there's more than one media
-    let double_class = '';
-    if (product.media !== undefined) {
-      if (product.media.length > 1) {
-        double_class += selectors.doubleImage;
-      }
-    }
-
-    const formatted = {
-      ...product,
-      classes,
-      on_sale,
-      double_class,
-      sold_out: !product.available,
-      sold_out_translation: window.theme.strings.soldOut,
-      compare_at_price: themeCurrency.formatMoney(product.compare_at_price, theme.moneyFormat),
-      compare_at_price_max: themeCurrency.formatMoney(product.compare_at_price_max, theme.moneyFormat),
-      compare_at_price_min: themeCurrency.formatMoney(product.compare_at_price_min, theme.moneyFormat),
-      price_max: themeCurrency.formatMoney(product.price_max, theme.moneyFormat),
-      price_min: themeCurrency.formatMoney(product.price_min, theme.moneyFormat),
-      unit_price: themeCurrency.formatMoney(product.unit_price, theme.moneyFormat),
     };
-    return formatted;
   }
 
-  const selectors$1 = {
-    template: '[pair-product-template]',
-    pairProducts: '[data-pair-products]',
-    upsellButton: '[data-upsell-btn]',
-    upsellButtonText: '[data-upsell-btn-text]',
-  };
-
-  class PairWithProduct {
-    constructor(handle) {
-      this.handle = handle;
-      this.document = document;
-      this.template = this.document.querySelector(selectors$1.template).innerHTML;
-      this.pairProducts = this.document.querySelector(selectors$1.pairProducts);
-      this.resizeEventUpsell = () => this.calcUpsellButtonDemensions();
-      this.variant = null;
-      this.variantObject = null;
-
-      this.init();
-    }
-
-    init() {
-      if (this.handle.includes('_')) {
-        const parts = this.handle.split('_');
-        this.handle = parts[0];
-        this.variant = parts[1];
-      }
-
-      fetchProduct(this.handle)
-        .then((response) => {
-          if (response === undefined) {
-            this.document.dispatchEvent(new CustomEvent('upsell-product-error'));
-
-            return;
-          }
-
-          const formatted = formatPrices(response);
-
-          let availableVariant = false;
-
-          if (this.variant !== null) {
-            formatted.variants.filter((variant) => {
-              if (variant.id === Number(this.variant) && variant.available) {
-                this.variantObject = variant;
-                availableVariant = true;
-              }
-
-              return variant;
-            });
-          }
-
-          if (formatted.available && this.variant === null) {
-            this.renderPairProduct(formatted);
-          } else if (availableVariant) {
-            this.renderPairProduct(formatted);
-          } else {
-            this.pairProducts.innerHTML = '';
-            this.document.dispatchEvent(new CustomEvent('upsell-unavailable'));
-          }
-        })
-        .catch((e) => {
-          console.error(e);
-        });
-    }
-
-    renderPairProduct(formatted) {
-      const productMarkup = this.renderProduct(formatted);
-
-      this.pairProducts.innerHTML = productMarkup;
-
-      this.upsellButtonDemensions();
-    }
-
-    upsellButtonDemensions() {
-      this.calcUpsellButtonDemensions();
-
-      document.addEventListener('theme:resize', this.resizeEventUpsell);
-    }
-
-    calcUpsellButtonDemensions() {
-      const upsellButtonText = this.pairProducts.querySelector(selectors$1.upsellButtonText);
-      const button = this.pairProducts.querySelector(selectors$1.upsellButton);
-
-      if (upsellButtonText) {
-        button.style.setProperty('--btn-text-width', `${upsellButtonText.clientWidth}px`);
-      }
-    }
-
-    renderProduct(currentProduct) {
-      let media = null;
-      let image = '';
-      let firstAvailableVariant = '';
-      let hasVariants = true;
-      let hasUnitPrice = false;
-
-      if (currentProduct.media !== undefined) {
-        media = currentProduct.media[0];
-      }
-
-      if (this.variantObject !== null && this.variantObject.featured_media !== undefined) {
-        media = this.variantObject.featured_media;
-      }
-
-      if (media) {
-        image = {
-          thumb: themeImages.getSizedImageUrl(media.preview_image.src, '480x480'),
-        };
-      } else {
-        image = {
-          thumb: window.theme.assets.no_image,
-        };
-      }
-
-      if (currentProduct.options[0].name === 'Title' && currentProduct.options.length === 1 && currentProduct.options[0].values[0] === 'Default Title') {
-        hasVariants = false;
-      }
-
-      if (this.variantObject === null) {
-        for (let index = 0; index < currentProduct.variants.length; index++) {
-          const variant = currentProduct.variants[index];
-
-          if (variant.available) {
-            const title = variant.title.replaceAll('/', '<span>&nbsp;</span>');
-            hasUnitPrice = variant.unit_price !== undefined;
-            const formatedVariant = formatPrices(variant);
-
-            firstAvailableVariant = {
-              ...formatedVariant,
-              title,
-              hasUnitPrice,
-            };
-
-            break;
-          }
-        }
-      }
-
-      if (this.variantObject !== null) {
-        const title = this.variantObject.title.replaceAll('/', '<span>&nbsp;</span>');
-        hasUnitPrice = this.variantObject.unit_price !== undefined;
-        const formatedVariant = formatPrices(this.variantObject);
-
-        firstAvailableVariant = {
-          ...formatedVariant,
-          title,
-          hasUnitPrice,
-        };
-      }
-
-      if (firstAvailableVariant === '') {
-        return '';
-      }
-
-      const title = currentProduct.title.replace(/(<([^>]+)>)/gi, '');
-
-      if (firstAvailableVariant.unit_price_measurement) {
-        firstAvailableVariant.unitValue = firstAvailableVariant.unit_price_measurement.reference_unit;
-
-        if (firstAvailableVariant.unit_price_measurement.reference_value !== 1) {
-          firstAvailableVariant.unitCount = firstAvailableVariant.unit_price_measurement.reference_value;
-        }
-      }
-
-      const updateValues = {
-        ...currentProduct,
-        title,
-        image,
-        firstAvailableVariant,
-        hasVariants,
-        addToCartText: theme.strings.upsellAddToCart,
-        unitPriceLabel: theme.strings.unitPrice,
-        unitPriceSeparator: theme.strings.unitPriceSeparator,
-      };
-
-      return Sqrl.render(this.template, {product: updateValues});
+  function publish(eventName, data) {
+    if (window.theme.subscribers[eventName]) {
+      window.theme.subscribers[eventName].forEach((callback) => {
+        callback(data);
+      });
     }
   }
 
-  const selectors$2 = {
+  const selectors$W = {
     quantityHolder: '[data-quantity-holder]',
     quantityField: '[data-quantity-field]',
     quantityButton: '[data-quantity-button]',
@@ -1650,7 +1915,7 @@
 
     init() {
       // Settings
-      this.settings = selectors$2;
+      this.settings = selectors$W;
 
       // DOM Elements
       this.quantity = this.holder.querySelector(this.settings.quantityHolder);
@@ -1669,9 +1934,6 @@
       this.maxValue = Number(this.field.getAttribute('max')) > 0 ? Number(this.field.getAttribute('max')) : null;
       this.minValue = Number(this.field.getAttribute('min')) > 0 ? Number(this.field.getAttribute('min')) : 0;
       this.disableIncrease = this.disableIncrease.bind(this);
-
-      // Flags
-      this.emptyField = false;
 
       // Methods
       this.updateQuantity = this.updateQuantity.bind(this);
@@ -1699,6 +1961,9 @@
       this.buttons.forEach((element) => {
         element.addEventListener('click', (event) => {
           event.preventDefault();
+
+          this.quantityValue = Number(this.field.value || 0);
+
           const clickedElement = event.target;
           const isDescrease = clickedElement.matches(that.settings.quantityMinusButton) || clickedElement.closest(that.settings.quantityMinusButton);
           const isIncrease = clickedElement.matches(that.settings.quantityPlusButton) || clickedElement.closest(that.settings.quantityPlusButton);
@@ -1723,21 +1988,10 @@
      */
 
     changeValueOnInput() {
-      const that = this;
-
-      this.field.addEventListener(
-        'input',
-        function () {
-          that.quantityValue = this.value;
-
-          if (this.value === '') {
-            that.emptyField = true;
-          }
-
-          that.updateQuantity();
-        },
-        this
-      );
+      this.field.addEventListener('change', () => {
+        this.quantityValue = this.field.value;
+        this.updateQuantity();
+      });
     }
 
     /**
@@ -1758,8 +2012,6 @@
       this.field.value = this.quantityValue;
 
       this.disableIncrease();
-
-      document.dispatchEvent(new CustomEvent('popout:updateValue'));
 
       if (this.quantityUpdateCart) {
         this.updateCart();
@@ -1809,12 +2061,13 @@
      */
 
     updateCart() {
-      const event = new CustomEvent('update-cart', {
+      if (this.quantityValue === '') return;
+
+      const event = new CustomEvent('theme:cart:update', {
         bubbles: true,
         detail: {
           id: this.cartItemID,
           quantity: this.quantityValue,
-          valueIsEmpty: this.emptyField,
         },
       });
 
@@ -1822,76 +2075,90 @@
     }
   }
 
-  const settings = {
-    cartDrawerEnabled: window.theme.cartDrawerEnabled,
-    times: {
-      timeoutAddProduct: 1000,
-      closeDropdownAfter: 5000,
-    },
-    classes: {
-      hidden: 'is-hidden',
-      added: 'is-added',
-      htmlClasses: 'has-open-cart-dropdown',
-      open: 'is-open',
-      active: 'is-active',
-      visible: 'is-visible',
-      loading: 'is-loading',
-      disabled: 'is-disabled',
-      success: 'is-success',
-      error: 'has-error',
-      headerStuck: 'js__header__stuck',
-      drawerVisible: 'drawer--visible',
-    },
-    attributes: {
-      transparent: 'data-header-transparent',
-      upsellButton: 'data-upsell-btn',
-    },
-    elements: {
-      html: 'html',
-      outerSection: '[data-section-id]',
-      cartDropdown: '[data-cart-dropdown]',
-      cartDropdownBody: '[data-cart-dropdown-body]',
-      emptyMessage: '[data-empty-message]',
-      buttonHolder: '[data-foot-holder]',
-      itemsHolder: '[data-items-holder]',
-      item: '[data-item]',
-      cartToggleElement: '[data-cart-toggle]',
-      cartItemRemove: '[data-item-remove]',
-      cartCount: '[data-cart-count]',
-      cartCountValue: 'data-cart-count',
-      clickedElementForExpanding: '[data-expand-button]',
-      cartWidget: '[data-cart-widget]',
-      cartTotal: '[data-cart-total]',
-      cartMessage: '[data-cart-message]',
-      cartMessageValue: 'data-cart-message',
-      buttonAddToCart: '[data-add-to-cart]',
-      formErrorsContainer: '[data-cart-errors-container]',
-      cartErrors: '[data-cart-errors]',
-      cartCloseError: '[data-cart-error-close]',
-      formCloseError: '[data-close-error]',
-      quickAddHolder: '[data-quick-add-holder]',
-      cartProgress: '[data-cart-progress]',
-      cartOriginalTotal: '[data-cart-original-total]',
-      cartOriginaTotalPrice: '[data-cart-original-total-price]',
-      cartDiscountsHolder: '[data-cart-discounts-holder]',
-      headerWrapper: '[data-header-wrapper]',
-      burgerButton: '[data-drawer-toggle]',
-      upsellHolder: '[data-upsell-holder]',
-      errorMessage: '[data-error-message]',
-      navDrawer: '[data-drawer]',
-      pairProductsHolder: '[data-pair-products-holder]',
-      pairProducts: '[data-pair-products]',
-      buttonSkipPairProduct: '[data-skip-pair-product]',
-      productIDAttribute: 'data-product-id',
-      leftToSpend: '[data-left-to-spend]',
-    },
-    formatMoney: theme.moneyFormat,
-    cartTotalDiscountsTemplate: '[data-cart-total-discount]',
+  const events$2 = {
+    cartUpdate: 'cart-update',
+    cartError: 'cart-error',
+  };
+
+  const classes$H = {
+    animated: 'is-animated',
+    active: 'is-active',
+    added: 'is-added',
+    disabled: 'is-disabled',
+    error: 'has-error',
+    headerStuck: 'js__header__stuck',
+    hidden: 'is-hidden',
+    hiding: 'is-hiding',
+    loading: 'is-loading',
+    open: 'is-open',
+    removed: 'is-removed',
+    success: 'is-success',
+    visible: 'is-visible',
+    focused: 'is-focused',
+    expanded: 'is-expanded',
+    updated: 'is-updated',
+    variantSoldOut: 'variant--soldout',
+    variantUnavailable: 'variant--unavailable',
+  };
+
+  const selectors$V = {
+    apiContent: '[data-api-content]',
+    apiLineItems: '[data-api-line-items]',
+    apiUpsellItems: '[data-api-upsell-items]',
+    apiCartPrice: '[data-api-cart-price]',
+    animation: '[data-animation]',
+    additionalCheckoutButtons: '.additional-checkout-buttons',
+    buttonHolder: '[data-foot-holder]',
+    buttonSkipUpsellProduct: '[data-skip-upsell-product]',
+    cartBarAdd: '[data-add-to-cart-bar]',
+    cartCloseError: '[data-cart-error-close]',
+    cartDrawer: '[data-cart-drawer]',
+    cartDrawerClose: '[data-cart-drawer-close]',
+    cartEmpty: '[data-cart-empty]',
+    cartErrors: '[data-cart-errors]',
+    cartItemRemove: '[data-item-remove]',
+    cartPage: '[data-cart-page]',
+    cartToggle: '[data-cart-toggle]',
+    cartTotal: '[data-cart-total]',
+    errorMessage: '[data-error-message]',
+    formCloseError: '[data-close-error]',
+    formErrorsContainer: '[data-cart-errors-container]',
+    formWrapper: '[data-form-wrapper]',
+    freeShipping: '[data-free-shipping]',
+    freeShippingGraph: '[data-progress-graph]',
+    freeShippingProgress: '[data-progress-bar]',
+    headerWrapper: '[data-header-wrapper]',
+    item: '[data-item]',
+    itemsHolder: '[data-items-holder]',
+    leftToSpend: '[data-left-to-spend]',
+    navDrawer: '[data-drawer]',
+    outerSection: '[data-section-id]',
+    priceHolder: '[data-cart-price-holder]',
+    quickAddHolder: '[data-quick-add-holder]',
+    quickAddModal: '[data-quick-add-modal]',
+    qtyInput: '[data-quantity-field]',
+    upsellProductsHolder: '[data-upsell-products]',
+    upsellWidget: '[data-upsell-widget]',
+  };
+
+  const attributes$m = {
+    cartToggle: 'data-cart-toggle',
+    cartTotal: 'data-cart-total',
+    disabled: 'disabled',
+    drawerUnderlay: 'data-drawer-underlay',
+    freeShipping: 'data-free-shipping',
+    freeShippingLimit: 'data-free-shipping-limit',
+    hideErrors: 'data-hide-errors',
+    item: 'data-item',
+    itemIndex: 'data-item-index',
+    itemTitle: 'data-item-title',
+    quickAddHolder: 'data-quick-add-holder',
+    quickAddVariant: 'data-quick-add-variant',
   };
 
   class CartDrawer {
     constructor() {
-      if (window.location.pathname === '/password') {
+      if (window.location.pathname.endsWith('/password')) {
         return;
       }
 
@@ -1899,93 +2166,96 @@
     }
 
     init() {
-      this.settings = settings;
-
       // DOM Elements
-      this.document = document;
-      this.html = this.document.querySelector(this.settings.elements.html);
-      this.cartDropdown = this.document.querySelector(this.settings.elements.cartDropdown);
-      this.cartDropdownBody = this.document.querySelector(this.settings.elements.cartDropdownBody);
-      this.emptyMessage = this.document.querySelector(this.settings.elements.emptyMessage);
-      this.buttonHolder = this.document.querySelector(this.settings.elements.buttonHolder);
-      this.itemsHolder = this.document.querySelector(this.settings.elements.itemsHolder);
-      this.items = this.document.querySelectorAll(this.settings.elements.item);
-      this.counterHolders = this.document.querySelectorAll(this.settings.elements.cartCount);
-      this.cartTotal = this.document.querySelector(this.settings.elements.cartTotal);
-      this.cartMessage = this.document.querySelectorAll(this.settings.elements.cartMessage);
-      this.cartOriginalTotal = this.document.querySelector(this.settings.elements.cartOriginalTotal);
-      this.cartOriginaTotalPrice = this.document.querySelector(this.settings.elements.cartOriginaTotalPrice);
-      this.cartDiscountHolder = this.document.querySelector(this.settings.elements.cartDiscountsHolder);
-      this.clickedElementForExpanding = this.document.querySelectorAll(this.settings.elements.clickedElementForExpanding);
-      this.cartTotalDiscountTemplate = this.document.querySelector(this.settings.cartTotalDiscountsTemplate).innerHTML;
-      this.cartErrorHolder = this.document.querySelector(this.settings.elements.cartErrors);
-      this.cartCloseErrorMessage = this.document.querySelector(this.settings.elements.cartCloseError);
-      this.headerWrapper = this.document.querySelector(this.settings.elements.headerWrapper);
+      this.cartPage = document.querySelector(selectors$V.cartPage);
+      this.cartDrawer = document.querySelector(selectors$V.cartDrawer);
+      this.cartDrawerClose = document.querySelector(selectors$V.cartDrawerClose);
+      this.cartEmpty = document.querySelector(selectors$V.cartEmpty);
+      this.buttonHolder = document.querySelector(selectors$V.buttonHolder);
+      this.itemsHolder = document.querySelector(selectors$V.itemsHolder);
+      this.priceHolder = document.querySelector(selectors$V.priceHolder);
+      this.items = document.querySelectorAll(selectors$V.item);
+      this.cartTotal = document.querySelector(selectors$V.cartTotal);
+      this.freeShipping = document.querySelectorAll(selectors$V.freeShipping);
+      this.cartErrorHolder = document.querySelector(selectors$V.cartErrors);
+      this.cartCloseErrorMessage = document.querySelector(selectors$V.cartCloseError);
+      this.headerWrapper = document.querySelector(selectors$V.headerWrapper);
       this.accessibility = a11y;
-      this.navDrawer = this.document.querySelector(this.settings.elements.navDrawer);
-      this.pairProductsHolder = this.document.querySelector(this.settings.elements.pairProductsHolder);
-      this.pairProducts = this.document.querySelector(this.settings.elements.pairProducts);
+      this.navDrawer = document.querySelector(selectors$V.navDrawer);
+      this.upsellProductsHolder = document.querySelector(selectors$V.upsellProductsHolder);
+      this.hideErrors = false;
+      this.subtotal = window.theme.subtotal;
 
-      this.form = null;
-
-      this.build = this.build.bind(this);
-
-      // AJAX request
-      this.addToCart = this.addToCart.bind(this);
-      this.updateCart = this.updateCart.bind(this);
+      // Define Cart object depending on if we have cart drawer or cart page
+      this.cart = this.cartDrawer || this.cartPage;
 
       // Cart events
-      this.openCartDropdown = this.openCartDropdown.bind(this);
-      this.closeCartDropdown = this.closeCartDropdown.bind(this);
-      this.toggleCartDropdown = this.toggleCartDropdown.bind(this);
+      this.cartAddEvent = this.cartAddEvent.bind(this);
+      this.addToCart = this.addToCart.bind(this);
+      this.updateProgress = this.updateProgress.bind(this);
+
+      // Set global event listeners for "Add to cart" and Announcement bar wheel progress
+      document.addEventListener('theme:cart:add', this.cartAddEvent);
+      document.addEventListener('theme:announcement:init', this.updateProgress);
+
+      // Upsell products
+      this.skipUpsellProductsArray = [];
+      this.skipUpsellProductEvent();
+      this.checkSkippedUpsellProductsFromStorage();
+      this.toggleCartUpsellWidgetVisibility();
+
+      // Init estimate shipping calculator
+      this.estimateShippingCalculator();
+
+      // Free Shipping values
+      this.circumference = 28 * Math.PI; // radius - stroke * 4 * PI
+      this.cartFreeShippingLimit = 0;
+
+      this.freeShippingMessageHandle(this.subtotal);
+      this.updateProgress();
+
+      // Don't run any cart JS if Cart drawer is disabled and you are not on the Cart page
+      if (!this.cart) return;
+
+      this.build = this.build.bind(this);
+      this.updateCart = this.updateCart.bind(this);
+      this.productAddCallback = this.productAddCallback.bind(this);
+      this.openCartDrawer = this.openCartDrawer.bind(this);
+      this.closeCartDrawer = this.closeCartDrawer.bind(this);
+      this.toggleCartDrawer = this.toggleCartDrawer.bind(this);
+      this.openCartDrawerOnProductAdded = this.openCartDrawerOnProductAdded.bind(this);
+      this.animateItems = this.animateItems.bind(this);
+      this.showAnimatedItems = this.showAnimatedItems.bind(this);
+
+      if (this.cartPage) {
+        this.showAnimatedItems();
+      }
 
       // Checking
       this.hasItemsInCart = this.hasItemsInCart.bind(this);
+      this.cartCount = this.getCartItemCount();
 
       // Set classes
       this.toggleClassesOnContainers = this.toggleClassesOnContainers.bind(this);
 
       // Flags
-      this.cartDropdownIsBuilded = this.items.length > 0;
-      this.totalItems = this.cartDropdownIsBuilded;
-      this.cartDropdownIsOpen = false;
-      this.cartDiscounts = 0;
-      this.cartDrawerEnabled = this.settings.cartDrawerEnabled;
-      this.cartLimitErrorIsHidden = true;
+      this.totalItems = this.items.length;
+      this.cartDrawerIsOpen = false;
+      this.cartDrawerEnabled = theme.settings.cartDrawerEnabled;
+      this.cartUpdateFailed = false;
 
       // Cart Events
-      this.eventToggleCart();
-      this.expandEvents();
+      this.cartToggleEvents();
       this.cartEvents();
-      this.cartEventAdd();
 
       // Init quantity for fields
       this.initQuantity();
 
-      this.customEventAddProduct();
-
-      // Init estimate shipping calculator
-      this.estimateShippingCalculator();
-
-      // Attributes
-      if (this.cartMessage.length > 0) {
-        this.cartFreeLimitShipping = Number(this.cartMessage[0].getAttribute('data-limit')) * 100;
-        this.subtotal = 0;
-        this.circumference = 28 * Math.PI; // radius - stroke * 4 * PI
-
-        this.cartBarProgress();
-      }
-
-      // Pair with
-      this.pairWithArray = window.pairWithProducts;
-      this.sessionStorage = window.sessionStorage;
-      this.getEnablePairProducts();
-      this.renderPairProducts();
-      this.pairProductSkipEvent();
-
-      this.document.addEventListener('upsell-unavailable', () => {
-        this.checkPairProductIsSoldOut();
-      });
+      document.addEventListener('theme:cart:toggle', this.toggleCartDrawer);
+      document.addEventListener('theme:quick-add:open', this.closeCartDrawer);
+      document.addEventListener('theme:product:add', this.productAddCallback);
+      document.addEventListener('theme:product:add-error', this.productAddCallback);
+      document.addEventListener('theme:product:added', this.openCartDrawerOnProductAdded);
     }
 
     /**
@@ -1995,81 +2265,32 @@
      */
 
     initQuantity() {
-      this.items = this.document.querySelectorAll(this.settings.elements.item);
+      this.items = document.querySelectorAll(selectors$V.item);
 
       this.items.forEach((item) => {
         const initQuantity = new QuantityCounter(item, true);
 
         initQuantity.init();
-        this.customEventsHandle(item);
+        this.cartUpdateEvent(item);
       });
     }
 
     /**
-     * Expand blocks and close siblings
+     * Cart update event hook
      *
      * @return  {Void}
      */
 
-    expandEvents() {
-      const holders = this.document.querySelectorAll(this.settings.elements.cartWidget);
-
-      this.clickedElementForExpanding.forEach((item) => {
-        item.addEventListener('click', (event) => {
-          event.preventDefault();
-
-          const holder = this.document.querySelector(item.getAttribute('href'));
-
-          item.classList.toggle(this.settings.classes.active);
-          slideToggle(holder, 400);
-
-          if (holders.length > 1) {
-            holders.forEach((content) => {
-              if (content !== holder.parentElement) {
-                const buttonExpand = content.querySelector(this.settings.elements.clickedElementForExpanding);
-
-                buttonExpand.classList.remove(this.settings.classes.active);
-
-                slideUp(buttonExpand.nextElementSibling, 400);
-              }
-            });
-          }
-        });
+    cartUpdateEvent(item) {
+      item.addEventListener('theme:cart:update', (event) => {
+        this.updateCart(
+          {
+            id: event.detail.id,
+            quantity: event.detail.quantity,
+          },
+          item
+        );
       });
-    }
-
-    /**
-     * Custom event who change the cart
-     *
-     * @return  {Void}
-     */
-
-    customEventsHandle(holder) {
-      holder.addEventListener(
-        'update-cart',
-        debounce((event) => {
-          this.updateCart(
-            {
-              id: event.detail.id,
-              quantity: event.detail.quantity,
-            },
-            holder,
-            event.detail.valueIsEmpty
-          );
-        }, 500)
-      );
-    }
-
-    /**
-     *  Custom event for add product to the cart
-     */
-    customEventAddProduct() {
-      this.html.addEventListener(
-        'cart:add-to-cart',
-        debounce((event) => {
-          this.addToCart(`id=${event.detail.data.id}`, event.detail);
-        }, 500)
-      );
     }
 
     /**
@@ -2079,17 +2300,22 @@
      */
 
     cartEvents() {
-      const that = this;
-      const cartItemRemove = this.document.querySelectorAll(that.settings.elements.cartItemRemove);
+      const cartItemRemove = document.querySelectorAll(selectors$V.cartItemRemove);
 
-      cartItemRemove.forEach((item) => {
-        item.addEventListener('click', function (event) {
+      cartItemRemove.forEach((button) => {
+        const item = button.closest(selectors$V.item);
+        button.addEventListener('click', (event) => {
           event.preventDefault();
 
-          that.updateCart({
-            id: this.getAttribute('data-id'),
-            quantity: 0,
-          });
+          if (button.classList.contains(classes$H.disabled)) return;
+
+          this.updateCart(
+            {
+              id: button.dataset.id,
+              quantity: 0,
+            },
+            item
+          );
         });
       });
 
@@ -2097,7 +2323,7 @@
         this.cartCloseErrorMessage.addEventListener('click', (event) => {
           event.preventDefault();
 
-          slideUp(this.cartErrorHolder, 400);
+          this.cartErrorHolder.classList.remove(classes$H.expanded);
         });
       }
     }
@@ -2108,42 +2334,38 @@
      * @return  {Void}
      */
 
-    cartEventAdd() {
-      this.document.addEventListener('click', (event) => {
-        const clickedElement = event.target;
+    cartAddEvent(event) {
+      let formData = '';
+      let button = event.detail.button;
+      if (button.hasAttribute('disabled')) return;
+      const form = button.closest('form');
+      this.hideErrors = form?.getAttribute(attributes$m.hideErrors) === 'true';
+      // Validate form
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      formData = new FormData(form);
+      if (form !== null && form.querySelector('[type="file"]')) {
+        return;
+      }
+      event.preventDefault();
+      this.addToCart(formData, button);
+    }
 
-        if (clickedElement.matches(this.settings.elements.buttonAddToCart) || (clickedElement.closest(this.settings.elements.buttonAddToCart) && clickedElement)) {
-          let formData = '';
-          let button = clickedElement.matches(this.settings.elements.buttonAddToCart) ? clickedElement : clickedElement.closest(this.settings.elements.buttonAddToCart);
+    /**
+     * Cart event remove out of stock error
+     *
+     * @return  {Void}
+     */
 
-          if (button.hasAttribute(this.settings.elements.productIDAttribute)) {
-            formData = `id=${Number(button.getAttribute(this.settings.elements.productIDAttribute))}`;
-          } else {
-            this.form = clickedElement.closest('form');
-            formData = new FormData(this.form);
-            formData = new URLSearchParams(formData).toString();
-          }
+    formErrorsEvents(errorContainer) {
+      const buttonErrorClose = errorContainer.querySelector(selectors$V.formCloseError);
+      buttonErrorClose?.addEventListener('click', (e) => {
+        e.preventDefault();
 
-          if (this.form !== null && this.form.querySelector('[type="file"]')) {
-            return;
-          }
-
-          event.preventDefault();
-
-          if (clickedElement.hasAttribute('disabled') || clickedElement.parentNode.hasAttribute('disabled')) {
-            return;
-          }
-
-          this.addToCart(formData, null, button);
-
-          this.html.dispatchEvent(
-            new CustomEvent('cart:add-item', {
-              bubbles: true,
-              detail: {
-                selector: clickedElement,
-              },
-            })
-          );
+        if (errorContainer) {
+          errorContainer.classList.remove(classes$H.visible);
         }
       });
     }
@@ -2158,7 +2380,7 @@
       Shopify.Cart.ShippingCalculator.show({
         submitButton: theme.strings.shippingCalcSubmitButton,
         submitButtonDisabled: theme.strings.shippingCalcSubmitButtonDisabled,
-        customerIsLoggedIn: theme.customerLoggedIn,
+        customerIsLoggedIn: theme.settings.customerLoggedIn,
         moneyFormat: theme.moneyWithCurrencyFormat,
       });
     }
@@ -2170,38 +2392,14 @@
      */
 
     getCart() {
-      fetch(theme.routes.root + 'cart.js')
-        .then(this.handleErrors)
-        .then((response) => response.json())
-        .then((response) => {
-          this.updateCounter(response.item_count);
-          this.newTotalItems = response.items.length;
-
-          this.buildTotalPrice(response);
-          this.freeShippingMessageHandle(response.total_price);
-
-          if (this.cartMessage.length > 0) {
-            this.subtotal = response.total_price;
-            this.updateProgress();
-          }
-
-          return fetch(theme.routes.cart + '?section_id=api-cart-items');
-        })
+      fetch(theme.routes.cart_url + '?section_id=api-cart-items')
+        .then(this.cartErrorsHandler)
         .then((response) => response.text())
         .then((response) => {
           const element = document.createElement('div');
           element.innerHTML = response;
 
-          if (element.querySelector('script')) {
-            this.pairWithArray = JSON.parse(element.querySelector('script').innerText.split('=')[1].replace(';', ''));
-          } else {
-            this.pairWithArray = undefined;
-          }
-
-          this.getEnablePairProducts();
-          this.renderPairProducts();
-
-          const cleanResponse = element.querySelector('[data-api-content]').innerHTML;
+          const cleanResponse = element.querySelector(selectors$V.apiContent);
           this.build(cleanResponse);
         })
         .catch((error) => console.log(error));
@@ -2210,80 +2408,88 @@
     /**
      * Add item(s) to the cart and show the added item(s)
      *
-     * @param   {String}  data
-     * @param   {DOM Element/Object}  quickAddHolder
+     * @param   {String}  formData
      * @param   {DOM Element}  button
      *
      * @return  {Void}
      */
 
-    addToCart(data, quickAddHolder = null, button = null, json = null) {
-      // Get Quick Add form
-      if (this.form === null && quickAddHolder !== null && quickAddHolder.label) {
-        this.form = quickAddHolder.label.parentNode.querySelector('form');
+    addToCart(formData, button) {
+      if (this.cart) {
+        this.cart.classList.add(classes$H.loading);
       }
 
-      if (this.cartDrawerEnabled && button) {
-        button.classList.add(this.settings.classes.loading);
+      const variantId = formData.get('id');
+      const quickAddHolder = button?.closest(selectors$V.quickAddHolder);
+
+      if (this.cartDrawerEnabled) {
+        if (button) {
+          button.classList.add(classes$H.loading);
+          button.disabled = true;
+        }
+
+        if (quickAddHolder) {
+          quickAddHolder.classList.add(classes$H.visible);
+        }
       }
 
-      fetch(theme.routes.root + 'cart/add.js', {
+      fetch(theme.routes.cart_add_url, {
         method: 'POST',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
-          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: 'application/javascript',
         },
-        body: data,
+        body: formData,
       })
         .then((response) => response.json())
         .then((response) => {
-          if (button) {
-            button.setAttribute('disabled', 'disabled');
-          }
-
+          let error = false;
           if (response.status) {
-            if (quickAddHolder !== null) {
-              this.addToCartError(response, quickAddHolder.element, button);
-            } else {
-              this.addToCartError(response, null, button);
+            publish(events$2.cartError, {source: 'product-form', productVariantId: variantId, errors: response.description, message: response.message});
+
+            this.addToCartError(response, button);
+
+            error = true;
+            this.hideErrors = false;
+
+            if (button) {
+              button.classList.remove(classes$H.loading);
+              button.disabled = false;
             }
 
             return;
           }
 
+          if (!error) {
+            publish(events$2.cartUpdate, {source: 'product-form', productVariantId: variantId});
+          }
+
           if (this.cartDrawerEnabled) {
-            if (quickAddHolder !== null && quickAddHolder.label) {
-              quickAddHolder.label.classList.remove(this.settings.classes.hidden, this.settings.classes.loading);
-              quickAddHolder.label.classList.add(this.settings.classes.added);
+            if (button) {
+              button.classList.remove(classes$H.loading);
+              button.classList.add(classes$H.added);
+
+              button.dispatchEvent(
+                new CustomEvent('theme:product:add', {
+                  detail: {
+                    response: response,
+                    button: button,
+                  },
+                  bubbles: true,
+                })
+              );
             }
 
             this.getCart();
-
-            setTimeout(() => {
-              if (button !== null) {
-                button.classList.remove(this.settings.classes.loading);
-                button.removeAttribute('disabled');
-                button.classList.add(this.settings.classes.success);
-
-                document.dispatchEvent(new CustomEvent('product:bar:button', {bubbles: false}));
-
-                if (button.closest(this.settings.elements.pairProductsHolder)) {
-                  setTimeout(() => {
-                    button.classList.remove(this.settings.classes.success);
-                  }, this.settings.times.timeoutAddProduct * 2);
-                }
-              }
-
-              if (this.cartDropdown) {
-                this.openCartDropdown();
-                this.cartDropdownIsOpen = true;
-              }
-            }, this.settings.times.timeoutAddProduct);
           } else {
-            window.location = theme.routes.cart;
+            // Redirect to cart page if "Add to cart" is successful
+            window.location = theme.routes.cart_url;
           }
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          this.addToCartError(error, button);
+          this.enableCartButtons();
+        });
     }
 
     /**
@@ -2294,90 +2500,145 @@
      * @return  {Void}
      */
 
-    updateCart(updateData = {}, holder = null, valueIsEmpty = false) {
-      let newCount = null;
-      let oldCount = null;
-      let newItem = null;
-      let settedQuantity = updateData.quantity;
+    updateCart(updateData = {}, currentItem = null) {
+      this.cart.classList.add(classes$H.loading);
 
-      if (holder !== null) {
-        holder.closest(this.settings.elements.item).classList.add(this.settings.classes.loading);
+      let updatedQuantity = updateData.quantity;
+      if (currentItem !== null) {
+        if (updatedQuantity) {
+          currentItem.classList.add(classes$H.loading);
+        } else {
+          currentItem.classList.add(classes$H.removed);
+        }
       }
+      this.disableCartButtons();
 
-      this.items.forEach((item) => {
-        item.classList.add(this.settings.classes.disabled);
-        item.querySelector('input').blur();
-      });
+      const newItem = this.cart.querySelector(`[${attributes$m.item}="${updateData.id}"]`) || currentItem;
+      const lineIndex = newItem?.hasAttribute(attributes$m.itemIndex) ? parseInt(newItem.getAttribute(attributes$m.itemIndex)) : 0;
+      const itemTitle = newItem?.hasAttribute(attributes$m.itemTitle) ? newItem.getAttribute(attributes$m.itemTitle) : null;
 
-      fetch(theme.routes.root + 'cart.js')
-        .then(this.handleErrors)
-        .then((response) => response.json())
+      if (lineIndex === 0) return;
+
+      const data = {
+        line: lineIndex,
+        quantity: updatedQuantity,
+      };
+
+      fetch(theme.routes.cart_change_url, {
+        method: 'post',
+        headers: {'Content-Type': 'application/json', Accept: 'application/json'},
+        body: JSON.stringify(data),
+      })
         .then((response) => {
-          const matchKeys = (item) => item.key === updateData.id;
-          const index = response.items.findIndex(matchKeys);
-          oldCount = response.item_count;
-          newItem = response.items[index].title;
-
-          const data = {
-            line: `${index + 1}`,
-            quantity: settedQuantity,
-          };
-
-          return fetch(theme.routes.root + 'cart/change.js', {
-            method: 'post',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data),
-          });
+          return response.text();
         })
-        .then(this.handleErrors)
-        .then((response) => response.json())
-        .then((response) => {
-          newCount = response.item_count;
+        .then((state) => {
+          const parsedState = JSON.parse(state);
 
-          if (valueIsEmpty) {
-            settedQuantity = 1;
-          }
+          if (parsedState.errors) {
+            this.cartUpdateFailed = true;
+            this.updateErrorText(itemTitle);
+            this.toggleErrorMessage();
+            this.resetLineItem(currentItem);
+            this.enableCartButtons();
 
-          if (settedQuantity !== 0) {
-            this.cartLimitErrorIsHidden = newCount !== oldCount;
-
-            this.toggleLimitError(newItem);
-          }
-
-          this.updateCounter(newCount);
-
-          // Change the cart total and hide message if missing discounts and the changed product is not deleted
-          this.buildTotalPrice(response);
-          this.freeShippingMessageHandle(response.total_price);
-          this.cartDiscounts = response.total_discount;
-
-          // Build cart again if the quantity of the changed product is 0 or cart discounts are changed
-          if (this.cartMessage.length > 0) {
-            this.subtotal = response.total_price;
-            this.updateProgress();
+            return;
           }
 
           this.getCart();
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          console.log(error);
+          this.enableCartButtons();
+        });
     }
 
     /**
-     * Show/hide limit error
+     * Reset line item initial state
+     *
+     * @return  {Void}
+     */
+    resetLineItem(item) {
+      const qtyInput = item.querySelector(selectors$V.qtyInput);
+      const qty = qtyInput.getAttribute('value');
+      qtyInput.value = qty;
+      item.classList.remove(classes$H.loading);
+    }
+
+    /**
+     * Disable cart buttons and inputs
+     *
+     * @return  {Void}
+     */
+    disableCartButtons() {
+      const inputs = this.cart.querySelectorAll('input');
+      const buttons = this.cart.querySelectorAll(`button, ${selectors$V.cartItemRemove}`);
+
+      if (inputs.length) {
+        inputs.forEach((item) => {
+          item.classList.add(classes$H.disabled);
+          item.blur();
+          item.disabled = true;
+        });
+      }
+
+      if (buttons.length) {
+        buttons.forEach((item) => {
+          item.setAttribute(attributes$m.disabled, true);
+        });
+      }
+    }
+
+    /**
+     * Enable cart buttons and inputs
+     *
+     * @return  {Void}
+     */
+    enableCartButtons() {
+      const inputs = this.cart.querySelectorAll('input');
+      const buttons = this.cart.querySelectorAll(`button, ${selectors$V.cartItemRemove}`);
+
+      if (inputs.length) {
+        inputs.forEach((item) => {
+          item.classList.remove(classes$H.disabled);
+          item.disabled = false;
+        });
+      }
+
+      if (buttons.length) {
+        buttons.forEach((item) => {
+          item.removeAttribute(attributes$m.disabled);
+        });
+      }
+
+      this.cart.classList.remove(classes$H.loading);
+    }
+
+    /**
+     * Update error text
      *
      * @param   {String}  itemTitle
      *
      * @return  {Void}
      */
 
-    toggleLimitError(itemTitle) {
-      this.cartErrorHolder.querySelector(this.settings.elements.errorMessage).innerText = itemTitle;
+    updateErrorText(itemTitle) {
+      this.cartErrorHolder.querySelector(selectors$V.errorMessage).innerText = itemTitle;
+    }
 
-      if (this.cartLimitErrorIsHidden) {
-        slideUp(this.cartErrorHolder, 400);
-      } else {
-        slideDown(this.cartErrorHolder, 400);
-      }
+    /**
+     * Toggle error message
+     *
+     * @return  {Void}
+     */
+
+    toggleErrorMessage() {
+      if (!this.cartErrorHolder) return;
+
+      this.cartErrorHolder.classList.toggle(classes$H.expanded, this.cartUpdateFailed);
+
+      // Reset cart error events flag
+      this.cartUpdateFailed = false;
     }
 
     /**
@@ -2388,7 +2649,7 @@
      * @return  {Object}
      */
 
-    handleErrors(response) {
+    cartErrorsHandler(response) {
       if (!response.ok) {
         return response.json().then(function (json) {
           const e = new FetchError({
@@ -2406,41 +2667,49 @@
      * Add to cart error handle
      *
      * @param   {Object}  data
-     * @param   {DOM Element/Null} quickAddHolder
      * @param   {DOM Element/Null} button
      *
      * @return  {Void}
      */
 
-    addToCartError(data, quickAddHolder, button) {
-      if (this.cartDrawerEnabled && button && button.closest(this.settings.elements.cartDropdown) !== null && !button.closest(this.settings.elements.cartDropdown)) {
-        this.closeCartDropdown();
+    addToCartError(data, button) {
+      if (this.hideErrors) return;
+
+      if (this.cartDrawerEnabled) {
+        this.closeCartDrawer();
       }
-      const outerSection = button.closest(this.settings.elements.outerSection);
-      let errorContainer = outerSection.querySelector(this.settings.elements.formErrorsContainer);
 
       if (button !== null) {
-        const buttonUpsellHolder = button.closest(this.settings.elements.upsellHolder);
-        if (buttonUpsellHolder && buttonUpsellHolder.querySelector(this.settings.elements.formErrorsContainer)) {
-          errorContainer = buttonUpsellHolder.querySelector(this.settings.elements.formErrorsContainer);
+        const outerContainer = button.closest(selectors$V.outerSection) || button.closest(selectors$V.quickAddHolder) || button.closest(selectors$V.quickAddModal);
+        let errorContainer = outerContainer?.querySelector(selectors$V.formErrorsContainer);
+        const buttonUpsellHolder = button.closest(selectors$V.quickAddHolder);
+
+        if (buttonUpsellHolder && buttonUpsellHolder.querySelector(selectors$V.formErrorsContainer)) {
+          errorContainer = buttonUpsellHolder.querySelector(selectors$V.formErrorsContainer);
         }
-        button.classList.remove(this.settings.classes.loading);
-        button.removeAttribute('disabled');
 
-        document.dispatchEvent(new CustomEvent('product:bar:button', {bubbles: false}));
+        if (errorContainer) {
+          errorContainer.innerHTML = `<div class="errors">${data.message}: ${data.description}<button type="button" class="errors__close" data-close-error><svg aria-hidden="true" focusable="false" role="presentation" width="24px" height="24px" stroke-width="1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" class="icon icon-cancel"><path d="M6.758 17.243L12.001 12m5.243-5.243L12 12m0 0L6.758 6.757M12.001 12l5.243 5.243" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>`;
+          errorContainer.classList.add(classes$H.visible);
+          this.formErrorsEvents(errorContainer);
+        }
+
+        button.dispatchEvent(
+          new CustomEvent('theme:product:add-error', {
+            detail: {
+              response: data,
+              button: button,
+            },
+            bubbles: true,
+          })
+        );
       }
 
-      if (errorContainer) {
-        errorContainer.innerHTML = `<div class="errors">${data.message}: ${data.description}<span class="errors__close" data-close-error><svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-close-thin" viewBox="0 0 27 27"><g stroke="#979797" fill="none" fill-rule="evenodd" stroke-linecap="square"><path d="M.5.5l26 26M26.5.5l-26 26"></path></g></svg></span></div>`;
-
-        errorContainer.classList.add(this.settings.classes.visible);
-
-        document.dispatchEvent(new CustomEvent('product:bar:error', {bubbles: false}));
-      }
+      const quickAddHolder = button?.closest(selectors$V.quickAddHolder);
 
       if (quickAddHolder) {
-        this.html.dispatchEvent(
-          new CustomEvent('cart:add-to-error', {
+        quickAddHolder.dispatchEvent(
+          new CustomEvent('theme:cart:error', {
             bubbles: true,
             detail: {
               message: data.message,
@@ -2451,127 +2720,170 @@
         );
       }
 
-      this.document.addEventListener('click', (event) => {
-        const clickedElement = event.target;
-
-        if (clickedElement.matches(this.settings.elements.formCloseError) || clickedElement.closest(this.settings.elements.formCloseError)) {
-          event.preventDefault();
-
-          errorContainer.classList.remove(this.settings.classes.visible);
-        }
-      });
+      this.cart?.classList.remove(classes$H.loading);
     }
 
     /**
-     * Open cart dropdown and add class on body
+     * Add product to cart events
+     *
+     * @return  {Void}
+     */
+    productAddCallback(event) {
+      let buttons = [];
+      let quickAddHolder = null;
+      const hasError = event.type == 'theme:product:add-error';
+      const buttonATC = event.detail.button;
+      const cartBarButtonATC = document.querySelector(selectors$V.cartBarAdd);
+
+      buttons.push(buttonATC);
+      quickAddHolder = buttonATC.closest(selectors$V.quickAddHolder);
+
+      if (cartBarButtonATC) {
+        buttons.push(cartBarButtonATC);
+      }
+
+      buttons.forEach((button) => {
+        button.classList.remove(classes$H.loading);
+        if (!hasError) {
+          button.classList.add(classes$H.added);
+        }
+      });
+
+      setTimeout(() => {
+        buttons.forEach((button) => {
+          button.classList.remove(classes$H.added);
+          const isVariantUnavailable =
+            button.closest(selectors$V.formWrapper)?.classList.contains(classes$H.variantSoldOut) || button.closest(selectors$V.formWrapper)?.classList.contains(classes$H.variantUnavailable);
+
+          if (!isVariantUnavailable) {
+            button.disabled = false;
+          }
+        });
+
+        quickAddHolder?.classList.remove(classes$H.visible);
+      }, 1000);
+    }
+
+    /**
+     * Open cart drawer when product is added to cart
+     *
+     * @return  {Void}
+     */
+    openCartDrawerOnProductAdded() {
+      if (this.cartDrawerIsOpen) {
+        this.showAnimatedItems();
+      } else {
+        this.openCartDrawer();
+      }
+    }
+
+    /**
+     * Open cart drawer and add class on body
      *
      * @return  {Void}
      */
 
-    openCartDropdown() {
-      document.dispatchEvent(
-        new CustomEvent('theme:drawer:close', {
-          bubbles: false,
-        })
-      );
+    openCartDrawer() {
+      if (!this.cartDrawer) return;
 
-      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true, detail: this.cartDropdown}));
-      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true, detail: this.cartDropdownBody}));
+      this.cartDrawerIsOpen = true;
 
-      this.html.classList.add(this.settings.classes.htmlClasses);
-      this.cartDropdown.classList.add(this.settings.classes.open);
+      this.onBodyClickEvent = this.onBodyClickEvent || this.onBodyClick.bind(this);
+      document.body.addEventListener('click', this.onBodyClickEvent);
 
-      this.accessibility.removeTrapFocus();
-      this.accessibility.trapFocus(this.cartDropdown, {
-        elementToFocus: this.cartDropdown.querySelector('a:first-child, input:first-child'),
-      });
+      document.dispatchEvent(new CustomEvent('theme:cart:open', {bubbles: true}));
+      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
 
-      if (!this.cartDropdownIsBuilded) {
-        this.getCart();
-      }
+      this.cartDrawer.classList.add(classes$H.open);
 
       // Observe Additional Checkout Buttons
       this.observeAdditionalCheckoutButtons();
+
+      // Animate cart items
+      // setTimeout is needed here to prevent animation issues on Safari
+      setTimeout(this.showAnimatedItems);
+
+      this.accessibility.trapFocus(this.cartDrawer, {
+        elementToFocus: this.cartDrawer.querySelector(selectors$V.cartDrawerClose),
+      });
     }
 
     /**
-     * Close cart dropdown and remove class on body
+     * Close cart drawer and remove class on body
      *
      * @return  {Void}
      */
 
-    closeCartDropdown() {
-      this.document.dispatchEvent(
-        new CustomEvent('theme:cart-close', {
+    closeCartDrawer() {
+      if (!this.cartDrawer) return;
+      if (!this.cartDrawer.classList.contains(classes$H.open)) return;
+
+      this.cartDrawerIsOpen = false;
+
+      document.dispatchEvent(
+        new CustomEvent('theme:cart:close', {
           bubbles: true,
         })
       );
 
+      // Cart elements animation reset
+      this.resetAnimatedItems();
+      this.itemsHolder.classList.remove(classes$H.updated);
+      this.cartEmpty.classList.remove(classes$H.updated);
+      this.cartErrorHolder.classList.remove(classes$H.expanded);
+      this.cartDrawer.querySelectorAll(selectors$V.animation).forEach((item) => {
+        const removeHidingClass = () => {
+          item.classList.remove(classes$H.hiding);
+          item.removeEventListener('animationend', removeHidingClass);
+        };
+
+        item.classList.add(classes$H.hiding);
+        item.addEventListener('animationend', removeHidingClass);
+      });
+      this.cartDrawer.classList.remove(classes$H.open);
       this.accessibility.removeTrapFocus();
-
-      slideUp(this.cartErrorHolder, 400);
-
-      if (this.html.classList.contains('is-focused')) {
-        const button = this.document.querySelector(`${this.settings.elements.cartToggleElement}[data-focus-element]`);
-
-        setTimeout(() => {
-          button.focus();
-        }, 200);
-      }
-
-      const upsellButton = this.document.querySelector(`[${this.settings.attributes.upsellButton}].${this.settings.classes.success}`);
-
-      if (upsellButton) {
-        setTimeout(() => {
-          upsellButton.classList.remove(this.settings.classes.success);
-        }, 2000);
-      }
-
-      this.html.classList.remove(this.settings.classes.htmlClasses);
-      this.cartDropdown.classList.remove(this.settings.classes.open);
+      document.body.removeEventListener('click', this.onBodyClickEvent);
 
       document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
     }
 
     /**
-     * Toggle cart dropdown
+     * Toggle cart drawer
      *
      * @return  {Void}
      */
 
-    toggleCartDropdown() {
-      this.cartDropdownIsOpen = !this.cartDropdownIsOpen;
-
-      if (this.cartDropdownIsOpen) {
-        this.openCartDropdown();
+    toggleCartDrawer() {
+      if (!this.cartDrawerIsOpen) {
+        this.openCartDrawer();
       } else {
-        this.closeCartDropdown();
+        this.closeCartDrawer();
       }
     }
 
     /**
-     * Event click to element to open cart dropdown
+     * Event click to element to open cart drawer
      *
      * @return  {Void}
      */
 
-    eventToggleCart() {
-      this.document.addEventListener('click', (event) => {
-        const clickedElement = event.target;
-        const isNotCartButton = !(clickedElement.matches(this.settings.elements.cartToggleElement) || clickedElement.closest(this.settings.elements.cartToggleElement));
-        const isNotCartDropdownOrCartDropdownChild = !(clickedElement.matches(this.settings.elements.cartDropdown) || clickedElement.closest(this.settings.elements.cartDropdown));
-        const isNotPairProduct = !(clickedElement.matches(this.settings.elements.buttonSkipPairProduct) || clickedElement.closest(this.settings.elements.buttonSkipPairProduct));
+    cartToggleEvents() {
+      if (this.cartDrawer) {
+        this.cartDrawerClose.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.closeCartDrawer();
+        });
 
-        if (clickedElement.matches(this.settings.elements.cartToggleElement) || clickedElement.closest(this.settings.elements.cartToggleElement)) {
-          event.preventDefault();
+        this.cartDrawer.addEventListener('keyup', (event) => {
+          if (event.code === window.theme.keyboardKeys.ESCAPE) {
+            this.closeCartDrawer();
+          }
+        });
+      }
+    }
 
-          this.toggleCartDropdown();
-        } else if (this.cartDropdownIsOpen && isNotCartButton && isNotCartDropdownOrCartDropdownChild && isNotPairProduct) {
-          this.cartDropdownIsOpen = false;
-
-          this.closeCartDropdown();
-        }
-      });
+    onBodyClick(event) {
+      if (event.target.hasAttribute(attributes$m.drawerUnderlay)) this.closeCartDrawer();
     }
 
     /**
@@ -2581,11 +2893,11 @@
      */
 
     toggleClassesOnContainers() {
-      const that = this;
+      const hasItemsInCart = this.hasItemsInCart();
 
-      this.emptyMessage.classList.toggle(that.settings.classes.hidden, that.hasItemsInCart());
-      this.buttonHolder.classList.toggle(that.settings.classes.hidden, !that.hasItemsInCart());
-      this.itemsHolder.classList.toggle(that.settings.classes.hidden, !that.hasItemsInCart());
+      this.cartEmpty.classList.toggle(classes$H.hidden, hasItemsInCart);
+      this.buttonHolder.classList.toggle(classes$H.hidden, !hasItemsInCart);
+      this.itemsHolder.classList.toggle(classes$H.hidden, !hasItemsInCart);
     }
 
     /**
@@ -2597,35 +2909,90 @@
      */
 
     build(data) {
+      const cartItemsData = data.querySelector(selectors$V.apiLineItems);
+      const upsellItemsData = data.querySelector(selectors$V.apiUpsellItems);
+      const cartEmptyData = Boolean(cartItemsData === null && upsellItemsData === null);
+      const priceData = data.querySelector(selectors$V.apiCartPrice);
+      const cartTotal = data.querySelector(selectors$V.cartTotal);
+
+      if (this.priceHolder && priceData) {
+        this.priceHolder.innerHTML = priceData.innerHTML;
+      }
+
+      if (cartEmptyData) {
+        this.itemsHolder.innerHTML = data;
+        this.upsellProductsHolder.innerHTML = '';
+      } else {
+        this.itemsHolder.innerHTML = cartItemsData.innerHTML;
+        this.upsellProductsHolder.innerHTML = upsellItemsData.innerHTML;
+        this.skipUpsellProductEvent();
+        this.checkSkippedUpsellProductsFromStorage();
+        this.toggleCartUpsellWidgetVisibility();
+      }
+
+      this.newTotalItems = cartItemsData && cartItemsData.querySelectorAll(selectors$V.item).length ? cartItemsData.querySelectorAll(selectors$V.item).length : 0;
+      this.subtotal = cartTotal && cartTotal.hasAttribute(attributes$m.cartTotal) ? parseInt(cartTotal.getAttribute(attributes$m.cartTotal)) : 0;
+      this.cartCount = this.getCartItemCount();
+
+      document.dispatchEvent(
+        new CustomEvent('theme:cart:change', {
+          bubbles: true,
+          detail: {
+            cartCount: this.cartCount,
+          },
+        })
+      );
+
+      // Update cart total price
+      this.cartTotal.innerHTML = this.subtotal === 0 ? window.theme.strings.free : themeCurrency.formatMoney(this.subtotal, theme.moneyWithCurrencyFormat);
+
+      // Remove cart loading class
+      this.cart.classList.remove(classes$H.loading);
+
       if (this.totalItems !== this.newTotalItems) {
         this.totalItems = this.newTotalItems;
 
         this.toggleClassesOnContainers();
       }
 
-      this.itemsHolder.innerHTML = data;
+      // Add class "is-updated" line items holder to reduce cart items animation delay via CSS variables
+      if (this.cartDrawerIsOpen) {
+        this.itemsHolder.classList.add(classes$H.updated);
+      }
 
+      // Prepare empty cart buttons for animation
+      if (!this.hasItemsInCart()) {
+        this.cartEmpty.querySelectorAll(selectors$V.animation).forEach((item) => {
+          item.classList.remove(classes$H.animated);
+        });
+      }
+
+      this.freeShippingMessageHandle(this.subtotal);
       this.cartEvents();
       this.initQuantity();
+      this.toggleErrorMessage();
+      this.enableCartButtons();
+      this.updateProgress();
+
+      document.dispatchEvent(
+        new CustomEvent('theme:product:added', {
+          bubbles: true,
+        })
+      );
+
+      if (!this.cartDrawer) {
+        this.showAnimatedItems();
+      }
     }
 
     /**
-     * Update cart count
-     *
-     * @param   {Number}  countItems
+     * Get cart item count
      *
      * @return  {Void}
      */
 
-    updateCounter(countItems) {
-      if (!this.counterHolders.length) {
-        return;
-      }
-
-      this.counterHolders.forEach((holder) => {
-        holder.innerHTML = countItems;
-        holder.setAttribute(settings.elements.cartCountValue, countItems);
-      });
+    getCartItemCount() {
+      return Array.from(this.cart.querySelectorAll(selectors$V.qtyInput)).reduce((total, quantityInput) => total + parseInt(quantityInput.value), 0);
     }
 
     /**
@@ -2639,55 +3006,6 @@
     }
 
     /**
-     * Build total cart total price
-     *
-     * @param   {Object}  data
-     *
-     * @return  {Void}
-     */
-
-    buildTotalPrice(data) {
-      if (data.original_total_price > data.total_price && data.cart_level_discount_applications.length > 0) {
-        this.cartOriginalTotal.classList.remove(this.settings.classes.hidden);
-        this.cartOriginaTotalPrice.innerHTML = data.original_total_price === 0 ? window.theme.strings.free : themeCurrency.formatMoney(data.original_total_price, this.settings.formatMoney);
-      } else {
-        this.cartOriginalTotal.classList.add(this.settings.classes.hidden);
-      }
-
-      this.cartTotal.innerHTML = data.total_price === 0 ? window.theme.strings.free : themeCurrency.formatMoney(data.total_price, this.settings.formatMoney);
-
-      if (data.cart_level_discount_applications.length > 0) {
-        const discountsMarkup = this.buildCartTotalDiscounts(data.cart_level_discount_applications);
-
-        this.cartDiscountHolder.classList.remove(this.settings.classes.hidden);
-        this.cartDiscountHolder.innerHTML = discountsMarkup;
-      } else {
-        this.cartDiscountHolder.classList.add(this.settings.classes.hidden);
-      }
-    }
-
-    /**
-     * Build cart total discounts
-     *
-     * @param   {Array}  discounts
-     *
-     * @return  {String}
-     */
-
-    buildCartTotalDiscounts(discounts) {
-      let discountMarkup = '';
-
-      discounts.forEach((discount) => {
-        discountMarkup += Sqrl.render(this.cartTotalDiscountTemplate, {
-          discountTitle: discount.title,
-          discountTotalAllocatedAmount: themeCurrency.formatMoney(discount.total_allocated_amount, this.settings.formatMoney),
-        });
-      });
-
-      return discountMarkup;
-    }
-
-    /**
      * Show/hide free shipping message
      *
      * @param   {Number}  total
@@ -2696,41 +3014,14 @@
      */
 
     freeShippingMessageHandle(total) {
-      if (this.cartMessage.length > 0) {
-        this.document.querySelectorAll(this.settings.elements.cartMessage).forEach((message) => {
-          const hasFreeShipping = message.hasAttribute(this.settings.elements.cartMessageValue) && message.getAttribute(this.settings.elements.cartMessageValue) === 'true' && total !== 0;
-          const cartMessageClass = hasFreeShipping ? this.settings.classes.success : this.settings.classes.hidden;
+      if (!this.freeShipping.length) return;
 
-          message.classList.toggle(cartMessageClass, total >= this.cartFreeLimitShipping || total === 0);
-        });
-      }
-    }
+      this.cartFreeShippingLimit = Number(this.freeShipping[0].getAttribute(attributes$m.freeShippingLimit)) * 100 * window.Shopify.currency.rate;
 
-    /**
-     * Cart bar progress with message for free shipping
-     *
-     * @param   {Number}  progress
-     *
-     */
-    cartBarProgress(progress = null) {
-      this.document.querySelectorAll(this.settings.elements.cartProgress).forEach((element) => {
-        this.setProgress(element, progress === null ? element.getAttribute('data-percent') : progress);
+      this.freeShipping.forEach((message) => {
+        const hasQualifiedShippingMessage = message.hasAttribute(attributes$m.freeShipping) && message.getAttribute(attributes$m.freeShipping) === 'true' && total >= 0;
+        message.classList.toggle(classes$H.success, hasQualifiedShippingMessage && total >= this.cartFreeShippingLimit);
       });
-    }
-
-    /**
-     * Set circle progress
-     *
-     * @param   {DOM Element}  holder
-     * @param   {Number}       percent
-     *
-     * @return  {Void}
-     */
-
-    setProgress(holder, percent) {
-      const offset = this.circumference - ((percent / 100) * this.circumference) / 2;
-
-      holder.style.strokeDashoffset = offset;
     }
 
     /**
@@ -2740,113 +3031,119 @@
      */
 
     updateProgress() {
-      const newPercentValue = (this.subtotal / this.cartFreeLimitShipping) * 100;
-      const leftToSpend = themeCurrency.formatMoney(this.cartFreeLimitShipping - this.subtotal, this.settings.formatMoney);
+      this.freeShipping = document.querySelectorAll(selectors$V.freeShipping);
 
-      this.document.querySelectorAll(this.settings.elements.leftToSpend).forEach((element) => {
-        element.innerHTML = leftToSpend.replace('.00', '');
+      if (!this.freeShipping.length) return;
+
+      const percentValue = isNaN(this.subtotal / this.cartFreeShippingLimit) ? 100 : this.subtotal / this.cartFreeShippingLimit;
+      const percent = Math.min(percentValue * 100, 100);
+      const dashoffset = this.circumference - ((percent / 100) * this.circumference) / 2;
+      const leftToSpend = themeCurrency.formatMoney(this.cartFreeShippingLimit - this.subtotal, theme.moneyFormat);
+
+      this.freeShipping.forEach((item) => {
+        const progressBar = item.querySelector(selectors$V.freeShippingProgress);
+        const progressGraph = item.querySelector(selectors$V.freeShippingGraph);
+        const leftToSpendMessage = item.querySelector(selectors$V.leftToSpend);
+
+        if (leftToSpendMessage) {
+          leftToSpendMessage.innerHTML = leftToSpend.replace('.00', '').replace(',00', '');
+        }
+
+        // Set progress bar value
+        if (progressBar) {
+          progressBar.value = percent;
+        }
+
+        // Set circle progress
+        if (progressGraph) {
+          progressGraph.style.setProperty('--stroke-dashoffset', `${dashoffset}`);
+        }
       });
-
-      this.cartBarProgress(newPercentValue > 100 ? 100 : newPercentValue);
     }
 
     /**
-     * Render pair with products
+     * Skip upsell product
      */
-    renderPairProducts() {
-      if (this.pairProductsHolder === null) {
+    skipUpsellProductEvent() {
+      if (this.upsellProductsHolder === null) {
         return;
       }
+      const skipButtons = this.upsellProductsHolder.querySelectorAll(selectors$V.buttonSkipUpsellProduct);
 
-      if (this.pairWithArray === undefined || this.pairWithArray.length <= 0) {
-        this.pairProductsHolder.classList.add(this.settings.classes.hidden);
+      if (skipButtons.length) {
+        skipButtons.forEach((button) => {
+          button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const productID = button.closest(selectors$V.quickAddHolder).getAttribute(attributes$m.quickAddHolder);
 
-        return;
-      }
+            if (!this.skipUpsellProductsArray.includes(productID)) {
+              this.skipUpsellProductsArray.push(productID);
+            }
 
-      new PairWithProduct(this.pairWithArray[0]);
+            // Add skipped upsell product to session storage
+            window.sessionStorage.setItem('skip_upsell_products', this.skipUpsellProductsArray);
 
-      this.document.addEventListener('upsell-product-error', () => {
-        this.checkPairProductIsSoldOut();
-      });
-
-      this.pairProductsHolder.classList.remove(this.settings.classes.hidden);
-    }
-
-    /**
-     * Update pairWithArray only with uniq and available handles
-     */
-    getEnablePairProducts() {
-      if (this.pairWithArray !== undefined && this.sessionStorage !== undefined && this.sessionStorage.getItem('pair_products') !== null) {
-        this.pairWithArray = this.pairWithArray.filter((handle) => {
-          return this.sessionStorage.getItem('pair_products').indexOf(`,${handle},`) === -1;
+            // Remove upsell product from cart
+            this.removeUpsellProduct(productID);
+            this.toggleCartUpsellWidgetVisibility();
+          });
         });
       }
     }
 
     /**
-     * Skip pair product
+     * Check for skipped upsell product added to session storage
      */
-    pairProductSkipEvent() {
-      if (this.pairProductsHolder === null) {
-        return;
-      }
+    checkSkippedUpsellProductsFromStorage() {
+      const skippedUpsellItemsFromStorage = window.sessionStorage.getItem('skip_upsell_products');
+      if (!skippedUpsellItemsFromStorage) return;
 
-      this.pairProductsHolder.addEventListener('click', (event) => {
-        const target = event.target;
+      const skippedUpsellItemsFromStorageArray = skippedUpsellItemsFromStorage.split(',');
 
-        if (target.matches(this.settings.elements.buttonSkipPairProduct) || target.closest(this.settings.elements.buttonSkipPairProduct)) {
-          event.preventDefault();
-
-          // Add to session storage
-          if (this.sessionStorage !== undefined) {
-            this.sessionStorage.setItem(
-              'pair_products',
-              this.sessionStorage.getItem('pair_products') !== null ? `${this.sessionStorage.getItem('pair_products')},${this.pairWithArray[0]},` : `,${this.pairWithArray[0]},`
-            );
-          }
-
-          this.getEnablePairProducts();
-
-          if (this.pairWithArray.length <= 0) {
-            this.pairProductsHolder.classList.add(this.settings.classes.hidden);
-          } else {
-            new PairWithProduct(this.pairWithArray[0]);
-          }
+      skippedUpsellItemsFromStorageArray.forEach((productID) => {
+        if (!this.skipUpsellProductsArray.includes(productID)) {
+          this.skipUpsellProductsArray.push(productID);
         }
+
+        this.removeUpsellProduct(productID);
       });
     }
 
-    /**
-     * Check pair product is sold out
-     */
-    checkPairProductIsSoldOut() {
-      if (this.sessionStorage !== undefined) {
-        this.sessionStorage.setItem(
-          'pair_products',
-          this.sessionStorage.getItem('pair_products') !== null ? `${this.sessionStorage.getItem('pair_products')},${this.pairWithArray[0]},` : `,${this.pairWithArray[0]},`
-        );
+    removeUpsellProduct(productID) {
+      if (!this.upsellProductsHolder) return;
 
-        this.getEnablePairProducts();
+      // Remove skipped upsell product from Cart
+      const upsellProduct = this.upsellProductsHolder.querySelector(`[${attributes$m.quickAddHolder}="${productID}"]`);
 
-        if (this.pairWithArray.length <= 0) {
-          this.pairProductsHolder.classList.add(this.settings.classes.hidden);
-        } else {
-          this.renderPairProducts();
-        }
+      if (upsellProduct) {
+        upsellProduct.parentNode.remove();
       }
+    }
+
+    /**
+     * Show or hide cart upsell products widget visibility
+     */
+    toggleCartUpsellWidgetVisibility() {
+      if (!this.upsellProductsHolder) return;
+
+      // Hide upsell container if no items
+      const upsellItems = this.upsellProductsHolder.querySelectorAll(selectors$V.quickAddHolder);
+      const upsellWidget = this.upsellProductsHolder.closest(selectors$V.upsellWidget);
+
+      if (!upsellWidget) return;
+
+      upsellWidget.classList.toggle(classes$H.hidden, !upsellItems.length);
     }
 
     observeAdditionalCheckoutButtons() {
       // identify an element to observe
-      const additionalCheckoutButtons = this.cartDropdown.querySelector('.additional-checkout-buttons');
+      const additionalCheckoutButtons = this.cartDrawer.querySelector(selectors$V.additionalCheckoutButtons);
       if (additionalCheckoutButtons) {
         // create a new instance of `MutationObserver` named `observer`,
         // passing it a callback function
         const observer = new MutationObserver(() => {
-          this.accessibility.removeTrapFocus();
-          this.accessibility.trapFocus(this.cartDropdown, {
-            elementToFocus: this.cartDropdown.querySelector('a:first-child, input:first-child'),
+          this.accessibility.trapFocus(this.cartDrawer, {
+            elementToFocus: this.cartDrawer.querySelector(selectors$V.cartDrawerClose),
           });
           observer.disconnect();
         });
@@ -2856,29 +3153,44 @@
         observer.observe(additionalCheckoutButtons, {subtree: true, childList: true});
       }
     }
+
+    /**
+     * Remove initially added AOS classes to allow animation on cart drawer open
+     *
+     * @return  {Void}
+     */
+    resetAnimatedItems() {
+      this.cart.querySelectorAll(selectors$V.animation).forEach((item) => {
+        item.classList.remove(classes$H.animated);
+        item.classList.remove(classes$H.hiding);
+      });
+    }
+
+    showAnimatedItems() {
+      requestAnimationFrame(this.animateItems);
+    }
+
+    /**
+     * Cart elements opening animation
+     *
+     * @return  {Void}
+     */
+    animateItems() {
+      this.cart.querySelectorAll(selectors$V.animation).forEach((item) => {
+        item.classList.add(classes$H.animated);
+      });
+    }
   }
 
   window.cart = new CartDrawer();
 
-  const settings$1 = {
-    elements: {
-      html: 'html',
-      body: 'body',
-      inPageLink: '[data-skip-content]',
-      linkesWithOnlyHash: 'a[href="#"]',
-      triggerFocusElement: '[data-focus-element]',
-      cartDropdown: '#cart-dropdown',
-      search: '#search-popdown',
-      accordionContent: '.accordion-content',
-      tabs: '.tabs',
-      accordionDataToggle: 'data-accordion-toggle',
-    },
-    classes: {
-      focus: 'is-focused',
-      open: 'is-open',
-      accordionToggle: 'accordion-toggle',
-      tabLink: 'tab-link',
-    },
+  const classes$G = {
+    focus: 'is-focused',
+  };
+
+  const selectors$U = {
+    inPageLink: '[data-skip-content]',
+    linkesWithOnlyHash: 'a[href="#"]',
   };
 
   class Accessibility {
@@ -2887,22 +3199,13 @@
     }
 
     init() {
-      this.settings = settings$1;
-      this.window = window;
-      this.document = document;
       this.a11y = a11y;
-      this.cart = this.window.cart;
 
       // DOM Elements
-      this.inPageLink = this.document.querySelector(this.settings.elements.inPageLink);
-      this.linkesWithOnlyHash = this.document.querySelectorAll(this.settings.elements.linkesWithOnlyHash);
-      this.html = this.document.querySelector(this.settings.elements.html);
-      this.body = this.document.querySelector(this.settings.elements.body);
-      this.cartDropdown = this.document.querySelector(this.settings.elements.cartDropdown);
-      this.lastFocused = null;
-
-      // Flags
-      this.isFocused = false;
+      this.html = document.documentElement;
+      this.body = document.body;
+      this.inPageLink = document.querySelector(selectors$U.inPageLink);
+      this.linkesWithOnlyHash = document.querySelectorAll(selectors$U.linkesWithOnlyHash);
 
       // A11Y init methods
       this.a11y.focusHash();
@@ -2911,8 +3214,6 @@
       // Events
       this.clickEvents();
       this.focusEvents();
-      this.focusEventsOff();
-      this.closeExpandedElements();
     }
 
     /**
@@ -2944,131 +3245,254 @@
      */
 
     focusEvents() {
-      this.document.addEventListener('keyup', (event) => {
-        if (event.keyCode !== window.theme.keyboardKeys.TAB) {
-          return;
-        }
-
-        this.body.classList.add(this.settings.classes.focus);
-        this.isFocused = true;
+      document.addEventListener('mousedown', () => {
+        this.body.classList.remove(classes$G.focus);
       });
 
-      // Expand modals
-      this.document.addEventListener('keyup', (event) => {
-        if (!this.isFocused) {
-          return;
-        }
-
-        const target = event.target;
-        const pressEnterOrSpace = event.keyCode === window.theme.keyboardKeys.ENTER || event.keyCode === window.theme.keyboardKeys.SPACE;
-        const targetElement = target.matches(this.settings.elements.triggerFocusElement) || target.closest(this.settings.elements.triggerFocusElement);
-        const isAccordion =
-          target.classList.contains(this.settings.classes.accordionToggle) ||
-          target.parentNode.classList.contains(this.settings.classes.accordionToggle) ||
-          target.hasAttribute(this.settings.elements.accordionDataToggle) ||
-          target.parentNode.hasAttribute(this.settings.elements.accordionDataToggle);
-        const isTab = target.classList.contains(this.settings.classes.tabLink) || target.parentNode.classList.contains(this.settings.classes.tabLink);
-
-        const isSearchModal =
-          target.hasAttribute('data-popdown-toggle') ||
-          (target.closest(this.settings.elements.triggerFocusElement) && target.closest(this.settings.elements.triggerFocusElement).hasAttribute('data-popdown-toggle'));
-
-        if (pressEnterOrSpace && targetElement) {
-          if (this.lastFocused === null) {
-            this.lastFocused = target;
-          }
-
-          let container = this.document.querySelector(this.settings.elements.cartDropdown);
-
-          if (isSearchModal) {
-            container = this.document.querySelector(this.settings.elements.search);
-          }
-
-          if (isAccordion) {
-            container = target.nextElementSibling;
-            target.click();
-          }
-
-          if (isTab) {
-            const selector = `.tab-content-${target.getAttribute('data-tab')}`;
-
-            container = this.document.querySelector(selector);
-            target.click();
-          }
-
-          if (container.querySelector('a, input')) {
-            this.a11y.trapFocus(container, {
-              elementToFocus: container.querySelector('a:first-child, input:first-child'),
-            });
-          }
-        }
-      });
-
-      // Focus addToCart button or quickview button
-      this.html.addEventListener('cart:add-item', (event) => {
-        this.lastFocused = event.detail.selector;
-      });
-    }
-
-    /**
-     * Focus events off
-     *
-     * @return  {Void}
-     */
-
-    focusEventsOff() {
-      this.document.addEventListener('mousedown', () => {
-        this.body.classList.remove(this.settings.classes.focus);
-        this.isFocused = false;
-      });
-    }
-
-    /**
-     * Close expanded elements with when press escape
-     *
-     * @return  {Void}
-     */
-
-    closeExpandedElements() {
       document.addEventListener('keyup', (event) => {
-        if (event.keyCode !== window.theme.keyboardKeys.ESCAPE) {
+        if (event.code !== window.theme.keyboardKeys.TAB) {
           return;
         }
 
-        this.a11y.removeTrapFocus();
-
-        if (this.html.classList.contains(this.cart.settings.classes.htmlClasses)) {
-          this.cart.toggleCartDropdown();
-          this.html.classList.remove(this.cart.settings.classes.htmlClasses);
-          this.cartDropdown.classList.remove(this.cart.settings.classes.open);
-        }
-
-        const accordionContents = document.querySelectorAll(this.settings.elements.accordionContent);
-
-        if (accordionContents.length) {
-          for (let i = 0; i < accordionContents.length; i++) {
-            if (accordionContents[i].style.display !== 'block') {
-              continue;
-            }
-
-            const accordionArrow = accordionContents[i].previousElementSibling;
-            accordionArrow.classList.remove(this.settings.classes.open);
-
-            slideUp(accordionContents[i]);
-          }
-        }
-
-        if (this.lastFocused !== null) {
-          setTimeout(() => {
-            this.lastFocused.focus();
-            this.lastFocused = null;
-          }, 600);
-        }
+        this.body.classList.add(classes$G.focus);
       });
     }
   }
 
   window.accessibility = new Accessibility();
+
+  const selectors$T = {
+    inputSearch: 'input[type="search"]',
+  };
+
+  class MainSearch extends HeaderSearchForm {
+    constructor() {
+      super();
+
+      this.allSearchInputs = document.querySelectorAll(selectors$T.inputSearch);
+      this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+      let allSearchForms = [];
+      this.allSearchInputs.forEach((input) => allSearchForms.push(input.form));
+      this.input.addEventListener('focus', this.onInputFocus.bind(this));
+      if (allSearchForms.length < 2) return;
+      allSearchForms.forEach((form) => form.addEventListener('reset', this.onFormReset.bind(this)));
+      this.allSearchInputs.forEach((input) => input.addEventListener('input', this.onInput.bind(this)));
+    }
+
+    onFormReset(event) {
+      super.onFormReset(event);
+      if (super.shouldResetForm()) {
+        this.keepInSync('', this.input);
+      }
+    }
+
+    onInput(event) {
+      const target = event.target;
+      this.keepInSync(target.value, target);
+    }
+
+    onInputFocus() {
+      if (!isDesktop()) {
+        this.scrollIntoView({behavior: 'smooth'});
+      }
+    }
+
+    keepInSync(value, target) {
+      this.allSearchInputs.forEach((input) => {
+        if (input !== target) {
+          input.value = value;
+        }
+      });
+    }
+  }
+
+  customElements.define('main-search', MainSearch);
+
+  const selectors$S = {
+    details: 'details',
+    popdown: '[data-popdown]',
+    popdownClose: '[data-popdown-close]',
+    popdownToggle: '[data-popdown-toggle]',
+    input: 'input:not([type="hidden"])',
+  };
+
+  const attributes$l = {
+    popdownUnderlay: 'data-popdown-underlay',
+  };
+
+  class SearchPopdown extends HTMLElement {
+    constructor() {
+      super();
+      this.popdown = this.querySelector(selectors$S.popdown);
+      this.popdownContainer = this.querySelector(selectors$S.details);
+      this.popdownToggle = this.querySelector(selectors$S.popdownToggle);
+      this.popdownClose = this.querySelector(selectors$S.popdownClose);
+      this.a11y = a11y;
+    }
+
+    connectedCallback() {
+      this.popdownContainer.addEventListener('keyup', (event) => event.code.toUpperCase() === 'ESCAPE' && this.close());
+      this.popdownClose.addEventListener('click', this.close.bind(this));
+      this.popdownToggle.addEventListener('click', this.onPopdownToggleClick.bind(this));
+      this.popdownToggle.setAttribute('role', 'button');
+      this.popdown.addEventListener('transitionend', (event) => {
+        if (event.propertyName == 'visibility' && this.popdownContainer.hasAttribute('open') && this.popdownContainer.getAttribute('open') == 'false') {
+          this.popdownContainer.removeAttribute('open');
+        }
+      });
+    }
+
+    onPopdownToggleClick(event) {
+      event.preventDefault();
+      event.target.closest(selectors$S.details).hasAttribute('open') ? this.close() : this.open(event);
+    }
+
+    onBodyClick(event) {
+      if (!this.contains(event.target) || event.target.hasAttribute(attributes$l.popdownUnderlay)) this.close();
+    }
+
+    open(event) {
+      this.onBodyClickEvent = this.onBodyClickEvent || this.onBodyClick.bind(this);
+      event.target.closest(selectors$S.details).setAttribute('open', '');
+
+      document.body.addEventListener('click', this.onBodyClickEvent);
+      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
+
+      // Safari opening transition fix
+      requestAnimationFrame(() => {
+        event.target.closest(selectors$S.details).setAttribute('open', 'true');
+        this.a11y.trapFocus(this.popdown, {
+          elementToFocus: this.popdown.querySelector(selectors$S.input),
+        });
+      });
+    }
+
+    close() {
+      this.a11y.removeTrapFocus();
+      this.popdownContainer.setAttribute('open', 'false');
+
+      document.body.removeEventListener('click', this.onBodyClickEvent);
+      document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
+    }
+  }
+
+  customElements.define('header-search-popdown', SearchPopdown);
+
+  const selectors$R = {
+    collapsible: '[data-collapsible]',
+    trigger: '[data-collapsible-trigger]',
+    body: '[data-collapsible-body]',
+    content: '[data-collapsible-content]',
+  };
+
+  const attributes$k = {
+    open: 'open',
+    single: 'single',
+  };
+
+  class CollapsibleElements extends HTMLElement {
+    constructor() {
+      super();
+
+      this.collapsibles = this.querySelectorAll(selectors$R.collapsible);
+      this.single = this.hasAttribute(attributes$k.single);
+    }
+
+    connectedCallback() {
+      this.collapsibles.forEach((collapsible) => {
+        const trigger = collapsible.querySelector(selectors$R.trigger);
+        const body = collapsible.querySelector(selectors$R.body);
+
+        trigger.addEventListener('click', (event) => this.onCollapsibleClick(event));
+
+        body.addEventListener('transitionend', (event) => {
+          if (event.target !== body) return;
+
+          if (collapsible.getAttribute(attributes$k.open) == 'true') {
+            this.setBodyHeight(body, 'auto');
+          }
+
+          if (collapsible.getAttribute(attributes$k.open) == 'false') {
+            collapsible.removeAttribute(attributes$k.open);
+            this.setBodyHeight(body, '');
+          }
+        });
+      });
+    }
+
+    open(collapsible) {
+      if (collapsible.getAttribute('open') == 'true') return;
+
+      const body = collapsible.querySelector(selectors$R.body);
+      const content = collapsible.querySelector(selectors$R.content);
+
+      collapsible.setAttribute('open', true);
+
+      this.setBodyHeight(body, content.offsetHeight);
+    }
+
+    close(collapsible) {
+      if (!collapsible.hasAttribute('open')) return;
+
+      const body = collapsible.querySelector(selectors$R.body);
+      const content = collapsible.querySelector(selectors$R.content);
+
+      this.setBodyHeight(body, content.offsetHeight);
+
+      collapsible.setAttribute('open', false);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.setBodyHeight(body, 0);
+        });
+      });
+    }
+
+    setBodyHeight(body, contentHeight) {
+      body.style.height = contentHeight !== 'auto' && contentHeight !== '' ? `${contentHeight}px` : contentHeight;
+    }
+
+    onCollapsibleClick(event) {
+      event.preventDefault();
+
+      const trigger = event.target.matches(selectors$R.trigger) ? event.target : event.target.closest(selectors$R.trigger);
+      const collapsible = trigger.closest(selectors$R.collapsible);
+
+      // When we want only one item expanded at the same time
+      if (this.single) {
+        this.collapsibles.forEach((otherCollapsible) => {
+          // if otherCollapsible has attribute open and it's not the one we clicked on, remove the open attribute
+          if (otherCollapsible.hasAttribute(attributes$k.open) && otherCollapsible != collapsible) {
+            requestAnimationFrame(() => {
+              this.close(otherCollapsible);
+            });
+          }
+        });
+      }
+
+      if (collapsible.hasAttribute(attributes$k.open)) {
+        this.close(collapsible);
+      } else {
+        this.open(collapsible);
+      }
+
+      collapsible.dispatchEvent(
+        new CustomEvent('theme:form:sticky', {
+          bubbles: true,
+          detail: {
+            element: 'accordion',
+          },
+        })
+      );
+    }
+  }
+
+  if (!customElements.get('collapsible-elements')) {
+    customElements.define('collapsible-elements', CollapsibleElements);
+  }
 
   theme.ProductModel = (function () {
     let modelJsonSections = {};
@@ -3194,18 +3618,18 @@
     function setupModelViewerListeners(model) {
       const xrButton = xrButtons[model.sectionId];
 
-      model.container.addEventListener('mediaVisible', function () {
+      model.container.addEventListener('theme:media:visible', function () {
         xrButton.element.setAttribute(selectors.dataModel3d, model.modelId);
 
         pauseOtherMedia(model.mediaId);
 
-        if (window.theme.touched) {
+        if (window.theme.touch) {
           return;
         }
         model.modelViewerUi.play();
       });
 
-      model.container.addEventListener('mediaHidden', function () {
+      model.container.addEventListener('theme:media:hidden', function () {
         model.modelViewerUi.pause();
       });
 
@@ -3231,7 +3655,7 @@
       currentMedia.classList.remove(selectors.classMediaHidden);
       if (otherMedia.length) {
         otherMedia.forEach((element) => {
-          element.dispatchEvent(new CustomEvent('mediaHidden'));
+          element.dispatchEvent(new CustomEvent('theme:media:hidden'));
           element.classList.add(selectors.classMediaHidden);
         });
       }
@@ -3257,16 +3681,14 @@
     };
   })();
 
-  const selectors$3 = {
+  const selectors$Q = {
     templateAddresses: '.template-addresses',
     addressNewForm: '#AddressNewForm',
     btnNew: '.address-new-toggle',
     btnEdit: '.address-edit-toggle',
     btnDelete: '.address-delete',
-    classHide: 'hide',
     dataFormId: 'data-form-id',
     dataConfirmMessage: 'data-confirm-message',
-    defaultConfirmMessage: 'Are you sure you wish to delete this address?',
     editAddress: '#EditAddress',
     addressCountryNew: 'AddressCountryNew',
     addressProvinceNew: 'AddressProvinceNew',
@@ -3277,10 +3699,14 @@
     addressProvinceContainer: 'AddressProvinceContainer',
   };
 
+  const classes$F = {
+    hidden: 'hidden',
+  };
+
   class Addresses {
     constructor(section) {
       this.section = section;
-      this.addressNewForm = this.section.querySelector(selectors$3.addressNewForm);
+      this.addressNewForm = this.section.querySelector(selectors$Q.addressNewForm);
 
       this.init();
     }
@@ -3291,33 +3717,33 @@
         const newAddressForm = this.addressNewForm;
         this.customerAddresses();
 
-        const newButtons = section.querySelectorAll(selectors$3.btnNew);
+        const newButtons = section.querySelectorAll(selectors$Q.btnNew);
         if (newButtons.length) {
           newButtons.forEach((element) => {
             element.addEventListener('click', function () {
-              newAddressForm.classList.toggle(selectors$3.classHide);
+              newAddressForm.classList.toggle(classes$F.hidden);
             });
           });
         }
 
-        const editButtons = section.querySelectorAll(selectors$3.btnEdit);
+        const editButtons = section.querySelectorAll(selectors$Q.btnEdit);
         if (editButtons.length) {
           editButtons.forEach((element) => {
             element.addEventListener('click', function () {
-              const formId = this.getAttribute(selectors$3.dataFormId);
-              section.querySelector(`${selectors$3.editAddress}_${formId}`).classList.toggle(selectors$3.classHide);
+              const formId = this.getAttribute(selectors$Q.dataFormId);
+              section.querySelector(`${selectors$Q.editAddress}_${formId}`).classList.toggle(classes$F.hidden);
             });
           });
         }
 
-        const deleteButtons = section.querySelectorAll(selectors$3.btnDelete);
+        const deleteButtons = section.querySelectorAll(selectors$Q.btnDelete);
         if (deleteButtons.length) {
           deleteButtons.forEach((element) => {
             element.addEventListener('click', function () {
-              const formId = this.getAttribute(selectors$3.dataFormId);
-              const confirmMessage = this.getAttribute(selectors$3.dataConfirmMessage);
-              if (confirm(confirmMessage || selectors$3.defaultConfirmMessage)) {
-                Shopify.postLink('/account/addresses/' + formId, {parameters: {_method: 'delete'}});
+              const formId = this.getAttribute(selectors$Q.dataFormId);
+              const confirmMessage = this.getAttribute(selectors$Q.dataConfirmMessage);
+              if (confirm(confirmMessage)) {
+                Shopify.postLink(window.theme.routes.addresses_url + '/' + formId, {parameters: {_method: 'delete'}});
               }
             });
           });
@@ -3328,18 +3754,18 @@
     customerAddresses() {
       // Initialize observers on address selectors, defined in shopify_common.js
       if (Shopify.CountryProvinceSelector) {
-        new Shopify.CountryProvinceSelector(selectors$3.addressCountryNew, selectors$3.addressProvinceNew, {
-          hideElement: selectors$3.addressProvinceContainerNew,
+        new Shopify.CountryProvinceSelector(selectors$Q.addressCountryNew, selectors$Q.addressProvinceNew, {
+          hideElement: selectors$Q.addressProvinceContainerNew,
         });
       }
 
       // Initialize each edit form's country/province selector
-      const countryOptions = this.section.querySelectorAll(selectors$3.addressCountryOption);
+      const countryOptions = this.section.querySelectorAll(selectors$Q.addressCountryOption);
       countryOptions.forEach((element) => {
-        const formId = element.getAttribute(selectors$3.dataFormId);
-        const countrySelector = `${selectors$3.addressCountry}_${formId}`;
-        const provinceSelector = `${selectors$3.addressProvince}_${formId}`;
-        const containerSelector = `${selectors$3.addressProvinceContainer}_${formId}`;
+        const formId = element.getAttribute(selectors$Q.dataFormId);
+        const countrySelector = `${selectors$Q.addressCountry}_${formId}`;
+        const provinceSelector = `${selectors$Q.addressProvince}_${formId}`;
+        const containerSelector = `${selectors$Q.addressProvinceContainer}_${formId}`;
 
         new Shopify.CountryProvinceSelector(countrySelector, provinceSelector, {
           hideElement: containerSelector,
@@ -3348,12 +3774,12 @@
     }
   }
 
-  const template = document.querySelector(selectors$3.templateAddresses);
-  if (template) {
-    new Addresses(template);
+  const template$1 = document.querySelector(selectors$Q.templateAddresses);
+  if (template$1) {
+    new Addresses(template$1);
   }
 
-  const selectors$4 = {
+  const selectors$P = {
     accountTemplateLogged: '.customer-logged-in',
     account: '.account',
     accountSidebarMobile: '.account-sidebar--mobile',
@@ -3367,32 +3793,35 @@
     }
 
     init() {
-      if (this.section.querySelector(selectors$4.account)) {
+      if (this.section.querySelector(selectors$P.account)) {
         this.accountMobileSidebar();
       }
     }
 
     accountMobileSidebar() {
-      this.section.querySelector(selectors$4.accountSidebarMobile).addEventListener('click', function () {
-        const nextElem = this.nextElementSibling;
+      if (this.section.querySelector(selectors$P.accountSidebarMobile)) {
+        this.section.querySelector(selectors$P.accountSidebarMobile).addEventListener('click', function () {
+          const nextElem = this.nextElementSibling;
 
-        if (nextElem && nextElem.tagName === 'UL') {
-          nextElem.classList.toggle('visible');
-        }
-      });
+          if (nextElem && nextElem.tagName === 'UL') {
+            nextElem.classList.toggle('visible');
+          }
+        });
+      }
     }
   }
 
-  const template$1 = document.querySelector(selectors$4.accountTemplateLogged);
-  if (template$1) {
-    new Account(template$1);
+  const template = document.querySelector(selectors$P.accountTemplateLogged);
+  if (template) {
+    new Account(template);
   }
 
-  const selectors$5 = {
+  const selectors$O = {
     form: '[data-account-form]',
     showReset: '[data-show-reset]',
     hideReset: '[data-hide-reset]',
     recover: '[data-recover-password]',
+    recoverSuccess: '[data-recover-success]',
     login: '[data-login-form]',
     recoverHash: '#recover',
     hideClass: 'is-hidden',
@@ -3401,15 +3830,16 @@
   class Login {
     constructor(form) {
       this.form = form;
-      this.showButton = form.querySelector(selectors$5.showReset);
-      this.hideButton = form.querySelector(selectors$5.hideReset);
-      this.recover = form.querySelector(selectors$5.recover);
-      this.login = form.querySelector(selectors$5.login);
+      this.showButton = form.querySelector(selectors$O.showReset);
+      this.hideButton = form.querySelector(selectors$O.hideReset);
+      this.recover = form.querySelector(selectors$O.recover);
+      this.recoverSuccess = form.querySelector(selectors$O.recoverSuccess);
+      this.login = form.querySelector(selectors$O.login);
       this.init();
     }
 
     init() {
-      if (window.location.hash == selectors$5.recoverHash) {
+      if (window.location.hash == selectors$O.recoverHash || this.recoverSuccess) {
         this.showRecoverPasswordForm();
       } else {
         this.hideRecoverPasswordForm();
@@ -3433,21 +3863,21 @@
     }
 
     showRecoverPasswordForm() {
-      this.login.classList.add(selectors$5.hideClass);
-      this.recover.classList.remove(selectors$5.hideClass);
-      window.location.hash = selectors$5.recoverHash;
+      this.login.classList.add(selectors$O.hideClass);
+      this.recover.classList.remove(selectors$O.hideClass);
+      window.location.hash = selectors$O.recoverHash;
       return false;
     }
 
     hideRecoverPasswordForm() {
-      this.recover.classList.add(selectors$5.hideClass);
-      this.login.classList.remove(selectors$5.hideClass);
+      this.recover.classList.add(selectors$O.hideClass);
+      this.login.classList.remove(selectors$O.hideClass);
       window.location.hash = '';
       return false;
     }
   }
 
-  const loginForm = document.querySelector(selectors$5.form);
+  const loginForm = document.querySelector(selectors$O.form);
   if (loginForm) {
     new Login(loginForm);
   }
@@ -3461,7 +3891,7 @@
   const registered = window.Shopify.theme.sections.registered;
   const instances = window.Shopify.theme.sections.instances;
 
-  const selectors$6 = {
+  const selectors$N = {
     id: 'data-section-id',
     type: 'data-section-type',
   };
@@ -3500,7 +3930,7 @@
   class Section {
     constructor(container, registration) {
       this.container = validateContainerElement(container);
-      this.id = container.getAttribute(selectors$6.id);
+      this.id = container.getAttribute(selectors$N.id);
       this.type = registration.type;
       this.callStack = registration.getStack();
 
@@ -3561,8 +3991,8 @@
     if (!(container instanceof Element)) {
       throw new TypeError('Theme Sections: Attempted to load section. The section container provided is not a DOM element.');
     }
-    if (container.getAttribute(selectors$6.id) === null) {
-      throw new Error('Theme Sections: The section container provided does not have an id assigned to the ' + selectors$6.id + ' attribute.');
+    if (container.getAttribute(selectors$N.id) === null) {
+      throw new Error('Theme Sections: The section container provided does not have an id assigned to the ' + selectors$N.id + ' attribute.');
     }
 
     return container;
@@ -3609,7 +4039,7 @@
     types = normalizeType(types);
 
     if (typeof containers === 'undefined') {
-      containers = document.querySelectorAll('[' + selectors$6.type + ']');
+      containers = document.querySelectorAll('[' + selectors$N.type + ']');
     }
 
     containers = normalizeContainers(containers);
@@ -3628,12 +4058,12 @@
         }
 
         // Filter from list of containers because container doesn't have data-section-type attribute
-        if (container.getAttribute(selectors$6.type) === null) {
+        if (container.getAttribute(selectors$N.type) === null) {
           return false;
         }
 
         // Keep in list of containers because current type doesn't match
-        if (container.getAttribute(selectors$6.type) !== type) {
+        if (container.getAttribute(selectors$N.type) !== type) {
           return true;
         }
 
@@ -3772,16 +4202,16 @@
   if (window.Shopify.designMode) {
     document.addEventListener('shopify:section:load', function (event) {
       var id = event.detail.sectionId;
-      var container = event.target.querySelector('[' + selectors$6.id + '="' + id + '"]');
+      var container = event.target.querySelector('[' + selectors$N.id + '="' + id + '"]');
 
       if (container !== null) {
-        load(container.getAttribute(selectors$6.type), container);
+        load(container.getAttribute(selectors$N.type), container);
       }
     });
 
     document.addEventListener('shopify:section:reorder', function (event) {
       var id = event.detail.sectionId;
-      var container = event.target.querySelector('[' + selectors$6.id + '="' + id + '"]');
+      var container = event.target.querySelector('[' + selectors$N.id + '="' + id + '"]');
       var instance = getInstances(container)[0];
 
       if (typeof instance === 'object') {
@@ -3791,7 +4221,7 @@
 
     document.addEventListener('shopify:section:unload', function (event) {
       var id = event.detail.sectionId;
-      var container = event.target.querySelector('[' + selectors$6.id + '="' + id + '"]');
+      var container = event.target.querySelector('[' + selectors$N.id + '="' + id + '"]');
       var instance = getInstances(container)[0];
 
       if (typeof instance === 'object') {
@@ -3832,98 +4262,252 @@
     });
   }
 
-  const selectors$7 = {
-    slider: '[data-slider]',
+  const throttle = (fn, wait) => {
+    let prev, next;
+    return function invokeFn(...args) {
+      const now = Date.now();
+      next = clearTimeout(next);
+      if (!prev || now - prev >= wait) {
+        // eslint-disable-next-line prefer-spread
+        fn.apply(null, args);
+        prev = now;
+      } else {
+        next = setTimeout(invokeFn.bind(null, ...args), wait - (now - prev));
+      }
+    };
+  };
+
+  const selectors$M = {
+    tooltip: 'data-tooltip',
+    tooltipStopMouseEnter: 'data-tooltip-stop-mouseenter',
+  };
+
+  const classes$E = {
+    tooltipDefault: 'tooltip-default',
+    visible: 'is-visible',
+    hiding: 'is-hiding',
+  };
+
+  let sections$r = {};
+
+  class Tooltip {
+    constructor(el, options = {}) {
+      this.tooltip = el;
+      if (!this.tooltip.hasAttribute(selectors$M.tooltip)) return;
+      this.label = this.tooltip.getAttribute(selectors$M.tooltip);
+      this.class = options.class || classes$E.tooltipDefault;
+      this.transitionSpeed = options.transitionSpeed || 200;
+      this.hideTransitionTimeout = 0;
+      this.addPinEvent = () => this.addPin();
+      this.addPinMouseEvent = () => this.addPin(true);
+      this.removePinEvent = (event) => throttle(this.removePin(event), 50);
+      this.removePinMouseEvent = (event) => this.removePin(event, true, true);
+      this.init();
+    }
+
+    init() {
+      if (!document.querySelector(`.${this.class}`)) {
+        const tooltipTemplate = `<div class="${this.class}__arrow"></div><div class="${this.class}__inner"><div class="${this.class}__text"></div></div>`;
+        const tooltipElement = document.createElement('div');
+        tooltipElement.className = this.class;
+        tooltipElement.innerHTML = tooltipTemplate;
+        document.body.appendChild(tooltipElement);
+      }
+
+      this.tooltip.addEventListener('mouseenter', this.addPinMouseEvent);
+      this.tooltip.addEventListener('mouseleave', this.removePinMouseEvent);
+      this.tooltip.addEventListener('theme:tooltip:init', this.addPinEvent);
+      document.addEventListener('theme:tooltip:close', this.removePinEvent);
+    }
+
+    addPin(stopMouseEnter = false) {
+      const tooltipTarget = document.querySelector(`.${this.class}`);
+
+      if (tooltipTarget && ((stopMouseEnter && !this.tooltip.hasAttribute(selectors$M.tooltipStopMouseEnter)) || !stopMouseEnter)) {
+        const tooltipTargetArrow = tooltipTarget.querySelector(`.${this.class}__arrow`);
+        const tooltipTargetInner = tooltipTarget.querySelector(`.${this.class}__inner`);
+        const tooltipTargetText = tooltipTarget.querySelector(`.${this.class}__text`);
+        tooltipTargetText.textContent = this.label;
+
+        const tooltipTargetWidth = tooltipTargetInner.offsetWidth;
+        const tooltipRect = this.tooltip.getBoundingClientRect();
+        const tooltipTop = tooltipRect.top;
+        const tooltipWidth = tooltipRect.width;
+        const tooltipHeight = tooltipRect.height;
+        const tooltipTargetPositionTop = tooltipTop + tooltipHeight + window.scrollY;
+        let tooltipTargetPositionLeft = tooltipRect.left - tooltipTargetWidth / 2 + tooltipWidth / 2;
+        const tooltipLeftWithWidth = tooltipTargetPositionLeft + tooltipTargetWidth;
+        const tooltipTargetWindowDifference = tooltipLeftWithWidth - getWindowWidth();
+
+        if (tooltipTargetWindowDifference > 0) {
+          tooltipTargetPositionLeft -= tooltipTargetWindowDifference;
+        }
+
+        if (tooltipTargetPositionLeft < 0) {
+          tooltipTargetPositionLeft = 0;
+        }
+
+        tooltipTargetArrow.style.left = `${tooltipRect.left + tooltipWidth / 2}px`;
+        tooltipTarget.style.setProperty('--tooltip-top', `${tooltipTargetPositionTop}px`);
+        tooltipTargetInner.style.transform = `translateX(${tooltipTargetPositionLeft}px)`;
+        tooltipTarget.classList.remove(classes$E.hiding);
+        tooltipTarget.classList.add(classes$E.visible);
+
+        document.addEventListener('theme:scroll', this.removePinEvent);
+      }
+    }
+
+    removePin(event, stopMouseEnter = false, hideTransition = false) {
+      const tooltipTarget = document.querySelector(`.${this.class}`);
+      const tooltipVisible = tooltipTarget.classList.contains(classes$E.visible);
+
+      if (tooltipTarget && ((stopMouseEnter && !this.tooltip.hasAttribute(selectors$M.tooltipStopMouseEnter)) || !stopMouseEnter)) {
+        if (tooltipVisible && (hideTransition || event.detail.hideTransition)) {
+          tooltipTarget.classList.add(classes$E.hiding);
+
+          if (this.hideTransitionTimeout) {
+            clearTimeout(this.hideTransitionTimeout);
+          }
+
+          this.hideTransitionTimeout = setTimeout(() => {
+            tooltipTarget.classList.remove(classes$E.hiding);
+          }, this.transitionSpeed);
+        }
+
+        tooltipTarget.classList.remove(classes$E.visible);
+
+        document.removeEventListener('theme:scroll', this.removePinEvent);
+      }
+    }
+
+    unload() {
+      this.tooltip.removeEventListener('mouseenter', this.addPinMouseEvent);
+      this.tooltip.removeEventListener('mouseleave', this.removePinMouseEvent);
+      this.tooltip.removeEventListener('theme:tooltip:init', this.addPinEvent);
+      document.removeEventListener('theme:tooltip:close', this.removePinEvent);
+      document.removeEventListener('theme:scroll', this.removePinEvent);
+    }
+  }
+
+  const tooltipSection = {
+    onLoad() {
+      sections$r[this.id] = [];
+      const els = this.container.querySelectorAll(`[${selectors$M.tooltip}]`);
+      els.forEach((el) => {
+        sections$r[this.id].push(new Tooltip(el));
+      });
+    },
+    onUnload: function () {
+      sections$r[this.id].forEach((el) => {
+        if (typeof el.unload === 'function') {
+          el.unload();
+        }
+      });
+    },
+  };
+
+  var sections$q = {};
+
+  const parallaxHero = {
+    onLoad() {
+      sections$q[this.id] = [];
+      const frames = this.container.querySelectorAll('[data-parallax-wrapper]');
+      frames.forEach((frame) => {
+        const inner = frame.querySelector('[data-parallax-img]');
+
+        sections$q[this.id].push(
+          new Rellax(inner, {
+            center: true,
+            round: true,
+            frame: frame,
+          })
+        );
+      });
+
+      window.addEventListener('load', () => {
+        sections$q[this.id].forEach((image) => {
+          if (typeof image.refresh === 'function') {
+            image.refresh();
+          }
+        });
+      });
+    },
+    onUnload: function () {
+      sections$q[this.id].forEach((image) => {
+        if (typeof image.destroy === 'function') {
+          image.destroy();
+        }
+      });
+    },
+  };
+
+  register('article', [tooltipSection, parallaxHero]);
+
+  const selectors$L = {
+    aos: '[data-aos]',
+    collectionImage: '.collection-item__image',
+    columnImage: '[data-column-image]',
+    flickityNextArrow: '.flickity-button.next',
+    flickityPrevArrow: '.flickity-button.previous',
+    link: 'a:not(.btn)',
+    nextArrow: '[data-next-arrow]',
+    prevArrow: '[data-prev-arrow]',
+    productItemImage: '.product-item__image',
     slide: '[data-slide]',
     slideValue: 'data-slide',
-    prevArrow: '[data-prev-arrow]',
-    nextArrow: '[data-next-arrow]',
-    slideshowSlideImg: '.slide-image-img',
-    flickityPrevArrow: '.flickity-button.previous',
-    flickityNextArrow: '.flickity-button.next',
-    collectionImage: '.collection-item__image',
-    productItemImage: '.product-item__image',
-    columnImage: '.column__image__wrapper',
+    slider: '[data-slider]',
     sliderThumb: '[data-slider-thumb]',
-    sliderThumbClick: '[data-slider-thumb-click]',
-    heroContent: '.hero__content',
-    heroContentWrapper: '.hero__content__wrapper',
-    dataSliderAnimate: 'data-slider-animate',
-    dataSliderAnimateOnce: 'data-slider-animate-once',
-    dataAos: '[data-aos]',
-    dataAspectRatio: 'data-aspectratio',
-    dataDots: 'data-dots',
-    dataArrows: 'data-arrows',
-    dataAutoplay: 'data-autoplay',
-    dataAutoplaySpeed: 'data-speed',
-    dataColor: 'data-color',
-    dataInfinite: 'data-infinite',
-    dataSetHeight: 'data-set-height',
-    dataWatchCss: 'data-watch-css',
-    dataAdaptiveHeight: 'data-adaptive-height',
-    dataCellAlign: 'data-cell-align',
-    dataDraggable: 'data-draggable',
-    dataPercentPosition: 'data-percent-position',
-    dataSlideIndex: 'data-slide-index',
-    dataSlidesLargeDesktop: 'data-slides-large-desktop',
-    dataSlidesDesktop: 'data-slides-desktop',
-    dataSlidesTabletDesktop: 'data-slides-tablet',
-    dataSlidesMobileDesktop: 'data-slides-mobile',
-    dataSliderStartIndex: 'data-slider-start-index',
-    dataGroupCells: 'data-group-cells',
-    dataArrowPositionMiddle: 'data-arrow-position-middle',
-    dataEqualizeHeight: 'data-equalize-height',
-    dataFade: 'data-fade',
   };
 
-  const classes = {
-    classIsSelected: 'is-selected',
-    textDark: 'text-dark',
-    textLight: 'text-light',
-    transparentWrapper: 'transparent__wrapper',
+  const attributes$j = {
+    arrowPositionMiddle: 'data-arrow-position-middle',
+    equalizeHeight: 'data-equalize-height',
+    slideIndex: 'data-slide-index',
+    sliderOptions: 'data-options',
+    slideTextColor: 'data-slide-text-color',
+  };
+
+  const classes$D = {
+    aosAnimate: 'aos-animate',
+    desktop: 'desktop',
+    focused: 'is-focused',
+    flickityResize: 'flickity-resize',
+    flickityResizing: 'flickity-resizing',
+    flickityEnabled: 'flickity-enabled',
     heroContentTransparent: 'hero__content--transparent',
-    classSliderInitialized: 'js-slider--initialized',
-    classSliderArrowsHidden: 'flickity-button-hide',
-    classAosAnimate: 'aos-animate',
-    classAosAnimated: 'aos-animated',
+    initialized: 'is-initialized',
+    isLoading: 'is-loading',
+    isSelected: 'is-selected',
+    mobile: 'mobile',
+    sliderInitialized: 'js-slider--initialized',
   };
 
-  const sections = {};
+  const sections$p = {};
 
   class Slider {
     constructor(container, slideshow = null) {
       this.container = container;
-      this.slideshow = slideshow || this.container.querySelector(selectors$7.slider);
+      this.slideshow = slideshow || this.container.querySelector(selectors$L.slider);
 
       if (!this.slideshow) return;
 
-      this.slideshowSlides = this.slideshow.querySelectorAll(selectors$7.slide);
-      this.sliderPrev = this.container.querySelector(selectors$7.prevArrow);
-      this.sliderNext = this.container.querySelector(selectors$7.nextArrow);
-      this.sliderThumbs = this.container.querySelectorAll(selectors$7.sliderThumb);
-      this.sliderThumbsClick = this.container.querySelectorAll(selectors$7.sliderThumbClick);
-      this.currentSlideColor = this.slideshowSlides[0].getAttribute(selectors$7.dataColor);
-      this.showDots = this.slideshow.getAttribute(selectors$7.dataDots) != 'hidden';
-      this.showArrows = this.slideshow.getAttribute(selectors$7.dataArrows) === 'true';
-      this.autoPlay = this.slideshow.getAttribute(selectors$7.dataAutoplay) === 'true';
-      this.autoPlaySpeed = this.slideshow.getAttribute(selectors$7.dataAutoplaySpeed);
-      this.infinite = this.slideshow.getAttribute(selectors$7.dataInfinite) !== 'false';
-      this.setMinHeightFlag = this.slideshow.getAttribute(selectors$7.dataSetHeight) === 'true';
-      this.watchCss = this.slideshow.getAttribute(selectors$7.dataWatchCss) === 'true';
-      this.adaptiveHeight = this.slideshow.getAttribute(selectors$7.dataAdaptiveHeight) !== 'false';
-      this.cellAlignLeft = this.slideshow.getAttribute(selectors$7.dataCellAlign) === 'left';
-      this.cellAlignRight = this.slideshow.getAttribute(selectors$7.dataCellAlign) === 'right';
-      this.draggable = this.slideshow.getAttribute(selectors$7.dataDraggable) !== 'false';
-      this.percentPosition = this.slideshow.getAttribute(selectors$7.dataPercentPosition) !== 'false';
-      this.multipleSlides = this.slideshow.hasAttribute(selectors$7.dataSlidesLargeDesktop);
-      this.sliderStartIndex = this.slideshow.hasAttribute(selectors$7.dataSliderStartIndex);
-      this.groupCells = this.slideshow.getAttribute(selectors$7.dataGroupCells) === 'true';
-      this.sliderAnimate = this.slideshow.getAttribute(selectors$7.dataSliderAnimate) === 'true';
-      this.sliderAnimateOnce = this.slideshow.getAttribute(selectors$7.dataSliderAnimateOnce) === 'true';
-      this.dataEqualizeHeight = this.slideshow.getAttribute(selectors$7.dataEqualizeHeight) === 'true';
-      this.fade = this.slideshow.getAttribute(selectors$7.dataFade) === 'true';
-      this.resizeEvent = debounce(() => this.resizeEvents(), 100);
-      this.resizeEventAlt = debounce(() => this.addRemoveSlidesForDevices(), 100);
+      this.slideshowSlides = this.slideshow.querySelectorAll(selectors$L.slide);
+
+      if (this.slideshowSlides.length <= 1) return;
+
+      this.sliderPrev = this.container.querySelector(selectors$L.prevArrow);
+      this.sliderNext = this.container.querySelector(selectors$L.nextArrow);
+      this.sliderThumbs = this.container.querySelectorAll(selectors$L.sliderThumb);
+      this.multipleSlides = this.slideshow.hasAttribute(attributes$j.slidesLargeDesktop);
+      this.isHeightEqualized = this.slideshow.getAttribute(attributes$j.equalizeHeight) === 'true';
+
+      this.sliderCallbackEventOnResize = () => this.sliderCallbackEvent();
+      this.addRemoveSlidesForDevicesOnResize = () => this.addRemoveSlidesForDevices();
+      this.resetSliderEvent = () => this.resetSlider();
+
+      if (this.slideshow.hasAttribute(attributes$j.sliderOptions)) {
+        this.customOptions = JSON.parse(decodeURIComponent(this.slideshow.getAttribute(attributes$j.sliderOptions)));
+      }
 
       this.flkty = null;
 
@@ -3931,67 +4515,65 @@
     }
 
     init() {
-      this.setMinHeight();
+      this.slideshow.classList.add(classes$D.isLoading);
 
-      const sliderOptions = {
-        initialIndex: this.sliderStartIndex ? parseInt(this.slideshow.getAttribute(selectors$7.dataSliderStartIndex)) : 0,
-        autoPlay: this.autoPlay && this.autoPlaySpeed ? parseInt(this.autoPlaySpeed) : false,
+      this.sliderOptions = {
         contain: true,
-        pageDots: this.showDots,
-        prevNextButtons: this.showArrows,
-        adaptiveHeight: this.adaptiveHeight,
-        wrapAround: this.infinite,
-        percentPosition: this.percentPosition,
-        watchCSS: this.watchCss,
-        cellAlign: this.cellAlignLeft ? 'left' : this.cellAlignRight ? 'right' : 'center',
-        groupCells: this.groupCells,
-        draggable: this.draggable ? '>1' : false,
+        wrapAround: true,
+        adaptiveHeight: true,
+        ...this.customOptions,
         on: {
           ready: () => {
-            if (this.sliderAnimate && this.sliderAnimateOnce && !this.autoPlay) {
-              const currentSlide = this.slideshow.querySelector(`.${classes.classIsSelected}`);
-              currentSlide.classList.add(classes.classAosAnimated);
-            }
-
-            setTimeout(() => {
+            requestAnimationFrame(() => {
+              this.slideshow.classList.add(classes$D.initialized);
+              this.slideshow.classList.remove(classes$D.isLoading);
               this.slideshow.parentNode.dispatchEvent(
-                new CustomEvent('slider-is-loaded', {
+                new CustomEvent('theme:slider:loaded', {
                   bubbles: true,
                   detail: {
                     slider: this,
                   },
                 })
               );
-            }, 10);
+            });
 
             this.slideActions();
 
-            if (this.slideshow.classList.contains(classes.classIsSelected)) {
-              this.slideshow.classList.remove(classes.classIsSelected);
-            }
-            if (this.showArrows) {
-              this.initArrows();
+            if (this.sliderOptions.prevNextButtons) {
               this.positionArrows();
             }
           },
+          change: (index) => {
+            const slide = this.slideshowSlides[index];
+            if (!slide || this.sliderOptions.groupCells) return;
+
+            const elementsToAnimate = slide.querySelectorAll(selectors$L.aos);
+            if (elementsToAnimate.length) {
+              elementsToAnimate.forEach((el) => {
+                el.classList.remove(classes$D.aosAnimate);
+                requestAnimationFrame(() => {
+                  el.classList.add(classes$D.aosAnimate);
+                });
+              });
+            }
+          },
           resize: () => {
-            if (this.showArrows) {
+            if (this.sliderOptions.prevNextButtons) {
               this.positionArrows();
             }
           },
         },
       };
 
-      if (this.fade) {
-        sliderOptions.fade = true;
-        this.flkty = new FlickityFade(this.slideshow, sliderOptions);
+      if (this.sliderOptions.fade) {
+        this.flkty = new FlickityFade(this.slideshow, this.sliderOptions);
       }
 
-      if (!this.fade) {
-        this.flkty = new Flickity(this.slideshow, sliderOptions);
+      if (!this.sliderOptions.fade) {
+        this.flkty = new Flickity(this.slideshow, this.sliderOptions);
       }
 
-      if (this.dataEqualizeHeight) {
+      if (this.isHeightEqualized) {
         this.equalizeHeight();
       }
 
@@ -4011,22 +4593,18 @@
         });
       }
 
-      this.flkty.on('change', () => this.slideActions());
+      this.flkty.on('change', () => this.slideActions(true));
 
       this.addRemoveSlidesForDevices();
 
-      window.addEventListener('resize', this.resizeEventAlt);
+      document.addEventListener('theme:resize', this.addRemoveSlidesForDevicesOnResize);
 
-      if (this.sliderAnimate) {
-        this.flkty.on('settle', () => this.sliderSettle());
+      if (this.multipleSlides) {
+        document.addEventListener('theme:resize', this.sliderCallbackEventOnResize);
       }
 
-      if (this.setMinHeightFlag || this.multipleSlides) {
-        window.addEventListener('resize', this.resizeEvent);
-      }
-
-      if (this.sliderThumbsClick.length) {
-        this.sliderThumbsClick.forEach((element) => {
+      if (this.sliderThumbs.length) {
+        this.sliderThumbs.forEach((element) => {
           element.addEventListener('click', (e) => {
             e.preventDefault();
             const slideIndex = [...element.parentElement.children].indexOf(element);
@@ -4034,30 +4612,28 @@
           });
         });
       }
+
+      this.container.addEventListener('theme:tab:change', this.resetSliderEvent);
     }
 
-    sliderSettle() {
-      let animatedItems = this.slideshow.querySelectorAll(`.${classes.classIsSelected} ${selectors$7.dataAos}`);
-
-      if (this.sliderAnimateOnce) {
-        animatedItems = this.slideshow.querySelectorAll(`.${classes.classIsSelected}:not(.${classes.classAosAnimated}) .${classes.classAosAnimated}`);
-      }
-
-      if (animatedItems.length) {
-        animatedItems.forEach((animatedItem) => {
-          animatedItem.classList.add(classes.classAosAnimate);
-
-          if (this.sliderAnimateOnce) {
-            animatedItem.closest(`.${classes.classIsSelected}`).classList.add(classes.classAosAnimated);
-          }
-        });
+    // Move slides to their initial position
+    resetSlider() {
+      if (this.slideshow) {
+        if (this.flkty && this.flkty.isActive) {
+          this.flkty.select(0, false, true);
+        } else {
+          this.slideshow.scrollTo({
+            left: 0,
+            behavior: 'auto',
+          });
+        }
       }
     }
 
     addRemoveSlidesForDevices() {
       this.hasDiffSlidesForMobileDesktop =
         Array.prototype.filter.call(this.slideshowSlides, (slide) => {
-          if (slide.classList.contains('desktop') || slide.classList.contains('mobile')) {
+          if (slide.classList.contains(classes$D.desktop) || slide.classList.contains(classes$D.mobile)) {
             return slide;
           }
         }).length > 0;
@@ -4066,13 +4642,12 @@
         return;
       }
 
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
       let selectorSlides = null;
 
-      if (windowWidth <= 749) {
-        selectorSlides = `${selectors$7.slide}.mobile, ${selectors$7.slide}:not(.desktop)`;
+      if (!isDesktop()) {
+        selectorSlides = `${selectors$L.slide}.${classes$D.mobile}, ${selectors$L.slide}:not(.${classes$D.desktop})`;
       } else {
-        selectorSlides = `${selectors$7.slide}.desktop, ${selectors$7.slide}:not(.mobile)`;
+        selectorSlides = `${selectors$L.slide}.${classes$D.desktop}, ${selectors$L.slide}:not(.${classes$D.mobile})`;
       }
 
       this.flkty.options.cellSelector = selectorSlides;
@@ -4083,212 +4658,152 @@
       this.slideActions();
     }
 
-    resizeEvents() {
-      this.setMinHeight();
-
+    sliderCallbackEvent() {
       if (this.multipleSlides) {
-        if (this.showArrows) {
-          this.initArrows();
-        }
         this.flkty.resize();
-        if (!this.slideshow.classList.contains(classes.classSliderInitialized)) {
+        if (!this.slideshow.classList.contains(classes$D.sliderInitialized)) {
           this.flkty.select(0);
         }
       }
     }
 
-    slideActions() {
-      const currentSlide = this.slideshow.querySelector(`.${classes.classIsSelected}`);
-      this.currentSlideColor = currentSlide.getAttribute(selectors$7.dataColor);
+    slideActions(changeEvent = false) {
+      const currentSlide = this.slideshow.querySelector(`.${classes$D.isSelected}`);
+      const currentSlideTextColor = currentSlide.getAttribute(attributes$j.slideTextColor);
+      const currentSlideLink = currentSlide.querySelector(selectors$L.link);
+      const buttons = this.slideshow.querySelectorAll(`${selectors$L.slide} a, ${selectors$L.slide} button`);
 
-      if (this.currentSlideColor) {
-        this.slideshow.classList.remove(classes.textLight, classes.textDark);
-        this.slideshow.classList.add(this.currentSlideColor);
+      if (document.body.classList.contains(classes$D.focused) && currentSlideLink && this.sliderOptions.groupCells && changeEvent) {
+        currentSlideLink.focus();
       }
 
-      this.container.classList.remove(classes.transparentWrapper);
-      const heroContentWrapper = currentSlide.querySelector(selectors$7.heroContentWrapper);
-      if (heroContentWrapper && heroContentWrapper.classList.contains(classes.heroContentTransparent)) {
-        this.container.classList.add(classes.transparentWrapper);
+      if (buttons.length) {
+        buttons.forEach((button) => {
+          const slide = button.closest(selectors$L.slide);
+          if (slide) {
+            const tabIndex = slide.classList.contains(classes$D.isSelected) ? 0 : -1;
+            button.setAttribute('tabindex', tabIndex);
+          }
+        });
       }
 
-      this.setMinHeight();
-
-      if (this.sliderAnimate) {
-        let animatedItems = this.slideshow.querySelectorAll(`.${classes.classIsSelected} .${classes.classAosAnimate}`);
-        if (this.sliderAnimateOnce) {
-          animatedItems = this.slideshow.querySelectorAll(`.${classes.classIsSelected}:not(.${classes.classAosAnimated}) .${classes.classAosAnimate}`);
-        }
-        if (animatedItems.length) {
-          animatedItems.forEach((animatedItem) => {
-            animatedItem.classList.remove(classes.classAosAnimate);
-            if (this.sliderAnimateOnce) {
-              animatedItem.classList.add(classes.classAosAnimated);
-            }
-          });
-        }
+      if (currentSlideTextColor !== 'rgba(0,0,0,0)' && currentSlideTextColor !== '') {
+        this.slideshow.style.setProperty('--text', currentSlideTextColor);
       }
 
-      if (this.sliderThumbs.length && this.sliderThumbs.length === this.slideshowSlides.length && currentSlide.hasAttribute(selectors$7.dataSlideIndex)) {
-        const slideIndex = parseInt(currentSlide.getAttribute(selectors$7.dataSlideIndex));
-        const currentThumb = this.container.querySelector(`${selectors$7.sliderThumb}.${classes.classIsSelected}`);
+      if (this.sliderThumbs.length && this.sliderThumbs.length === this.slideshowSlides.length && currentSlide.hasAttribute(attributes$j.slideIndex)) {
+        const slideIndex = parseInt(currentSlide.getAttribute(attributes$j.slideIndex));
+        const currentThumb = this.container.querySelector(`${selectors$L.sliderThumb}.${classes$D.isSelected}`);
         if (currentThumb) {
-          currentThumb.classList.remove(classes.classIsSelected);
+          currentThumb.classList.remove(classes$D.isSelected);
         }
-        this.sliderThumbs[slideIndex].classList.add(classes.classIsSelected);
+        this.sliderThumbs[slideIndex].classList.add(classes$D.isSelected);
       }
-    }
-
-    setMinHeight() {
-      if (!this.setMinHeightFlag) return;
-
-      this.slideshowSlides.forEach((element) => {
-        const slideImageImg = element.querySelector(selectors$7.slideshowSlideImg);
-        let slideAspectRatio = '';
-        if (slideImageImg && slideImageImg.hasAttribute(selectors$7.dataAspectRatio)) {
-          slideAspectRatio = slideImageImg.getAttribute(selectors$7.dataAspectRatio);
-        }
-
-        let slideTextContentHeight = 0;
-        let getMargin = 0;
-        const slideTextContent = element.querySelector(selectors$7.heroContent);
-        if (slideTextContent) {
-          const getMarginTop = parseInt(window.getComputedStyle(slideTextContent).marginTop);
-          const getMarginBottom = parseInt(window.getComputedStyle(slideTextContent).marginBottom);
-          getMargin = getMarginTop + getMarginBottom;
-          slideTextContentHeight = slideTextContent.offsetHeight + getMargin;
-        }
-
-        const slideWidth = parseInt(getComputedStyle(element, null).width.replace('px', ''));
-        let slideHeight = parseInt(slideWidth / slideAspectRatio) || 0;
-        const isCurrentSlide = element.classList.contains(classes.classIsSelected);
-
-        if (slideTextContentHeight > slideHeight) {
-          slideHeight = slideTextContentHeight;
-        }
-
-        const minHeightValue = `calc(${slideHeight}px + var(--header-padding)`;
-        element.style.setProperty('min-height', minHeightValue);
-        const heroContentWrapper = element.querySelector(selectors$7.heroContentWrapper);
-        if (heroContentWrapper) {
-          heroContentWrapper.style.setProperty('min-height', minHeightValue);
-        }
-        if (isCurrentSlide) {
-          this.slideshow.parentElement.style.setProperty('min-height', minHeightValue);
-        }
-      });
     }
 
     positionArrows() {
-      if (this.slideshow.hasAttribute(selectors$7.dataArrowPositionMiddle) && this.showArrows) {
-        const itemImage = this.slideshow.querySelector(selectors$7.collectionImage) || this.slideshow.querySelector(selectors$7.productItemImage) || this.slideshow.querySelector(selectors$7.columnImage);
+      if (this.slideshow.hasAttribute(attributes$j.arrowPositionMiddle) && this.sliderOptions.prevNextButtons) {
+        const itemImage = this.slideshow.querySelector(selectors$L.collectionImage) || this.slideshow.querySelector(selectors$L.productItemImage) || this.slideshow.querySelector(selectors$L.columnImage);
 
         // Prevent 'clientHeight' of null error if no image
         if (!itemImage) return;
 
-        this.slideshow.querySelector(selectors$7.flickityPrevArrow).style.top = itemImage.clientHeight / 2 + 'px';
-        this.slideshow.querySelector(selectors$7.flickityNextArrow).style.top = itemImage.clientHeight / 2 + 'px';
+        this.slideshow.querySelector(selectors$L.flickityPrevArrow).style.top = itemImage.clientHeight / 2 + 'px';
+        this.slideshow.querySelector(selectors$L.flickityNextArrow).style.top = itemImage.clientHeight / 2 + 'px';
       }
-    }
-
-    initArrows() {
-      if (!this.multipleSlides) return;
-      const slidesNumberCustom = parseInt(this.slideshow.getAttribute(selectors$7.dataSlidesLargeDesktop));
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      const desktopSlides = this.slideshow.hasAttribute(selectors$7.dataSlidesDesktop) ? parseInt(this.slideshow.getAttribute(selectors$7.dataSlidesDesktop)) : 3;
-      const tabletSlides = this.slideshow.hasAttribute(selectors$7.dataSlidesTabletDesktop) ? parseInt(this.slideshow.getAttribute(selectors$7.dataSlidesTabletDesktop)) : 2;
-      const mobileSlides = this.slideshow.hasAttribute(selectors$7.dataSlidesMobileDesktop) ? parseInt(this.slideshow.getAttribute(selectors$7.dataSlidesMobileDesktop)) : 1;
-      const largeDesktopCheck = windowWidth > 1339 && this.slideshowSlides.length > slidesNumberCustom;
-      const desktopCheck = windowWidth <= 1339 && windowWidth > 1023 && this.slideshowSlides.length > desktopSlides;
-      const tabletCheck = windowWidth <= 1023 && windowWidth > 749 && this.slideshowSlides.length > tabletSlides;
-      const mobileCheck = windowWidth <= 749 && this.slideshowSlides.length > mobileSlides;
-      const flag = Boolean(largeDesktopCheck || desktopCheck || tabletCheck || mobileCheck);
-      this.slideshow.classList.toggle(classes.classSliderArrowsHidden, !flag);
-      this.slideshow.classList.toggle(classes.classSliderInitialized, flag);
     }
 
     equalizeHeight() {
       Flickity.prototype._createResizeClass = function () {
-        setTimeout(() => {
-          this.element.classList.add('flickity-resize');
+        requestAnimationFrame(() => {
+          this.element.classList.add(classes$D.flickityResize);
         });
       };
 
-      Flickity.createMethods.push('_createResizeClass');
+      this.flkty._createResizeClass();
 
       const resize = Flickity.prototype.resize;
       Flickity.prototype.resize = function () {
-        this.element.classList.remove('flickity-resize');
+        this.element.classList.remove(classes$D.flickityResize);
+        this.element.classList.add(classes$D.flickityResizing);
         resize.call(this);
-        this.element.classList.add('flickity-resize');
+        requestAnimationFrame(() => {
+          this.element.classList.add(classes$D.flickityResize);
+          this.element.classList.remove(classes$D.flickityResizing);
+        });
       };
-
-      this.flkty.resize();
     }
 
     onUnload() {
-      if (this.setMinHeightFlag || this.multipleSlides) {
-        window.removeEventListener('resize', this.resizeEvent);
+      if (this.multipleSlides) {
+        document.removeEventListener('theme:resize', this.sliderCallbackEventOnResize);
       }
 
       if (this.slideshow && this.flkty) {
         this.flkty.options.watchCSS = false;
         this.flkty.destroy();
       }
+
+      this.container.removeEventListener('theme:tab:change', this.resetSliderEvent);
+
+      document.removeEventListener('theme:resize', this.addRemoveSlidesForDevicesOnResize);
     }
 
     onBlockSelect(evt) {
       if (!this.slideshow) return;
       // Ignore the cloned version
-      const slide = this.slideshow.querySelector(`[${selectors$7.slideValue}="${evt.detail.blockId}"]`);
+      const slide = this.slideshow.querySelector(`[${selectors$L.slideValue}="${evt.detail.blockId}"]`);
 
       if (!slide) return;
-      let slideIndex = parseInt(slide.getAttribute(selectors$7.dataSlideIndex));
+      let slideIndex = parseInt(slide.getAttribute(attributes$j.slideIndex));
 
-      if (this.multipleSlides && !this.slideshow.classList.contains(classes.classSliderInitialized)) {
+      if (this.multipleSlides && !this.slideshow.classList.contains(classes$D.sliderInitialized)) {
         slideIndex = 0;
       }
 
-      this.slideshow.classList.add(classes.classIsSelected);
+      this.slideshow.classList.add(classes$D.isSelected);
 
       // Go to selected slide, pause autoplay
-      this.flkty.selectCell(slideIndex);
-      this.flkty.stopPlayer();
+      if (this.flkty && this.slideshow.classList.contains(classes$D.flickityEnabled)) {
+        this.flkty.selectCell(slideIndex);
+        this.flkty.stopPlayer();
+      }
     }
 
     onBlockDeselect() {
       if (!this.slideshow) return;
-      this.slideshow.classList.remove(classes.classIsSelected);
+      this.slideshow.classList.remove(classes$D.isSelected);
 
-      if (!this.autoPlay) return;
-      this.flkty.playPlayer();
+      if (this.flkty && this.sliderOptions.hasOwnProperty('autoPlay') && this.sliderOptions.autoPlay) {
+        this.flkty.playPlayer();
+      }
     }
   }
 
   const slider = {
     onLoad() {
-      sections[this.id] = [];
-      const els = this.container.querySelectorAll(selectors$7.slider);
+      sections$p[this.id] = [];
+      const els = this.container.querySelectorAll(selectors$L.slider);
       els.forEach((el) => {
-        sections[this.id].push(new Slider(this.container, el));
+        sections$p[this.id].push(new Slider(this.container, el));
       });
     },
     onUnload() {
-      sections[this.id].forEach((el) => {
+      sections$p[this.id].forEach((el) => {
         if (typeof el.onUnload === 'function') {
           el.onUnload();
         }
       });
     },
     onBlockSelect(e) {
-      sections[this.id].forEach((el) => {
+      sections$p[this.id].forEach((el) => {
         if (typeof el.onBlockSelect === 'function') {
           el.onBlockSelect(e);
         }
       });
     },
     onBlockDeselect(e) {
-      sections[this.id].forEach((el) => {
+      sections$p[this.id].forEach((el) => {
         if (typeof el.onBlockDeselect === 'function') {
           el.onBlockDeselect(e);
         }
@@ -4296,513 +4811,100 @@
     },
   };
 
-  const selectors$8 = {
-    copyClipboard: '[data-copy-clipboard]',
-    tooltip: 'data-tooltip',
-  };
-
-  const classes$1 = {
-    classVisible: 'is-visible',
-  };
-
-  const sections$1 = {};
-
-  class CopyClipboard {
-    constructor(section) {
-      this.container = section.container;
-      this.copyButtons = this.container.querySelectorAll(selectors$8.copyClipboard);
-
-      if (this.copyButtons.length) {
-        this.init();
-      }
-    }
-
-    init() {
-      this.copyButtons.forEach((el) => {
-        el.addEventListener('click', function (e) {
-          e.preventDefault();
-          const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-          const copyText = this.getAttribute('href');
-          this.style.position = 'static';
-          let inputElem = document.createElement('input');
-          inputElem.type = 'text';
-          this.appendChild(inputElem);
-          const newInput = this.querySelector('input');
-          newInput.value = copyText;
-          newInput.select();
-          newInput.setSelectionRange(0, 99999); /* For mobile devices */
-          document.execCommand('copy');
-          this.style.removeProperty('position');
-          this.removeChild(newInput);
-
-          if (this.hasAttribute(selectors$8.tooltip) && windowWidth > 749) {
-            this.classList.add(classes$1.classVisible);
-            this.dispatchEvent(new CustomEvent('tooltip:init', {bubbles: true}));
-
-            setTimeout(() => {
-              this.classList.remove(classes$1.classVisible);
-              document.dispatchEvent(
-                new CustomEvent('tooltip:close', {
-                  bubbles: false,
-                  detail: {
-                    hideTransition: true,
-                  },
-                })
-              );
-            }, 2000);
-          }
-        });
-      });
-    }
-  }
-
-  const copyClipboard = {
-    onLoad() {
-      sections$1[this.id] = new CopyClipboard(this);
-    },
-  };
-
-  var sections$2 = {};
-
-  const parallaxHero = {
-    onLoad() {
-      sections$2[this.id] = [];
-      const frames = this.container.querySelectorAll('[data-parallax-wrapper]');
-      frames.forEach((frame) => {
-        const inner = frame.querySelector('[data-parallax-img]');
-
-        sections$2[this.id].push(
-          new Rellax(inner, {
-            center: true,
-            round: true,
-            frame: frame,
-          })
-        );
-      });
-
-      window.addEventListener('load', () => {
-        sections$2[this.id].forEach((image) => {
-          if (typeof image.refresh === 'function') {
-            image.refresh();
-          }
-        });
-      });
-    },
-    onUnload: function () {
-      sections$2[this.id].forEach((image) => {
-        if (typeof image.destroy === 'function') {
-          image.destroy();
-        }
-      });
-    },
-  };
-
-  const selectors$9 = {
-    sidebar: '.sidebar',
-    widgetCategories: '.widget--categories',
-    widgetLinksEl: '.widget__links',
-    widgetLinks: '.widget__links .has-sub-nav > a',
-    widgetLinksSub: '.widget__links .submenu > li > a',
-    listEl: 'li',
-    linkEl: 'a',
-    articleSingle: '.article--single',
-    sidebarContents: '.sidebar__contents',
-    hasSubNav: '.has-sub-nav',
-  };
-
-  const classes$2 = {
-    classOpen: 'open',
-    classActive: 'active',
-    classSubmenu: 'submenu',
-  };
-
-  const sections$3 = {};
-
-  class Article {
-    constructor(section) {
-      this.container = section.container;
-      this.sidebar = this.container.querySelector(selectors$9.sidebar);
-      this.widgetCategories = this.container.querySelector(selectors$9.widgetCategories);
-      this.resizeEvent = () => this.categories();
-
-      this.init();
-    }
-
-    init() {
-      if (this.sidebar) {
-        this.sidebarNav();
-      }
-    }
-
-    sidebarNav() {
-      this.navStates();
-
-      // Dropdown Menus
-      this.container.addEventListener('click', (e) => {
-        const checkLinkTag = e.target.tagName.toLowerCase() === selectors$9.linkEl;
-        const checkLinkParent = e.target.closest(`${selectors$9.listEl}${selectors$9.hasSubNav}`);
-        const checkLinkClosest = e.target.closest(selectors$9.widgetLinksEl);
-        const checkLink = checkLinkTag && checkLinkParent && checkLinkClosest;
-        const submenu = e.target.nextElementSibling;
-        const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-        const isMobile = windowWidth < theme.sizes.small;
-
-        if (!isMobile && checkLink && submenu) {
-          submenu.parentElement.classList.toggle(classes$2.classActive);
-          submenu.classList.toggle(classes$2.classOpen);
-          submenu.setAttribute('aria-expanded', submenu.classList.contains(classes$2.classOpen));
-          slideToggle(submenu);
-
-          e.preventDefault();
-        }
-      });
-
-      if (this.widgetCategories) {
-        this.widgetCategoriesNext = this.widgetCategories.nextSibling;
-        this.widgetCategoriesParentNode = this.widgetCategories.parentNode;
-
-        this.categories();
-
-        document.addEventListener('theme:resize', this.resizeEvent);
-      }
-    }
-
-    navStates() {
-      // Nav Active States
-      const links = this.container.querySelectorAll(`${selectors$9.widgetLinks}, ${selectors$9.widgetLinksSub}`);
-
-      if (links.length) {
-        links.forEach((element) => {
-          const href = element.getAttribute('href');
-          const location = window.location.pathname;
-
-          if (href === location) {
-            const elementClosest = element.closest(selectors$9.hasSubNav);
-            element.closest('li').classList.add(classes$2.classActive);
-            if (!elementClosest) return;
-            elementClosest.classList.add(classes$2.classActive);
-            const submenu = elementClosest.querySelector(`.${classes$2.classSubmenu}`);
-
-            if (submenu) {
-              submenu.classList.toggle(classes$2.classOpen);
-              submenu.setAttribute('aria-expanded', submenu.classList.contains(classes$2.classOpen));
-              showElement(submenu);
-            }
-          }
-        });
-      }
-    }
-
-    categories() {
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      const isMobile = windowWidth < theme.sizes.small;
-      const widgetCategories = document.querySelector(selectors$9.widgetCategories);
-      if (isMobile) {
-        document.querySelector(selectors$9.articleSingle).prepend(widgetCategories);
-      } else {
-        this.widgetCategoriesParentNode.insertBefore(widgetCategories, this.widgetCategoriesNext);
-      }
-    }
-
-    onUnload() {
-      if (this.widgetCategories) {
-        document.removeEventListener('theme:resize', this.resizeEvent);
-      }
-    }
-  }
-
-  const articleSection = {
-    onLoad() {
-      sections$3[this.id] = new Article(this);
-    },
-    onUnload(e) {
-      sections$3[this.id].onUnload(e);
-    },
-  };
-
-  register('article', [articleSection, slider, copyClipboard, parallaxHero]);
-
-  register('blog-template', [slider]);
+  register('blog-section', [slider]);
 
   register('hero', parallaxHero);
 
-  const selectors$a = {
-    popoutWrapper: '[data-popout]',
-    popoutList: '[data-popout-list]',
-    popoutToggle: '[data-popout-toggle]',
-    popoutInput: '[data-popout-input]',
-    popoutOptions: '[data-popout-option]',
-    popoutPrevent: 'data-popout-prevent',
-    popoutQuantity: 'data-quantity-field',
-    dataValue: 'data-value',
-    ariaExpanded: 'aria-expanded',
-    ariaCurrent: 'aria-current',
-    productGridImage: '[data-product-image]',
-    productGrid: '[data-product-grid-item]',
+  register('double', slider);
+
+  const selectors$K = {
+    headerSticky: '[data-header-sticky]',
+    headerHeight: '[data-header-height]',
   };
 
-  const classes$3 = {
-    listVisible: 'popout-list--visible',
-    currentSuffix: '--current',
-    classPopoutAlternative: 'popout-container--alt',
-    visible: 'is-visible',
+  const scrollTo = (elementTop) => {
+    /* Sticky header check */
+    const headerHeight =
+      document.querySelector(selectors$K.headerSticky) && document.querySelector(selectors$K.headerHeight) ? document.querySelector(selectors$K.headerHeight).getBoundingClientRect().height : 0;
+
+    window.scrollTo({
+      top: elementTop + window.scrollY - headerHeight,
+      left: 0,
+      behavior: 'smooth',
+    });
   };
 
-  let sections$4 = {};
+  class PopupCookie {
+    constructor(name, value, daysToExpire = 7) {
+      const today = new Date();
+      const expiresDate = new Date();
+      expiresDate.setTime(today.getTime() + 3600000 * 24 * daysToExpire);
 
-  class Popout {
-    constructor(popout) {
-      this.container = popout;
-      this.popoutList = this.container.querySelector(selectors$a.popoutList);
-      this.popoutToggle = this.container.querySelector(selectors$a.popoutToggle);
-      this.popoutInput = this.container.querySelector(selectors$a.popoutInput);
-      this.popoutOptions = this.container.querySelectorAll(selectors$a.popoutOptions);
-      this.popoutPrevent = this.container.getAttribute(selectors$a.popoutPrevent) === 'true';
-      this.popupToggleFocusoutEvent = (evt) => this.popupToggleFocusout(evt);
-      this.popupListFocusoutEvent = (evt) => this.popupListFocusout(evt);
-      this.popupToggleClickEvent = (evt) => this.popupToggleClick(evt);
-      this.containerKeyupEvent = (evt) => this.containerKeyup(evt);
-      this.popupOptionsClickEvent = (evt) => this.popupOptionsClick(evt);
-      this._connectOptionsDispatchEvent = (evt) => this._connectOptionsDispatch(evt);
+      this.configuration = {
+        expires: expiresDate.toGMTString(), // session cookie
+        path: '/',
+        domain: window.location.hostname,
+        sameSite: 'none',
+        secure: true,
+      };
+      this.name = name;
+      this.value = value;
+    }
 
-      this._connectOptions();
-      this._connectToggle();
-      this._onFocusOut();
+    write() {
+      const hasCookie = document.cookie.indexOf('; ') !== -1 && !document.cookie.split('; ').find((row) => row.startsWith(this.name));
 
-      if (this.popoutInput && this.popoutInput.hasAttribute(selectors$a.popoutQuantity)) {
-        document.addEventListener('popout:updateValue', this.updatePopout.bind(this));
+      if (hasCookie || document.cookie.indexOf('; ') === -1) {
+        document.cookie = `${this.name}=${this.value}; expires=${this.configuration.expires}; path=${this.configuration.path}; domain=${this.configuration.domain}; sameSite=${this.configuration.sameSite}; secure=${this.configuration.secure}`;
       }
     }
 
-    unload() {
-      if (this.popoutOptions.length) {
-        this.popoutOptions.forEach((element) => {
-          element.removeEventListener('clickDetails', this.popupOptionsClickEvent);
-          element.removeEventListener('click', this._connectOptionsDispatchEvent);
-        });
-      }
+    read() {
+      if (document.cookie.indexOf('; ') !== -1 && document.cookie.split('; ').find((row) => row.startsWith(this.name))) {
+        const returnCookie = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith(this.name))
+          .split('=')[1];
 
-      this.popoutToggle.removeEventListener('click', this.popupToggleClickEvent);
-
-      this.popoutToggle.removeEventListener('focusout', this.popupToggleFocusoutEvent);
-
-      this.popoutList.removeEventListener('focusout', this.popupListFocusoutEvent);
-
-      this.container.removeEventListener('keyup', this.containerKeyupEvent);
-    }
-
-    popupToggleClick(evt) {
-      const ariaExpanded = evt.currentTarget.getAttribute(selectors$a.ariaExpanded) === 'true';
-
-      if (this.popoutList.closest(selectors$a.productGrid)) {
-        const productGridItemImage = this.popoutList.closest(selectors$a.productGrid).querySelector(selectors$a.productGridImage);
-
-        if (productGridItemImage) {
-          productGridItemImage.classList.toggle(classes$3.visible, !ariaExpanded);
-        }
-      }
-
-      evt.currentTarget.setAttribute(selectors$a.ariaExpanded, !ariaExpanded);
-      this.popoutList.classList.toggle(classes$3.listVisible);
-    }
-
-    popupToggleFocusout(evt) {
-      const popoutLostFocus = this.container.contains(evt.relatedTarget);
-
-      if (!popoutLostFocus) {
-        this._hideList();
-      }
-    }
-
-    popupListFocusout(evt) {
-      const childInFocus = evt.currentTarget.contains(evt.relatedTarget);
-      const isVisible = this.popoutList.classList.contains(classes$3.listVisible);
-
-      if (isVisible && !childInFocus) {
-        this._hideList();
-      }
-    }
-
-    popupOptionsClick(evt) {
-      const link = evt.target.closest(selectors$a.popoutOptions);
-      if (link.attributes.href.value === '#') {
-        evt.preventDefault();
-
-        let attrValue = '';
-
-        if (evt.currentTarget.getAttribute(selectors$a.dataValue)) {
-          attrValue = evt.currentTarget.getAttribute(selectors$a.dataValue);
-        }
-
-        this.popoutInput.value = attrValue;
-
-        if (this.popoutPrevent) {
-          this.popoutInput.dispatchEvent(new Event('change'));
-
-          if (!evt.detail.preventTrigger && this.popoutInput.hasAttribute(selectors$a.popoutQuantity)) {
-            this.popoutInput.dispatchEvent(new Event('input'));
-          }
-
-          const currentElement = this.popoutList.querySelector(`[class*="${classes$3.currentSuffix}"]`);
-          let targetClass = classes$3.currentSuffix;
-
-          if (currentElement && currentElement.classList.length) {
-            for (const currentElementClass of currentElement.classList) {
-              if (currentElementClass.includes(classes$3.currentSuffix)) {
-                targetClass = currentElementClass;
-                break;
-              }
-            }
-          }
-
-          const listTargetElement = this.popoutList.querySelector(`.${targetClass}`);
-
-          if (listTargetElement) {
-            listTargetElement.classList.remove(`${targetClass}`);
-            evt.currentTarget.parentElement.classList.add(`${targetClass}`);
-          }
-
-          const targetAttribute = this.popoutList.querySelector(`[${selectors$a.ariaCurrent}]`);
-
-          if (targetAttribute && targetAttribute.hasAttribute(`${selectors$a.ariaCurrent}`)) {
-            targetAttribute.removeAttribute(`${selectors$a.ariaCurrent}`);
-            evt.currentTarget.setAttribute(`${selectors$a.ariaCurrent}`, 'true');
-          }
-
-          if (attrValue !== '') {
-            this.popoutToggle.textContent = attrValue;
-          }
-
-          this.popupToggleFocusout(evt);
-          this.popupListFocusout(evt);
-        } else {
-          this._submitForm(attrValue);
-        }
-      }
-    }
-
-    updatePopout() {
-      const targetElement = this.popoutList.querySelector(`[${selectors$a.dataValue}="${this.popoutInput.value}"]`);
-      if (targetElement) {
-        targetElement.dispatchEvent(
-          new CustomEvent('clickDetails', {
-            cancelable: true,
-            bubbles: true,
-            detail: {
-              preventTrigger: true,
-            },
-          })
-        );
-
-        if (!targetElement.parentElement.nextSibling) {
-          this.container.classList.add(classes$3.classPopoutAlternative);
-        }
+        return returnCookie;
       } else {
-        this.container.classList.add(classes$3.classPopoutAlternative);
+        return false;
       }
     }
 
-    containerKeyup(evt) {
-      if (evt.which !== window.theme.keyboardKeys.ESCAPE) {
-        return;
+    destroy() {
+      if (document.cookie.split('; ').find((row) => row.startsWith(this.name))) {
+        document.cookie = `${this.name}=null; expires=${this.configuration.expires}; path=${this.configuration.path}; domain=${this.configuration.domain}`;
       }
-      this._hideList();
-      this.popoutToggle.focus();
-    }
-
-    bodyClick(evt) {
-      const isOption = this.container.contains(evt.target);
-      const isVisible = this.popoutList.classList.contains(classes$3.listVisible);
-
-      if (isVisible && !isOption) {
-        this._hideList();
-      }
-    }
-
-    _connectToggle() {
-      this.popoutToggle.addEventListener('click', this.popupToggleClickEvent);
-    }
-
-    _connectOptions() {
-      if (this.popoutOptions.length) {
-        this.popoutOptions.forEach((element) => {
-          element.addEventListener('clickDetails', this.popupOptionsClickEvent);
-          element.addEventListener('click', this._connectOptionsDispatchEvent);
-        });
-      }
-    }
-
-    _connectOptionsDispatch(evt) {
-      const event = new CustomEvent('clickDetails', {
-        cancelable: true,
-        bubbles: true,
-        detail: {
-          preventTrigger: false,
-        },
-      });
-
-      if (!evt.target.dispatchEvent(event)) {
-        evt.preventDefault();
-      }
-    }
-
-    _onFocusOut() {
-      this.popoutToggle.addEventListener('focusout', this.popupToggleFocusoutEvent);
-
-      this.popoutList.addEventListener('focusout', this.popupListFocusoutEvent);
-
-      this.container.addEventListener('keyup', this.containerKeyupEvent);
-
-      document.body.addEventListener('click', this.bodyClick.bind(this));
-    }
-
-    _submitForm() {
-      const form = this.container.closest('form');
-      if (form) {
-        form.submit();
-      }
-    }
-
-    _hideList() {
-      this.popoutList.classList.remove(classes$3.listVisible);
-      this.popoutToggle.setAttribute(selectors$a.ariaExpanded, false);
     }
   }
 
-  const popoutSection = {
-    onLoad() {
-      sections$4[this.id] = [];
-      const wrappers = this.container.querySelectorAll(selectors$a.popoutWrapper);
-      wrappers.forEach((wrapper) => {
-        sections$4[this.id].push(new Popout(wrapper));
-      });
-    },
-    onUnload() {
-      sections$4[this.id].forEach((popout) => {
-        if (typeof popout.unload === 'function') {
-          popout.unload();
-        }
-      });
-    },
-  };
-
-  const selectors$b = {
+  const selectors$J = {
     newsletterForm: '[data-newsletter-form]',
     newsletterHeading: '[data-newsletter-heading]',
+    newsletterPopup: '[data-newsletter]',
   };
 
-  const classes$4 = {
+  const classes$C = {
     success: 'has-success',
-    error: 'not-success',
-    hide: 'hide',
+    error: 'has-error',
+    hidden: 'hidden',
   };
 
-  const sections$5 = {};
+  const attributes$i = {
+    cookieNameAttribute: 'data-cookie-name',
+  };
+
+  const sections$o = {};
 
   class NewsletterCheckForResult {
     constructor(newsletter) {
       this.sessionStorage = window.sessionStorage;
       this.newsletter = newsletter;
+      this.popup = this.newsletter.closest(selectors$J.newsletterPopup);
+      if (this.popup) {
+        this.cookie = new PopupCookie(this.popup.getAttribute(attributes$i.cookieNameAttribute), 'user_has_closed', null);
+      }
 
       this.stopSubmit = true;
       this.isChallengePage = false;
@@ -4826,6 +4928,7 @@
     newsletterSubmitEvent(e) {
       if (this.stopSubmit) {
         e.preventDefault();
+        e.stopImmediatePropagation();
 
         this.removeStorage();
         this.writeStorage();
@@ -4857,45 +4960,48 @@
 
       if (this.newsletter.id === this.formID) {
         const newsletter = document.getElementById(this.formID);
-        const newsletterHeading = newsletter.parentElement.querySelector(selectors$b.newsletterHeading);
+        const newsletterHeading = newsletter.parentElement.querySelector(selectors$J.newsletterHeading);
         const submissionSuccess = window.location.search.indexOf('?customer_posted=true') !== -1;
         const submissionFailure = window.location.search.indexOf('accepts_marketing') !== -1;
 
         if (submissionSuccess) {
-          newsletter.classList.remove(classes$4.error);
-          newsletter.classList.add(classes$4.success);
+          newsletter.classList.remove(classes$C.error);
+          newsletter.classList.add(classes$C.success);
 
           if (newsletterHeading) {
-            newsletterHeading.classList.add(classes$4.hide);
+            newsletterHeading.classList.add(classes$C.hidden);
+            newsletter.classList.remove(classes$C.hidden);
+          }
+
+          if (this.popup) {
+            this.cookie.write();
           }
         } else if (submissionFailure) {
-          newsletter.classList.remove(classes$4.success);
-          newsletter.classList.add(classes$4.error);
+          newsletter.classList.remove(classes$C.success);
+          newsletter.classList.add(classes$C.error);
 
           if (newsletterHeading) {
-            newsletterHeading.classList.add(classes$4.hide);
+            newsletterHeading.classList.add(classes$C.hidden);
+            newsletter.classList.remove(classes$C.hidden);
           }
         }
 
         if (submissionSuccess || submissionFailure) {
-          this.scrollToForm(newsletter);
+          window.addEventListener('load', () => {
+            this.scrollToForm(newsletter);
+          });
         }
       }
     }
 
     scrollToForm(newsletter) {
       const rect = newsletter.getBoundingClientRect();
-      const isVisible =
-        rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+      const isVisible = rect.top >= 0 && rect.left >= 0 && rect.bottom <= getWindowHeight() && rect.right <= getWindowWidth();
 
       if (!isVisible) {
         setTimeout(() => {
-          window.scroll({
-            top: rect.top,
-            left: 0,
-            behavior: 'smooth',
-          });
-        }, 400);
+          scrollTo(newsletter.getBoundingClientRect().top);
+        }, 500);
       }
     }
 
@@ -4906,14 +5012,14 @@
 
   const newsletterCheckForResultSection = {
     onLoad() {
-      sections$5[this.id] = [];
-      const newsletters = this.container.querySelectorAll(selectors$b.newsletterForm);
+      sections$o[this.id] = [];
+      const newsletters = this.container.querySelectorAll(selectors$J.newsletterForm);
       newsletters.forEach((form) => {
-        sections$5[this.id].push(new NewsletterCheckForResult(form));
+        sections$o[this.id].push(new NewsletterCheckForResult(form));
       });
     },
     onUnload() {
-      sections$5[this.id].forEach((form) => {
+      sections$o[this.id].forEach((form) => {
         if (typeof form.unload === 'function') {
           form.unload();
         }
@@ -4921,7 +5027,241 @@
     },
   };
 
-  register('footer', [popoutSection, parallaxHero, newsletterCheckForResultSection]);
+  register('footer', [parallaxHero, newsletterCheckForResultSection]);
+
+  const selectors$I = {
+    popoutWrapper: '[data-popout]',
+    popoutList: '[data-popout-list]',
+    popoutToggle: '[data-popout-toggle]',
+    popoutToggleText: '[data-popout-toggle-text]',
+    popoutToggleTextValue: 'data-popout-toggle-text',
+    popoutInput: '[data-popout-input]',
+    popoutOptions: '[data-popout-option]',
+    popoutPrevent: 'data-popout-prevent',
+    popoutQuantity: 'data-quantity-field',
+    dataValue: 'data-value',
+    ariaExpanded: 'aria-expanded',
+    ariaCurrent: 'aria-current',
+    productGridImage: '[data-product-image]',
+    productGrid: '[data-product-grid-item]',
+  };
+
+  const classes$B = {
+    listVisible: 'popout-list--visible',
+    visible: 'is-visible',
+    active: 'is-active',
+    selectPopoutTop: 'select-popout--top',
+  };
+
+  let sections$n = {};
+
+  class Popout {
+    constructor(popout) {
+      this.container = popout;
+      this.popoutList = this.container.querySelector(selectors$I.popoutList);
+      this.popoutToggle = this.container.querySelector(selectors$I.popoutToggle);
+      this.popoutToggleText = this.container.querySelector(selectors$I.popoutToggleText);
+      this.popoutInput = this.container.querySelector(selectors$I.popoutInput);
+      this.popoutOptions = this.container.querySelectorAll(selectors$I.popoutOptions);
+      this.productGrid = this.popoutList.closest(selectors$I.productGrid);
+      this.popoutPrevent = this.container.getAttribute(selectors$I.popoutPrevent) === 'true';
+      this.popupToggleFocusoutEvent = (evt) => this.popupToggleFocusout(evt);
+      this.popupListFocusoutEvent = (evt) => this.popupListFocusout(evt);
+      this.popupToggleClickEvent = (evt) => this.popupToggleClick(evt);
+      this.containerKeyupEvent = (evt) => this.containerKeyup(evt);
+      this.bodyClickEvent = (evt) => this.bodyClick(evt);
+
+      this._connectOptions();
+      this._connectToggle();
+      this._onFocusOut();
+      this.popupListMaxWidth();
+    }
+
+    popupToggleClick(evt) {
+      const button = evt.currentTarget;
+      const ariaExpanded = button.getAttribute(selectors$I.ariaExpanded) === 'true';
+
+      if (this.productGrid) {
+        const productGridItemImage = this.productGrid.querySelector(selectors$I.productGridImage);
+
+        if (productGridItemImage) {
+          productGridItemImage.classList.toggle(classes$B.visible, !ariaExpanded);
+        }
+
+        this.popoutList.style.maxHeight = `${Math.abs(this.popoutToggle.getBoundingClientRect().bottom - this.productGrid.getBoundingClientRect().bottom)}px`;
+      }
+
+      evt.currentTarget.setAttribute(selectors$I.ariaExpanded, !ariaExpanded);
+      this.popoutList.classList.toggle(classes$B.listVisible);
+      this.popupListMaxWidth();
+
+      this.toggleListPosition();
+    }
+
+    popupToggleFocusout(evt) {
+      const popoutLostFocus = this.container.contains(evt.relatedTarget);
+
+      if (!popoutLostFocus) {
+        this._hideList();
+      }
+    }
+
+    popupListFocusout(evt) {
+      const childInFocus = evt.currentTarget.contains(evt.relatedTarget);
+      const isVisible = this.popoutList.classList.contains(classes$B.listVisible);
+
+      if (isVisible && !childInFocus) {
+        this._hideList();
+      }
+    }
+
+    toggleListPosition() {
+      const popoutHolder = this.popoutList.closest(selectors$I.popoutWrapper);
+      const button = popoutHolder.querySelector(selectors$I.popoutToggle);
+      const ariaExpanded = button.getAttribute(selectors$I.ariaExpanded) === 'true';
+      const windowBottom = window.innerHeight;
+      const bottom = this.popoutList.getBoundingClientRect().bottom;
+
+      const removeTopClass = () => {
+        popoutHolder.classList.remove(classes$B.selectPopoutTop);
+        this.popoutList.removeEventListener('transitionend', removeTopClass);
+      };
+
+      if (ariaExpanded) {
+        if (windowBottom < bottom) {
+          popoutHolder.classList.add(classes$B.selectPopoutTop);
+        }
+      } else {
+        this.popoutList.addEventListener('transitionend', removeTopClass);
+      }
+    }
+
+    popupListMaxWidth() {
+      this.popoutList.style.maxWidth = `${parseInt(document.body.clientWidth - this.popoutList.getBoundingClientRect().left)}px`;
+    }
+
+    popupOptionsClick(evt) {
+      const link = evt.target.closest(selectors$I.popoutOptions);
+      if (link.attributes.href.value === '#') {
+        evt.preventDefault();
+
+        let attrValue = '';
+
+        if (evt.currentTarget.getAttribute(selectors$I.dataValue)) {
+          attrValue = evt.currentTarget.getAttribute(selectors$I.dataValue);
+        }
+
+        this.popoutInput.value = attrValue;
+
+        if (this.popoutPrevent) {
+          const currentTarget = evt.currentTarget.parentElement;
+          const listTargetElement = this.popoutList.querySelector(`.${classes$B.active}`);
+          const targetAttribute = this.popoutList.querySelector(`[${selectors$I.ariaCurrent}]`);
+
+          this.popoutInput.dispatchEvent(new Event('change'));
+
+          if (listTargetElement) {
+            listTargetElement.classList.remove(classes$B.active);
+            currentTarget.classList.add(classes$B.active);
+          }
+
+          if (this.popoutInput.hasAttribute(selectors$I.popoutQuantity) && !currentTarget.nextSibling) {
+            this.container.classList.add(classes$B.active);
+          }
+
+          if (targetAttribute && targetAttribute.hasAttribute(`${selectors$I.ariaCurrent}`)) {
+            targetAttribute.removeAttribute(`${selectors$I.ariaCurrent}`);
+            evt.currentTarget.setAttribute(`${selectors$I.ariaCurrent}`, 'true');
+          }
+
+          if (attrValue !== '') {
+            this.popoutToggleText.textContent = attrValue;
+
+            if (this.popoutToggleText.hasAttribute(selectors$I.popoutToggleTextValue) && this.popoutToggleText.getAttribute(selectors$I.popoutToggleTextValue) !== '') {
+              this.popoutToggleText.setAttribute(selectors$I.popoutToggleTextValue, attrValue);
+            }
+          }
+          this.popupToggleFocusout(evt);
+          this.popupListFocusout(evt);
+        } else {
+          this._submitForm(attrValue);
+        }
+      }
+    }
+
+    containerKeyup(evt) {
+      if (evt.code !== window.theme.keyboardKeys.ESCAPE) {
+        return;
+      }
+      this._hideList();
+      this.popoutToggle.focus();
+    }
+
+    bodyClick(evt) {
+      const isOption = this.container.contains(evt.target);
+      const isVisible = this.popoutList.classList.contains(classes$B.listVisible);
+
+      if (isVisible && !isOption) {
+        this._hideList();
+      }
+    }
+
+    unload() {
+      document.body.removeEventListener('click', this.bodyClickEvent);
+    }
+
+    _connectToggle() {
+      this.popoutToggle.addEventListener('click', this.popupToggleClickEvent);
+    }
+
+    _connectOptions() {
+      if (this.popoutOptions.length) {
+        this.popoutOptions.forEach((element) => {
+          element.addEventListener('click', (evt) => this.popupOptionsClick(evt));
+        });
+      }
+    }
+
+    _onFocusOut() {
+      this.popoutToggle.addEventListener('focusout', this.popupToggleFocusoutEvent);
+
+      this.popoutList.addEventListener('focusout', this.popupListFocusoutEvent);
+
+      this.container.addEventListener('keyup', this.containerKeyupEvent);
+
+      document.body.addEventListener('click', this.bodyClickEvent);
+    }
+
+    _submitForm() {
+      const form = this.container.closest('form');
+      if (form) {
+        form.submit();
+      }
+    }
+
+    _hideList() {
+      this.popoutList.classList.remove(classes$B.listVisible);
+      this.popoutToggle.setAttribute(selectors$I.ariaExpanded, false);
+      this.toggleListPosition();
+    }
+  }
+
+  const popoutSection = {
+    onLoad() {
+      sections$n[this.id] = [];
+      const wrappers = this.container.querySelectorAll(selectors$I.popoutWrapper);
+      wrappers.forEach((wrapper) => {
+        sections$n[this.id].push(new Popout(wrapper));
+      });
+    },
+    onUnload() {
+      sections$n[this.id].forEach((popout) => {
+        if (typeof popout.unload === 'function') {
+          popout.unload();
+        }
+      });
+    },
+  };
 
   function Listeners() {
     this.entries = [];
@@ -5054,7 +5394,7 @@
     }
   }
 
-  var selectors$c = {
+  var selectors$H = {
     idInput: '[name="id"]',
     planInput: '[name="selling_plan"]',
     optionInput: '[name^="options"]',
@@ -5095,25 +5435,24 @@
    * @param {Function} options.onPropertyChange - Callback for whenever a property input changes
    * @param {Function} options.onFormSubmit - Callback for whenever the product form is submitted
    */
-  class ProductForm {
+  class ProductFormReader {
     constructor(element, product, options) {
       this.element = element;
-      this.form = this.element.tagName == 'FORM' ? this.element : this.element.querySelector('form');
       this.product = this._validateProductObject(product);
-      this.variantElement = this.element.querySelector(selectors$c.idInput);
+      this.variantElement = this.element.querySelector(selectors$H.idInput);
 
       options = options || {};
 
       this._listeners = new Listeners();
       this._listeners.add(this.element, 'submit', this._onSubmit.bind(this, options));
 
-      this.optionInputs = this._initInputs(selectors$c.optionInput, options.onOptionChange);
+      this.optionInputs = this._initInputs(selectors$H.optionInput, options.onOptionChange);
 
-      this.planInputs = this._initInputs(selectors$c.planInput, options.onPlanChange);
+      this.planInputs = this._initInputs(selectors$H.planInput, options.onPlanChange);
 
-      this.quantityInputs = this._initInputs(selectors$c.quantityInput, options.onQuantityChange);
+      this.quantityInputs = this._initInputs(selectors$H.quantityInput, options.onQuantityChange);
 
-      this.propertyInputs = this._initInputs(selectors$c.propertyInput, options.onPropertyChange);
+      this.propertyInputs = this._initInputs(selectors$H.propertyInput, options.onPropertyChange);
     }
 
     /**
@@ -5164,8 +5503,10 @@
         group: null,
         detail: null,
       };
-      const formData = new FormData(this.form);
-      const id = formData.get('selling_plan');
+      const sellingPlanChecked = this.element.querySelector(`${selectors$H.planInput}:checked`);
+      if (!sellingPlanChecked) return null;
+      const sellingPlanCheckedValue = sellingPlanChecked.value;
+      const id = sellingPlanCheckedValue && sellingPlanCheckedValue !== '' ? sellingPlanCheckedValue : null;
 
       if (id && variant) {
         plan.allocation = variant.selling_plan_allocations.find(function (item) {
@@ -5294,6 +5635,19 @@
     }
   }
 
+  function fetchProduct(handle) {
+    const requestRoute = `${window.theme.routes.root}products/${handle}.js`;
+
+    return window
+      .fetch(requestRoute)
+      .then((response) => {
+        return response.json();
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  }
+
   function getScript(url, callback, callbackError) {
     let head = document.getElementsByTagName('head')[0];
     let done = false;
@@ -5315,6 +5669,7 @@
 
   const loaders = {};
   window.isYoutubeAPILoaded = false;
+  window.isVimeoAPILoaded = false;
 
   function loadScript(options = {}) {
     if (!options.type) {
@@ -5410,177 +5765,33 @@
     }
   }
 
-  const throttle = (fn, wait) => {
-    let prev, next;
-    return function invokeFn(...args) {
-      const now = Date.now();
-      next = clearTimeout(next);
-      if (!prev || now - prev >= wait) {
-        // eslint-disable-next-line prefer-spread
-        fn.apply(null, args);
-        prev = now;
-      } else {
-        next = setTimeout(invokeFn.bind(null, ...args), wait - (now - prev));
-      }
-    };
+  const selectors$G = {
+    scrollbarAttribute: 'data-scrollbar',
+    scrollbar: 'data-scrollbar-slider',
+    scrollbarSlideFullWidth: 'data-scrollbar-slide-fullwidth',
+    scrollbarArrowPrev: '[data-scrollbar-arrow-prev]',
+    scrollbarArrowNext: '[data-scrollbar-arrow-next]',
   };
-
-  const selectors$d = {
-    tooltip: 'data-tooltip',
-    tooltipStopMouseEnter: 'data-tooltip-stop-mouseenter',
+  const classes$A = {
+    hidden: 'is-hidden',
   };
-
-  const classes$5 = {
-    tooltipDefault: 'tooltip-default',
-    classVisible: 'is-visible',
-    classHiding: 'is-hiding',
-  };
-
-  let sections$6 = {};
-
-  class Tooltip {
-    constructor(el, options = {}) {
-      this.tooltip = el;
-      if (!this.tooltip.hasAttribute(selectors$d.tooltip)) return;
-      this.label = this.tooltip.getAttribute(selectors$d.tooltip);
-      this.class = options.class || classes$5.tooltipDefault;
-      this.transitionSpeed = options.transitionSpeed || 200;
-      this.hideTransitionTimeout = 0;
-      this.addPinEvent = () => this.addPin();
-      this.addPinMouseEvent = () => this.addPin(true);
-      this.removePinEvent = (event) => throttle(this.removePin(event), 50);
-      this.removePinMouseEvent = (event) => this.removePin(event, true, true);
-      this.init();
-    }
-
-    init() {
-      if (!document.querySelector(`.${this.class}`)) {
-        const tooltipTemplate = `<div class="${this.class}__inner"><div class="${this.class}__arrow"></div><div class="${this.class}__text"></div></div>`;
-        const tooltipElement = document.createElement('div');
-        tooltipElement.className = this.class;
-        tooltipElement.innerHTML = tooltipTemplate;
-        document.body.appendChild(tooltipElement);
-      }
-
-      this.tooltip.addEventListener('mouseenter', this.addPinMouseEvent);
-      this.tooltip.addEventListener('mouseleave', this.removePinMouseEvent);
-      this.tooltip.addEventListener('tooltip:init', this.addPinEvent);
-      document.addEventListener('tooltip:close', this.removePinEvent);
-    }
-
-    addPin(stopMouseEnter = false) {
-      const tooltipTarget = document.querySelector(`.${this.class}`);
-
-      if (tooltipTarget && ((stopMouseEnter && !this.tooltip.hasAttribute(selectors$d.tooltipStopMouseEnter)) || !stopMouseEnter)) {
-        const tooltipTargetInner = tooltipTarget.querySelector(`.${this.class}__inner`);
-        const tooltipTargetText = tooltipTarget.querySelector(`.${this.class}__text`);
-        tooltipTargetText.textContent = this.label;
-
-        const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-        const tooltipTargetWidth = tooltipTargetInner.offsetWidth;
-        const tooltipRect = this.tooltip.getBoundingClientRect();
-        const tooltipTop = tooltipRect.top;
-        const tooltipWidth = tooltipRect.width;
-        const tooltipHeight = tooltipRect.height;
-        const tooltipTargetPositionTop = tooltipTop + tooltipHeight + window.scrollY;
-        let tooltipTargetPositionLeft = tooltipRect.left - tooltipTargetWidth / 2 + tooltipWidth / 2;
-        const tooltipLeftWithWidth = tooltipTargetPositionLeft + tooltipTargetWidth;
-        const tooltipTargetWindowDifference = tooltipLeftWithWidth - windowWidth;
-
-        if (tooltipTargetWindowDifference > 0) {
-          tooltipTargetPositionLeft -= tooltipTargetWindowDifference;
-        }
-
-        if (tooltipTargetPositionLeft < 0) {
-          tooltipTargetPositionLeft = 0;
-        }
-
-        tooltipTarget.style.transform = `translate(${tooltipTargetPositionLeft}px, ${tooltipTargetPositionTop}px)`;
-        tooltipTarget.classList.remove(classes$5.classHiding);
-        tooltipTarget.classList.add(classes$5.classVisible);
-
-        document.addEventListener('theme:scroll', this.removePinEvent);
-      }
-    }
-
-    removePin(event, stopMouseEnter = false, hideTransition = false) {
-      const tooltipTarget = document.querySelector(`.${this.class}`);
-      const tooltipVisible = tooltipTarget.classList.contains(classes$5.classVisible);
-
-      if (tooltipTarget && ((stopMouseEnter && !this.tooltip.hasAttribute(selectors$d.tooltipStopMouseEnter)) || !stopMouseEnter)) {
-        if (tooltipVisible && (hideTransition || event.detail.hideTransition)) {
-          tooltipTarget.classList.add(classes$5.classHiding);
-
-          if (this.hideTransitionTimeout) {
-            clearTimeout(this.hideTransitionTimeout);
-          }
-
-          this.hideTransitionTimeout = setTimeout(() => {
-            tooltipTarget.classList.remove(classes$5.classHiding);
-          }, this.transitionSpeed);
-        }
-
-        tooltipTarget.classList.remove(classes$5.classVisible);
-
-        document.removeEventListener('theme:scroll', this.removePinEvent);
-      }
-    }
-
-    unload() {
-      this.tooltip.removeEventListener('mouseenter', this.addPinMouseEvent);
-      this.tooltip.removeEventListener('mouseleave', this.removePinMouseEvent);
-      this.tooltip.removeEventListener('tooltip:init', this.addPinEvent);
-      document.removeEventListener('tooltip:close', this.removePinEvent);
-      document.removeEventListener('theme:scroll', this.removePinEvent);
-    }
-  }
-
-  const tooltipSection = {
-    onLoad() {
-      sections$6[this.id] = [];
-      const els = this.container.querySelectorAll(`[${selectors$d.tooltip}]`);
-      els.forEach((el) => {
-        sections$6[this.id].push(new Tooltip(el));
-      });
-    },
-    onUnload: function () {
-      sections$6[this.id].forEach((el) => {
-        if (typeof el.unload === 'function') {
-          el.unload();
-        }
-      });
-    },
-  };
-
-  const selectors$e = {
-    elements: {
-      scrollbarAttribute: 'data-scrollbar',
-      scrollbar: 'data-scrollbar-slider',
-      scrollbarSlideFullWidth: 'data-scrollbar-slide-fullwidth',
-      scrollbarArrowPrev: '[data-scrollbar-arrow-prev]',
-      scrollbarArrowNext: '[data-scrollbar-arrow-next]',
-    },
-    classes: {
-      hide: 'is-hidden',
-    },
-    times: {
-      delay: 200,
-    },
+  const settings$2 = {
+    delay: 200,
   };
 
   class NativeScrollbar {
     constructor(scrollbar) {
       this.scrollbar = scrollbar;
 
-      this.arrowNext = this.scrollbar.parentNode.querySelector(selectors$e.elements.scrollbarArrowNext);
-      this.arrowPrev = this.scrollbar.parentNode.querySelector(selectors$e.elements.scrollbarArrowPrev);
+      this.arrowNext = this.scrollbar.parentNode.querySelector(selectors$G.scrollbarArrowNext);
+      this.arrowPrev = this.scrollbar.parentNode.querySelector(selectors$G.scrollbarArrowPrev);
 
-      if (this.scrollbar.hasAttribute(selectors$e.elements.scrollbarAttribute)) {
+      if (this.scrollbar.hasAttribute(selectors$G.scrollbarAttribute)) {
         this.init();
         this.resize();
       }
 
-      if (this.scrollbar.hasAttribute(selectors$e.elements.scrollbar)) {
+      if (this.scrollbar.hasAttribute(selectors$G.scrollbar)) {
         this.scrollToVisibleElement();
       }
     }
@@ -5619,37 +5830,37 @@
     }
 
     goToNext() {
-      const moveWith = this.scrollbar.hasAttribute(selectors$e.elements.scrollbarSlideFullWidth) ? this.scrollbar.getBoundingClientRect().width : this.scrollbar.getBoundingClientRect().width / 2;
+      const moveWith = this.scrollbar.hasAttribute(selectors$G.scrollbarSlideFullWidth) ? this.scrollbar.getBoundingClientRect().width : this.scrollbar.getBoundingClientRect().width / 2;
       const position = moveWith + this.scrollbar.scrollLeft;
 
       this.move(position);
 
-      this.arrowPrev.classList.remove(selectors$e.classes.hide);
+      this.arrowPrev.classList.remove(classes$A.hidden);
 
       this.toggleNextArrow();
     }
 
     goToPrev() {
-      const moveWith = this.scrollbar.hasAttribute(selectors$e.elements.scrollbarSlideFullWidth) ? this.scrollbar.getBoundingClientRect().width : this.scrollbar.getBoundingClientRect().width / 2;
+      const moveWith = this.scrollbar.hasAttribute(selectors$G.scrollbarSlideFullWidth) ? this.scrollbar.getBoundingClientRect().width : this.scrollbar.getBoundingClientRect().width / 2;
       const position = this.scrollbar.scrollLeft - moveWith;
 
       this.move(position);
 
-      this.arrowNext.classList.remove(selectors$e.classes.hide);
+      this.arrowNext.classList.remove(classes$A.hidden);
 
       this.togglePrevArrow();
     }
 
     toggleNextArrow() {
       setTimeout(() => {
-        this.arrowNext.classList.toggle(selectors$e.classes.hide, Math.round(this.scrollbar.scrollLeft + this.scrollbar.getBoundingClientRect().width + 1) >= this.scrollbar.scrollWidth);
-      }, selectors$e.times.delay);
+        this.arrowNext.classList.toggle(classes$A.hidden, Math.round(this.scrollbar.scrollLeft + this.scrollbar.getBoundingClientRect().width + 1) >= this.scrollbar.scrollWidth);
+      }, settings$2.delay);
     }
 
     togglePrevArrow() {
       setTimeout(() => {
-        this.arrowPrev.classList.toggle(selectors$e.classes.hide, this.scrollbar.scrollLeft <= 0);
-      }, selectors$e.times.delay);
+        this.arrowPrev.classList.toggle(classes$A.hidden, this.scrollbar.scrollLeft <= 0);
+      }, settings$2.delay);
     }
 
     scrollToVisibleElement() {
@@ -5675,25 +5886,30 @@
     color: 'ash',
   };
 
-  const selectors$f = {
-    formGridSwatch: '[data-grid-swatch-form]',
+  const selectors$F = {
+    gridSwatchForm: '[data-grid-swatch-form]',
     swatch: 'data-swatch',
     outerGrid: '[data-product-grid-item]',
-    slide: '[data-grid-slide]',
+    slide: '[data-product-image]',
     image: 'data-swatch-image',
+    sectionId: '[data-section-id]',
+    productInfo: '[data-product-information]',
     variant: 'data-swatch-variant',
+    variantName: 'data-swatch-variant-name',
+    variantTitle: 'data-variant-title',
     button: '[data-swatch-button]',
-    link: '[data-grid-link]',
+    swatchLink: '[data-swatch-link]',
     wrapper: '[data-grid-swatches]',
     template: '[data-swatch-template]',
     handle: 'data-swatch-handle',
     label: 'data-swatch-label',
+    input: '[data-swatch-input]',
     tooltip: 'data-tooltip',
     swatchCount: 'data-swatch-count',
     scrollbar: 'data-scrollbar',
   };
 
-  const classes$6 = {
+  const classes$z = {
     visible: 'is-visible',
     stopEvents: 'no-events',
   };
@@ -5766,9 +5982,12 @@
   class Swatch {
     constructor(element) {
       this.element = element;
-      this.colorString = element.getAttribute(selectors$f.swatch);
-      this.image = element.getAttribute(selectors$f.image);
-      this.variant = element.getAttribute(selectors$f.variant);
+      this.colorString = element.getAttribute(selectors$F.swatch);
+      this.image = element.getAttribute(selectors$F.image);
+      this.variant = element.getAttribute(selectors$F.variant);
+      this.variantName = element.getAttribute(selectors$F.variantName);
+      this.tooltip = this.element.closest(`[${selectors$F.tooltip}]`);
+
       const matcher = new ColorMatch({color: this.colorString});
       matcher.getColor().then((result) => {
         this.colorMatch = result;
@@ -5780,6 +5999,10 @@
       this.setStyles();
       if (this.variant) {
         this.handleEvents();
+      }
+
+      if (this.tooltip) {
+        new Tooltip(this.tooltip);
       }
     }
 
@@ -5795,16 +6018,15 @@
     }
 
     handleEvents() {
-      this.outer = this.element.closest(selectors$f.outerGrid);
+      this.outer = this.element.closest(selectors$F.outerGrid);
       if (this.outer) {
-        this.slide = this.outer.querySelector(selectors$f.slide);
+        this.slide = this.outer.querySelector(selectors$F.slide);
+        this.button = this.element.closest(selectors$F.button);
+        this.imagesHidden = this.outer.querySelectorAll(`[${selectors$F.variantTitle}][style*="display: none;"]`);
+        this.outerHoverEvent = () => this.showHoverImages();
+        this.outerLeaveEvent = () => this.hideHoverImages();
 
-        this.linkElement = this.outer.querySelector(selectors$f.link);
-        this.linkElementAll = this.outer.querySelectorAll(selectors$f.link);
-        this.linkDestination = getUrlWithVariant(this.linkElement.getAttribute('href'), this.variant);
-        this.button = this.element.closest(selectors$f.button);
-
-        if (this.button.closest(selectors$f.formGridSwatch)) {
+        if (this.button.closest(selectors$F.gridSwatchForm)) {
           this.button.addEventListener(
             'mouseenter',
             function () {
@@ -5813,53 +6035,55 @@
           );
         }
 
-        if (!this.button.closest(selectors$f.formGridSwatch)) {
-          this.button.addEventListener(
-            'click',
-            function () {
-              this.changeImage();
-            }.bind(this)
-          );
+        if (this.imagesHidden.length) {
+          this.outer.addEventListener('mouseenter', this.outerHoverEvent);
+          this.outer.addEventListener('mouseleave', this.outerLeaveEvent);
         }
       }
     }
 
-    changeImage() {
-      this.linkElementAll.forEach((link) => {
-        link.setAttribute('href', this.linkDestination);
+    showHoverImages() {
+      this.imagesHidden.forEach((image) => {
+        image.style.removeProperty('display');
       });
 
-      this.slide.setAttribute('src', this.linkDestination);
+      this.outer.removeEventListener('mouseenter', this.outerHoverEvent);
+    }
+
+    hideHoverImages() {
+      this.slide.querySelectorAll(`.${classes$z.visible}`)?.forEach((image) => {
+        image.classList.remove(classes$z.visible);
+      });
+    }
+
+    changeImage() {
       if (this.image) {
-        // container width rounded to the nearest 180 pixels
-        // increses likelihood that the image will be cached
-        let widthRounded = Math.ceil(this.slide.offsetWidth / 180) * 180;
-        let sizedImage = themeImages.getSizedImageUrl(this.image, `${widthRounded}x`);
-        window
-          .fetch(sizedImage)
-          .then((response) => {
-            return response.blob();
-          })
-          .then((blob) => {
-            var objectURL = URL.createObjectURL(blob);
-            this.slide.style.setProperty('background-color', '#fff');
-            this.slide.style.setProperty('background-image', `url("${objectURL}")`);
-          })
-          .catch((error) => {
-            console.log(`Error: ${error}`);
-          });
+        const variantName = this.variantName.replaceAll('"', "'");
+        const imageTarget = this.slide.querySelector(`[${selectors$F.variantTitle}="${variantName}"]`);
+
+        if (imageTarget) {
+          const imageVisible = this.slide.querySelector(`[${selectors$F.variantTitle}].${classes$z.visible}`);
+          if (imageVisible) {
+            imageVisible.classList.remove(classes$z.visible);
+          }
+
+          imageTarget.classList.add(classes$z.visible);
+        }
       }
     }
   }
 
   class GridSwatch {
     constructor(wrap, container) {
-      this.counterSwatches = wrap.parentNode.previousElementSibling;
-      this.template = document.querySelector(selectors$f.template).innerHTML;
-      this.wrap = wrap;
       this.container = container;
-      this.handle = wrap.getAttribute(selectors$f.handle);
-      const label = wrap.getAttribute(selectors$f.label).trim().toLowerCase();
+      this.wrap = wrap;
+      this.outerGrid = wrap.closest(selectors$F.outerGrid);
+      this.productInfo = wrap.closest(selectors$F.productInfo);
+      this.template = document.querySelector(selectors$F.template).innerHTML;
+      this.handle = wrap.getAttribute(selectors$F.handle);
+      this.sectionId = this.wrap.closest(selectors$F.sectionId).dataset.sectionId;
+
+      const label = wrap.getAttribute(selectors$F.label).trim().toLowerCase();
       fetchProduct(this.handle).then((product) => {
         this.product = product;
         this.colorOption = product.options.find(function (element) {
@@ -5876,59 +6100,94 @@
     init() {
       this.wrap.innerHTML = '';
       this.count = 0;
-
       this.swatches.forEach((swatch) => {
-        let variant = this.product.variants.find((variant) => {
-          return variant.options.includes(swatch);
-        });
+        let variant = null;
+        let variantAvailable = false;
+        let image = '';
+
+        for (const productVariant of this.product.variants) {
+          const optionWithSwatch = productVariant.options.includes(swatch);
+
+          if (!variant && optionWithSwatch) {
+            variant = productVariant;
+          }
+
+          // Use a variant with image if exists
+          if (optionWithSwatch && productVariant.featured_media) {
+            image = productVariant.featured_media.preview_image.src;
+            variant = productVariant;
+            break;
+          }
+        }
+
+        for (const productVariant of this.product.variants) {
+          const optionWithSwatch = productVariant.options.includes(swatch);
+
+          if (optionWithSwatch && productVariant.available) {
+            variantAvailable = true;
+            break;
+          }
+        }
 
         if (variant) {
-          this.count++;
-          const image = variant.featured_media ? variant.featured_media.preview_image.src : '';
+          const swatchTemplate = document.createElement('div');
+          swatchTemplate.innerHTML = this.template;
+          const button = swatchTemplate.querySelector(selectors$F.button);
+          const swatchLink = swatchTemplate.querySelector(selectors$F.swatchLink);
+          const variantTitle = variant.title.replaceAll('"', "'");
 
-          this.wrap.innerHTML += Sqrl.render(this.template, {
-            color: swatch,
-            uniq: `${this.product.id}-${variant.id}`,
-            variant: variant.id,
-            available: variant.available,
-            image,
-          });
+          button.style = `--animation-delay: ${(100 * this.count) / 1000}s`;
+          button.dataset.tooltip = swatch;
+          swatchLink.href = getUrlWithVariant(this.product.url, variant.id);
+          swatchLink.innerText = swatch;
+          swatchLink.dataset.swatch = swatch;
+          swatchLink.dataset.swatchVariant = variant.id;
+          swatchLink.dataset.swatchVariantName = variantTitle;
+          swatchLink.dataset.swatchImage = image;
+          swatchLink.dataset.variant = variant.id;
+          swatchLink.disabled = !variantAvailable;
+
+          this.wrap.innerHTML += swatchTemplate.innerHTML;
+          this.count++;
         }
       });
 
-      this.swatchElements = this.wrap.querySelectorAll(`[${selectors$f.swatch}]`);
+      this.swatchCount = this.productInfo.querySelector(`[${selectors$F.swatchCount}]`);
+      this.swatchElements = this.wrap.querySelectorAll(selectors$F.swatchLink);
+      this.swatchForm = this.productInfo.querySelector(selectors$F.gridSwatchForm);
+      this.hideSwatchesTimer = 0;
 
-      if (this.counterSwatches.hasAttribute(selectors$f.swatchCount)) {
-        this.counterSwatches.innerText = `${this.count} ${this.count > 1 ? theme.strings.otherColor : theme.strings.oneColor}`;
+      if (this.swatchCount.hasAttribute(selectors$F.swatchCount)) {
+        this.swatchCount.innerText = `${this.count} ${this.count > 1 ? theme.strings.otherColor : theme.strings.oneColor}`;
 
-        this.counterSwatches.addEventListener('mouseenter', () => {
-          this.wrap.closest(selectors$f.link).classList.add(classes$6.stopEvents);
-          this.counterSwatches.nextElementSibling.classList.add(classes$6.visible);
+        this.swatchCount.addEventListener('mouseenter', () => {
+          if (this.hideSwatchesTimer) clearTimeout(this.hideSwatchesTimer);
+
+          this.productInfo.classList.add(classes$z.stopEvents);
+          this.swatchForm.classList.add(classes$z.visible);
         });
 
-        this.counterSwatches.closest(selectors$f.outerGrid).addEventListener('mouseleave', () => {
-          this.wrap.closest(selectors$f.link).classList.remove(classes$6.stopEvents);
-          this.counterSwatches.nextElementSibling.classList.remove(classes$6.visible);
+        // Prevent color swatches blinking on mouse move
+        this.productInfo.addEventListener('mouseleave', () => {
+          this.hideSwatchesTimer = setTimeout(() => {
+            this.productInfo.classList.remove(classes$z.stopEvents);
+            this.swatchForm.classList.remove(classes$z.visible);
+          }, 100);
         });
       }
 
-      if (this.wrap.hasAttribute(selectors$f.scrollbar)) {
+      if (this.wrap.hasAttribute(selectors$F.scrollbar)) {
         new NativeScrollbar(this.wrap);
       }
 
       this.swatchElements.forEach((el) => {
         new Swatch(el);
-        const tooltipEl = el.closest(`[${selectors$f.tooltip}]`);
-
-        if (tooltipEl) {
-          new Tooltip(tooltipEl);
-        }
       });
     }
   }
 
   const makeGridSwatches = (section) => {
-    const gridSwatchWrappers = section.container.querySelectorAll(selectors$f.wrapper);
+    const gridSwatchWrappers = section.container.querySelectorAll(selectors$F.wrapper);
     gridSwatchWrappers.forEach((wrap) => {
       new GridSwatch(wrap, undefined);
     });
@@ -5937,7 +6196,7 @@
   const swatchSection = {
     onLoad() {
       this.swatches = [];
-      const els = this.container.querySelectorAll(`[${selectors$f.swatch}]`);
+      const els = this.container.querySelectorAll(`[${selectors$F.swatch}]`);
       els.forEach((el) => {
         this.swatches.push(new Swatch(el));
       });
@@ -5950,808 +6209,251 @@
     },
   };
 
-  const selectors$g = {
-    elements: {
-      html: 'html',
-      body: 'body',
-      sectionId: 'data-section-id',
-      sectionOuter: '[data-section-id]',
-      productGrid: 'data-product-grid-item',
-      formQuickAdd: '[data-form-quick-add]',
-      quickAddLabel: 'data-quick-add-label',
-      quickCollectionHande: 'data-collection-handle',
-      selectOption: '[data-select-option]:not([data-quick-add-button])',
-      holderFormQuickAdd: '[data-quick-add-holder]',
-      goToNextElement: 'data-go-to-next',
-      quickAddElement: 'data-quick-add-button',
-      productJson: '[data-product-json]',
-      productOptionsJson: '[data-product-options-json]',
-      quickAddFormHolder: '[data-quick-add-form-holder]',
-      featuredImageHolder: '[data-grid-slide]',
-      productImagesHolder: '[data-product-image]',
-      productInformationHolder: '[data-product-information]',
-      scrollbarHolder: '[data-scrollbar]',
-      scrollbarArrowPrev: '[data-scrollbar-arrow-prev]',
-      scrollbarArrowNext: '[data-scrollbar-arrow-next]',
-      radioOption: '[data-radio-option]',
-      popoutWrapper: '[data-popout]',
-      popupList: '[data-popout-list]',
-      popupoutOption: '[data-popout-option]',
-      popupoutOptionValue: 'data-value',
-      popupoutToggle: '[data-popout-toggle]',
-      selectPosition: 'data-select-position',
-      swatch: 'data-swatch',
-      backButton: '[data-back-button]',
-      messageError: '[data-message-error]',
-      idInput: '[name="id"]',
-      buttonQuickAddMobile: '[data-button-quick-add-mobile]',
-      ariaExpanded: 'aria-expanded',
-      input: 'input',
-    },
-    classes: {
-      active: 'is-active',
-      select: 'is-selected',
-      disable: 'is-disable',
-      hide: 'is-hidden',
-      added: 'is-added',
-      loading: 'is-loading',
-      visible: 'is-visible',
-      error: 'has-error',
-      focus: 'is-focused',
-      popupoutVisible: 'popout-list--visible',
-    },
-    times: {
-      debounce: 500,
-      delay: 400,
-      delaySmall: 200,
-      delayMedium: 2000,
-      delayLarge: 5000,
-    },
-    imageSize: '800x800',
+  const selectors$E = {
+    productCutline: '[data-product-cutline]',
+    productLink: '[data-product-link]',
+    productGridItem: '[data-product-grid-item]',
+    productInfo: '[data-product-information]',
+    productImage: '[data-product-image-default]',
+    productImageSibling: '[data-product-image-sibling]',
+    productPrice: '[data-product-price]',
+    siblingsInnerHolder: '[data-sibling-inner]',
+    siblingCount: '[data-sibling-count]',
+    siblingHolder: '[data-sibling-holder]',
+    siblingFieldset: '[data-sibling-fieldset]',
+    siblingLink: '[data-sibling-link]',
   };
 
-  const instances$1 = [];
+  const classes$y = {
+    visible: 'is-visible',
+    fade: 'is-fade',
+    stopEvents: 'no-events',
+    active: 'is-active',
+  };
 
-  class QuickAddProduct {
-    constructor(el) {
-      this.cart = window.cart;
-      this.a11y = a11y;
-      this.themeAccessibility = window.accessibility;
+  const attributes$h = {
+    siblingAddedImage: 'data-sibling-added-image',
+    siblingCutline: 'data-sibling-cutline',
+    siblingImage: 'data-sibling-image',
+    siblingLink: 'data-sibling-link',
+    siblingPrice: 'data-sibling-price',
+    productLink: 'data-product-link',
+  };
 
-      this.document = document;
-      this.html = this.document.querySelector(selectors$g.elements.html);
-      this.body = this.document.querySelector(selectors$g.elements.body);
+  class SiblingSwatches {
+    constructor(swatches, product) {
+      this.swatches = swatches;
+      this.product = product;
+      this.productLinks = this.product.querySelectorAll(selectors$E.productLink);
+      this.productCutline = this.product.querySelector(selectors$E.productCutline);
+      this.productPrice = this.product.querySelector(selectors$E.productPrice);
+      this.productImage = this.product.querySelector(selectors$E.productImage);
+      this.productImageSibling = this.product.querySelector(selectors$E.productImageSibling);
 
-      this.productGrid = el;
-      this.holder = this.productGrid.querySelector(selectors$g.elements.holderFormQuickAdd);
-      this.quickAddLabel = this.productGrid.querySelector(`[${selectors$g.elements.quickAddLabel}]`);
-      this.quickAddFormHolder = this.productGrid.querySelector(selectors$g.elements.quickAddFormHolder);
-      this.featuredImageHolder = this.productGrid.querySelector(selectors$g.elements.featuredImageHolder);
-      this.productInformationHolder = this.productGrid.querySelector(selectors$g.elements.productInformationHolder);
-      this.buttonQuickAddMobile = this.productGrid.querySelector(selectors$g.elements.buttonQuickAddMobile);
-
-      this.sectionOuter = this.productGrid.closest(selectors$g.elements.sectionOuter);
-      this.sectionId = this.sectionOuter.getAttribute(selectors$g.elements.sectionId);
-
-      this.productJSON = null;
-      this.productOptionsJSON = null;
-      this.productForm = null;
-
-      this.selectedOptions = [];
-      this.filteredOptions = [];
-
-      this.enableMobileMode = false;
-      this.accessibilityStopEvent = false;
-      this.quickAddFormIsLoaded = false;
-
-      if (theme.enableQuickAdd) {
-        this.accessibility();
-        this.show();
-        this.hide();
-        this.errorHandle();
-      }
+      this.init();
     }
 
-    /**
-     * Init native scrollbar for product options
-     */
-    initNativeScrollbar() {
-      if (this.scrollbarHolder.length) {
-        this.scrollbarHolder.forEach((scrollbar) => {
-          new NativeScrollbar(scrollbar);
-        });
-      }
-    }
+    init() {
+      this.cacheDefaultValues();
 
-    /**
-     * Handle AJAX product grid item form
-     */
-    getForm() {
-      if (this.quickAddFormIsLoaded) {
-        return;
-      }
+      this.product.addEventListener('mouseleave', () => this.resetProductValues());
 
-      this.quickAddFormIsLoaded = true;
-      const root = theme.routes.root === '/' ? '' : theme.routes.root;
-
-      fetch(root + '/products/' + this.quickAddLabel.getAttribute(selectors$g.elements.quickAddLabel) + '?section_id=api-quick-add')
-        .then((response) => response.text())
-        .then((data) => {
-          const fresh = document.createElement('div');
-          fresh.innerHTML = data;
-          const cleanResponse = fresh.querySelector('[data-api-content]').innerHTML;
-
-          // Inject a unique ID into the form
-          const collectionHandle = this.quickAddLabel.getAttribute(selectors$g.elements.quickCollectionHande);
-          const unique = `${collectionHandle}-${this.sectionId}`;
-          this.quickAddFormHolder.innerHTML = cleanResponse.replaceAll('||collection-index||', unique);
-
-          this.loadForm();
-        })
-        .catch((e) => {
-          console.warn(e);
-        });
-    }
-
-    /**
-     * Load form and cache elements
-     */
-    loadForm() {
-      this.form = this.quickAddFormHolder.querySelector(selectors$g.elements.formQuickAdd);
-      this.selectOption = this.quickAddFormHolder.querySelectorAll(selectors$g.elements.selectOption);
-      this.productElemJSON = this.quickAddFormHolder.querySelector(selectors$g.elements.productJson);
-      this.productOptionsElemJSON = this.quickAddFormHolder.querySelector(selectors$g.elements.productOptionsJson);
-      this.scrollbarHolder = this.quickAddFormHolder.querySelectorAll(selectors$g.elements.scrollbarHolder);
-      this.popoutWrapper = this.quickAddFormHolder.querySelectorAll(selectors$g.elements.popoutWrapper);
-      this.swatches = this.quickAddFormHolder.querySelectorAll(`[${selectors$g.elements.swatch}]`);
-      this.backButtons = this.quickAddFormHolder.querySelectorAll(selectors$g.elements.backButton);
-
-      // Init Swatches
-      if (this.swatches.length) {
-        this.swatches.forEach((swatch) => {
-          new Swatch(swatch);
-        });
-
-        this.changeVariantImageOnHover();
-      }
-
-      // Init Popout
-      if (this.popoutWrapper.length) {
-        this.popoutWrapper.forEach((wrapper) => {
-          new Popout(wrapper);
-        });
-      }
-
-      // Init native scrollbar
-      this.initNativeScrollbar();
-
-      // Init back buttons to return one step
-      this.initGoToBack();
-
-      const hasProductJSON = this.productElemJSON && this.productElemJSON.innerHTML !== '';
-      const hasProductOptionsJSON = this.productOptionsElemJSON && this.productOptionsElemJSON.innerHTML !== '';
-
-      if (hasProductJSON && hasProductOptionsJSON) {
-        this.productJSON = JSON.parse(this.productElemJSON.innerHTML);
-        this.productOptionsJSON = JSON.parse(this.productOptionsElemJSON.innerHTML);
-
-        this.initForm();
-      } else {
-        console.error('Missing product JSON or product options with values JSON');
-      }
-    }
-
-    /**
-     * Init product form
-     */
-    initForm() {
-      this.filterFirstOptionValues();
-
-      this.productForm = new ProductForm(this.form, this.productJSON, {
-        onOptionChange: this.onOptionChange.bind(this),
-      });
-
-      if (this.enableMobileMode) {
-        this.addFirstVariantIsDefault(this.buttonQuickAddMobile.hasAttribute(selectors$g.elements.quickAddElement));
-
-        this.buttonQuickAddMobile.classList.add(selectors$g.classes.hide);
-        this.buttonQuickAddMobile.classList.remove(selectors$g.classes.loading);
-
-        this.quickAddLabel.classList.add(selectors$g.classes.hide);
-
-        this.toggleClasses();
-      } else {
-        this.quickAddLabel.classList.remove(selectors$g.classes.disable, selectors$g.classes.hide);
-      }
-    }
-
-    /**
-     * Init one step go to back
-     */
-    onOptionChange(event) {
-      const targetElement = event.target;
-      const optionHolder = targetElement.closest(selectors$g.elements.selectOption);
-      const position = Number(optionHolder.getAttribute(selectors$g.elements.selectPosition));
-      const firstOptionValue = event.dataset.variant ? event.dataset.variant.options[position - 1] : event.dataset.options[position - 1];
-      const focusedIsEnable = this.body.classList.contains(selectors$g.classes.focus);
-
-      this.changeVariantImage(event.dataset.variant);
-
-      // Stop change when focus is enabled
-      if (focusedIsEnable && this.accessibilityStopEvent) {
-        return;
-      }
-
-      this.selectedOptions.push(event.target.value);
-
-      optionHolder.classList.add(selectors$g.classes.select);
-
-      this.filterAvailableOptions(firstOptionValue, position);
-
-      if (targetElement.hasAttribute(selectors$g.elements.goToNextElement)) {
-        optionHolder.classList.remove(selectors$g.classes.active);
-        optionHolder.nextElementSibling.classList.add(selectors$g.classes.active);
-      }
-
-      if (targetElement.hasAttribute(selectors$g.elements.quickAddElement) && event.dataset.variant.available) {
-        if (theme.cartDrawerEnabled) {
-          this.quickAddLabel.classList.remove(selectors$g.classes.hide);
-          this.quickAddLabel.classList.add(selectors$g.classes.loading);
-        }
-
-        this.html.dispatchEvent(
-          new CustomEvent('cart:add-to-cart', {
-            bubbles: true,
-            detail: {
-              element: this.holder,
-              label: this.quickAddLabel,
-              data: {
-                id: event.dataset.variant.id,
-                quantity: 1,
-              },
-            },
-          })
-        );
-
-        setTimeout(() => {
-          this.selectedOptions = [];
-          this.resetInputsOfInstance();
-        }, selectors$g.times.delayMedium);
-
-        optionHolder.classList.remove(selectors$g.classes.active);
-      }
-
-      if (focusedIsEnable && targetElement.hasAttribute(selectors$g.elements.goToNextElement)) {
-        this.accessibilityTrapFocus(optionHolder.nextElementSibling);
-      }
-
-      this.accessibilityStopEvent = false;
-    }
-
-    /**
-     * Init one-step go to back
-     */
-    initGoToBack() {
-      if (this.backButtons.length) {
-        this.backButtons.forEach((button) => {
-          button.addEventListener('click', (event) => {
-            event.preventDefault();
-
-            const isFocused = this.body.classList.contains(selectors$g.classes.focus);
-
-            // Remove last added option value
-            this.selectedOptions.pop();
-
-            const optionHolder = button.closest(selectors$g.elements.selectOption);
-
-            let previousHolder = optionHolder.previousElementSibling.matches(selectors$g.elements.selectOption) ? optionHolder.previousElementSibling : this.quickAddLabel;
-
-            if (previousHolder === this.quickAddLabel && isFocused) {
-              this.themeAccessibility.lastFocused = this.quickAddLabel;
-            }
-
-            if (previousHolder === this.quickAddLabel && this.enableMobileMode) {
-              previousHolder = this.buttonQuickAddMobile;
-            }
-
-            // Return inputs and selects to primary states
-            if (previousHolder !== this.quickAddLabel) {
-              if (isFocused) {
-                this.accessibilityTrapFocus(previousHolder);
-              }
-
-              const inputs = optionHolder.querySelectorAll(selectors$g.elements.input);
-              const selects = optionHolder.querySelectorAll(selectors$g.elements.popupoutOption);
-
-              const previousInputs = previousHolder.querySelectorAll(selectors$g.elements.input);
-              const previousSelects = previousHolder.querySelectorAll(selectors$g.elements.popupoutOption);
-
-              if (inputs) {
-                inputs.forEach((input) => {
-                  input.checked = false;
-                });
-              }
-
-              if (selects) {
-                selects.forEach((option) => {
-                  option.classList.remove(selectors$g.classes.visible);
-                });
-              }
-
-              if (previousInputs) {
-                previousInputs.forEach((input) => {
-                  input.checked = false;
-                });
-              }
-
-              if (previousSelects) {
-                previousSelects.forEach((option) => {
-                  option.classList.remove(selectors$g.classes.visible);
-                });
-              }
-            }
-
-            if (previousHolder !== this.buttonQuickAddMobile) {
-              if (isFocused) {
-                this.accessibilityTrapFocus(previousHolder);
-              }
-
-              previousHolder.classList.add(selectors$g.classes.active, selectors$g.classes.select);
-            }
-
-            if (previousHolder === this.buttonQuickAddMobile) {
-              this.holder.classList.remove(selectors$g.classes.visible);
-            }
-
-            previousHolder.classList.remove(selectors$g.classes.hide);
-
-            optionHolder.classList.remove(selectors$g.classes.active, selectors$g.classes.select);
-
-            if (isFocused) {
-              previousHolder.focus();
-            }
-          });
-        });
-      }
-    }
-
-    /**
-     * Toggle classes
-     */
-    toggleClasses() {
-      this.holder.classList.add(selectors$g.classes.visible);
-
-      if (this.selectOption && this.selectOption.length && this.quickAddFormHolder.innerHTML !== '&nbsp;') {
-        this.quickAddLabel.classList.add(selectors$g.classes.hide);
-
-        const options = Array.from(this.selectOption);
-        const hasActiveOption = options.filter((option) => {
-          return option.classList.contains(selectors$g.classes.active);
-        });
-
-        if (hasActiveOption.length === 0) {
-          this.selectOption[0].classList.add(selectors$g.classes.active);
-
-          if (this.body.classList.contains(selectors$g.classes.focus) && this.accessibilityStopEvent) {
-            setTimeout(() => {
-              this.accessibilityTrapFocus(this.selectOption[0]);
-            }, selectors$g.times.delaySmall);
-          }
-        }
-      }
-    }
-
-    /**
-     * Add first variant if it is the default variant
-     *
-     * @param { Boolean } targetHasQuickAddAttribute
-     */
-    addFirstVariantIsDefault(targetHasQuickAddAttribute) {
-      const firstVariant = this.productJSON.variants[0];
-
-      if (targetHasQuickAddAttribute && firstVariant.available) {
-        if (theme.cartDrawerEnabled) {
-          this.quickAddLabel.classList.remove(selectors$g.classes.hide);
-          this.quickAddLabel.classList.add(selectors$g.classes.loading);
-        }
-
-        this.html.dispatchEvent(
-          new CustomEvent('cart:add-to-cart', {
-            bubbles: true,
-            detail: {
-              element: this.holder,
-              label: this.quickAddLabel,
-              data: {
-                id: firstVariant.id,
-                quantity: 1,
-              },
-            },
-          })
-        );
-      }
-    }
-
-    /**
-     * Show quick add
-     */
-    show() {
-      // Button quick view (touch devices)
-      if (this.buttonQuickAddMobile) {
-        this.buttonQuickAddMobile.addEventListener('click', () => {
-          this.enableMobileMode = true;
-
-          this.buttonQuickAddMobile.classList.add(selectors$g.classes.loading);
-
-          if (this.quickAddFormHolder.innerHTML === '&nbsp;' && !this.quickAddFormIsLoaded) {
-            this.getForm();
-          } else {
-            this.toggleClasses();
-
-            this.buttonQuickAddMobile.classList.remove(selectors$g.classes.loading);
-            this.buttonQuickAddMobile.classList.add(selectors$g.classes.hide);
-            this.holder.classList.add(selectors$g.classes.visible);
-          }
-
-          if (this.productJSON !== null) {
-            this.addFirstVariantIsDefault(this.buttonQuickAddMobile.hasAttribute(selectors$g.elements.quickAddElement));
-          }
-        });
-      }
-
-      // Do AJAX when hover on product grid item
-      if (this.productGrid) {
-        this.productGrid.addEventListener('mouseenter', () => {
-          this.enableMobileMode = false;
-
-          this.hideOtherHolders();
-
-          if (this.quickAddFormHolder && this.quickAddFormHolder.innerHTML === '&nbsp;' && !this.quickAddFormIsLoaded) {
-            this.getForm();
-          }
-        });
-      }
-
-      if (this.quickAddLabel) {
-        // Do AJAX when focus on quick add label
-        this.quickAddLabel.addEventListener('focusin', () => {
-          this.enableMobileMode = false;
-
-          if (this.quickAddFormHolder.innerHTML === '&nbsp;' && !this.quickAddFormIsLoaded) {
-            this.getForm();
-          }
-        });
-
-        // Open the first product option values or
-        // add product to the cart if it is enable
-        this.quickAddLabel.addEventListener('click', () => {
-          this.enableMobileMode = false;
-
-          const stopEvent = this.quickAddLabel.classList.contains(selectors$g.classes.added) || this.quickAddLabel.classList.contains(selectors$g.classes.disable);
-
-          if (stopEvent || this.productJSON === null) {
-            return;
-          }
-
-          this.selectedOptions = [];
-
-          this.addFirstVariantIsDefault(this.quickAddLabel.hasAttribute(selectors$g.elements.quickAddElement));
-
-          if (this.quickAddFormHolder.innerHTML !== '&nbsp;') {
-            this.toggleClasses();
-          }
-        });
-      }
-
-      this.productInformationHolder.addEventListener('mouseenter', () => {
-        this.featuredImageHolder.closest(selectors$g.elements.productImagesHolder).classList.remove(selectors$g.classes.visible);
-      });
-    }
-
-    /**
-     * Hide quick add
-     */
-    hide() {
-      if (this.quickAddLabel || this.buttonQuickAddMobile) {
-        if (theme.cartDrawerEnabled) {
-          this.document.addEventListener('theme:cart-close', () => {
-            setTimeout(() => {
-              this.resetButtonsOfInstance();
-            }, selectors$g.times.delayLarge);
-          });
-        } else {
-          setTimeout(() => {
-            this.resetButtonsOfInstance();
-          }, selectors$g.times.delayLarge);
-        }
-      }
-    }
-
-    accessibility() {
-      this.productGrid.addEventListener('keyup', (event) => {
-        if (event.keyCode === window.theme.keyboardKeys.TAB) {
-          this.accessibilityStopEvent = true;
-        }
-
-        if (event.keyCode === window.theme.keyboardKeys.ENTER) {
-          this.accessibilityStopEvent = false;
-          const element = event.target.hasAttribute(selectors$g.elements.popupoutOptionValue) ? event.target.closest(selectors$g.elements.popupList).nextElementSibling : event.target;
-
-          element.dispatchEvent(new Event('change'));
-        }
-      });
-    }
-
-    /**
-     * Enable trap focus
-     *
-     * @param { DOM Element } container
-     */
-    accessibilityTrapFocus(container) {
-      this.a11y.removeTrapFocus();
-      this.a11y.trapFocus(container, {
-        elementToFocus: container.querySelector(selectors$g.elements.backButton),
-      });
-    }
-
-    /**
-     * Filter available options based on variants
-     *
-     * @param { String } value
-     * @param { Number } optionIndex
-     * @param { Boolean } enableCheck
-     */
-    filterAvailableOptions(value, optionIndex, enableCheck = true) {
-      const variants = this.productJSON.variants.filter((variant) => {
-        if (variant.options.length > 1) {
-          let available = [];
-
-          this.selectedOptions.forEach((option, index) => {
-            available.push(variant[`option${optionIndex}`] === value && variant.options[index] === option && variant.available);
-          });
-
-          if (!available.includes(false) && available.length > 0) {
-            return variant;
-          }
-        } else {
-          return variant[`option${optionIndex}`] === value && variant.available;
-        }
-      });
-
-      this.productOptionsJSON.forEach((option) => {
-        if (option.position !== optionIndex) {
-          const filteredObject = {};
-          filteredObject.name = option.name;
-          filteredObject.position = option.position;
-          filteredObject.values = [];
-
-          option.values.forEach((value) => {
-            const availableVariants = variants.filter((variant) => variant[`option${option.position}`] === value);
-
-            if (availableVariants.length) {
-              filteredObject.values.push(value);
-            }
-          });
-
-          this.filteredOptions = [...this.filteredOptions, filteredObject];
-        }
-      });
-
-      if (enableCheck) {
-        this.disableUnavailableValues();
-        this.filteredOptions = [];
-      }
-    }
-
-    /**
-     * Filter first option values based on the variants
-     * on load or when the product is added
-     */
-    filterFirstOptionValues() {
-      this.productOptionsJSON[0].values.forEach((value) => {
-        const variants = this.productJSON.variants.filter((variant) => {
-          return variant.option1 === value && variant.available;
-        });
-
-        if (variants.length === 0 && this.selectOption[0] !== undefined) {
-          const currentInput = this.selectOption[0].querySelector(`input[value="${value}"]`);
-          const currentOption = this.selectOption[0].querySelector(`[${selectors$g.elements.popupoutOptionValue}="${value}"]`);
-
-          if (currentInput) {
-            currentInput.checked = false;
-            currentInput.disabled = true;
-          }
-
-          if (currentOption) {
-            currentOption.classList.add(selectors$g.classes.disable);
-            currentOption.setAttribute('tabindex', -1);
-          }
-        }
-      });
-    }
-
-    /**
-     * Disable/Enable option values
-     */
-    disableUnavailableValues() {
-      if (this.selectOption) {
-        this.selectOption.forEach((option) => {
-          const inputs = option.querySelectorAll(selectors$g.elements.input);
-          const selects = option.querySelectorAll(selectors$g.elements.popupoutOption);
-
-          // Disable/Enable swatches and boxes
-          inputs.forEach((input) => {
-            if (!option.classList.contains(selectors$g.classes.select)) {
-              input.checked = false;
-              input.disabled = true;
-            }
-
-            this.filteredOptions.forEach((data) => {
-              if (data.values.includes(input.value)) {
-                input.disabled = false;
-              }
-            });
-          });
-
-          // Disable/Enable select options
-          selects.forEach((item) => {
-            if (!option.classList.contains(selectors$g.classes.select)) {
-              item.setAttribute('tabindex', -1);
-              item.classList.add(selectors$g.classes.disable);
-            }
-
-            this.filteredOptions.forEach((data) => {
-              if (data.values.includes(item.getAttribute(`${selectors$g.elements.popupoutOptionValue}`))) {
-                item.classList.remove(selectors$g.classes.disable);
-                item.setAttribute('tabindex', 1);
-              }
-            });
-          });
-        });
-      }
-    }
-
-    /**
-     * Change variant image on hover
-     */
-    changeVariantImageOnHover() {
       this.swatches.forEach((swatch) => {
-        swatch.addEventListener('mouseover', () => {
-          for (let index = 0; index < this.productJSON.variants.length; index++) {
-            const variant = this.productJSON.variants[index];
-
-            if (variant.featured_media !== undefined && variant.options[this.selectedOptions.length] === swatch.getAttribute(selectors$g.elements.swatch)) {
-              this.changeVariantImage(variant);
-              break;
-            }
-          }
-        });
+        swatch.addEventListener('mouseenter', (event) => this.showSibling(event));
       });
+
+      if (this.productLinks.length) {
+        this.swatches.forEach((swatch) => {
+          swatch.addEventListener('click', () => {
+            this.productLinks[0].click();
+          });
+        });
+      }
     }
 
-    /**
-     * Change image with a variant image if exists
-     *
-     * @param { Object } currentVariant
-     */
-    changeVariantImage(currentVariant) {
-      const imageExists = currentVariant && currentVariant.featured_media && currentVariant.featured_media !== undefined;
+    cacheDefaultValues() {
+      this.productLinkValue = this.productLinks[0].hasAttribute(attributes$h.productLink) ? this.productLinks[0].getAttribute(attributes$h.productLink) : '';
+      this.productPriceValue = this.productPrice.innerHTML;
+
+      if (this.productCutline) {
+        this.productCutlineValue = this.productCutline.innerHTML;
+      }
+    }
+
+    resetProductValues() {
+      this.product.classList.remove(classes$y.active);
+
+      if (this.productLinkValue) {
+        this.productLinks.forEach((productLink) => {
+          productLink.href = this.productLinkValue;
+        });
+      }
+
+      if (this.productPrice) {
+        this.productPrice.innerHTML = this.productPriceValue;
+      }
+
+      if (this.productCutline && this.productCutline) {
+        this.productCutline.innerHTML = this.productCutlineValue;
+      }
+
+      this.hideSiblingImage();
+    }
+
+    showSibling(event) {
+      const swatch = event.target;
+      const siblingLink = swatch.hasAttribute(attributes$h.siblingLink) ? swatch.getAttribute(attributes$h.siblingLink) : '';
+      const siblingPrice = swatch.hasAttribute(attributes$h.siblingPrice) ? swatch.getAttribute(attributes$h.siblingPrice) : '';
+      const siblingCutline = swatch.hasAttribute(attributes$h.siblingCutline) ? swatch.getAttribute(attributes$h.siblingCutline) : '';
+      const siblingImage = swatch.hasAttribute(attributes$h.siblingImage) ? swatch.getAttribute(attributes$h.siblingImage) : '';
+
+      if (siblingLink) {
+        this.productLinks.forEach((productLink) => {
+          productLink.href = siblingLink;
+        });
+      }
+
+      if (siblingPrice) {
+        this.productPrice.innerHTML = siblingPrice;
+      }
+
+      if (siblingCutline) {
+        this.productCutline.innerHTML = siblingCutline;
+      } else {
+        this.productCutline.innerHTML = '';
+      }
+
+      if (siblingImage) {
+        this.showSiblingImage(siblingImage);
+      }
+    }
+
+    showSiblingImage(siblingImage) {
+      if (!this.productImageSibling) return;
+
+      // Add current sibling swatch image to PGI image
+      const ratio = window.devicePixelRatio || 1;
+      const pixels = this.productImage.offsetWidth * ratio;
+      const widthRounded = Math.ceil(pixels / 180) * 180;
+      const imageSrc = themeImages.getSizedImageUrl(siblingImage, `${widthRounded}x`);
+      const imageExists = this.productImageSibling.querySelector(`[src="${imageSrc}"]`);
+      const showCurrentImage = () => {
+        this.productImageSibling.classList.add(classes$y.visible);
+        this.productImageSibling.querySelector(`[src="${imageSrc}"]`).classList.add(classes$y.fade);
+      };
+      const swapImages = () => {
+        this.productImageSibling.querySelectorAll('img').forEach((image) => {
+          image.classList.remove(classes$y.fade);
+        });
+        requestAnimationFrame(showCurrentImage);
+      };
 
       if (imageExists) {
-        const currentImage = themeImages.getSizedImageUrl(currentVariant.featured_media.preview_image.src, selectors$g.imageSize);
+        swapImages();
+      } else {
+        const imageTag = document.createElement('img');
 
-        this.featuredImageHolder.style.setProperty('background-image', `url(${currentImage})`);
-        this.featuredImageHolder.closest(selectors$g.elements.productImagesHolder).classList.add(selectors$g.classes.visible);
-      }
-    }
+        imageTag.src = imageSrc;
 
-    /**
-     *  Reset option values
-     *
-     * @param { DOM Element } option
-     */
-    resetOptions(option) {
-      option.querySelectorAll(selectors$g.elements.input).forEach((input) => {
-        input.checked = false;
-        input.disabled = false;
-      });
+        if (this.productCutline) {
+          imageTag.alt = this.productCutline.innerText;
+        }
 
-      option.querySelectorAll(selectors$g.elements.popupoutOption).forEach((option) => {
-        option.classList.remove(selectors$g.classes.disable);
-        option.setAttribute('tabindex', 1);
-      });
-    }
+        imageTag.addEventListener('load', () => {
+          this.productImageSibling.append(imageTag);
 
-    /**
-     * Hide other holders if they are visible
-     */
-    hideOtherHolders() {
-      const otherHolderFormQuickAdd = this.document.querySelectorAll(selectors$g.elements.holderFormQuickAdd);
-
-      if (otherHolderFormQuickAdd) {
-        otherHolderFormQuickAdd.forEach((holder) => {
-          if (holder !== this.holder) {
-            holder.classList.remove(selectors$g.classes.visible);
-            const selectToggleButton = holder.querySelector(selectors$g.elements.popupoutToggle);
-
-            if (selectToggleButton) {
-              selectToggleButton.setAttribute(selectors$g.elements.ariaExpanded, false);
-              selectToggleButton.nextElementSibling.classList.remove(selectors$g.classes.popupoutVisible);
-            }
-
-            if (this.popoutWrapper) {
-              holder.closest(`[${selectors$g.elements.productGrid}]`).querySelector(selectors$g.elements.productImagesHolder).classList.remove(selectors$g.classes.visible);
-            }
-          }
+          swapImages();
         });
       }
     }
 
-    /**
-     * Reset inputs of this instance
-     */
-    resetInputsOfInstance() {
-      if (this.selectOption) {
-        this.quickAddLabel.classList.remove(selectors$g.classes.hide);
-        this.initNativeScrollbar();
+    hideSiblingImage() {
+      if (!this.productImageSibling) return;
 
-        this.selectOption.forEach((option) => {
-          option.classList.remove(selectors$g.classes.active, selectors$g.classes.select);
-          const selectToggleButton = option.querySelector(selectors$g.elements.popupoutToggle);
-
-          if (selectToggleButton) {
-            selectToggleButton.innerText = theme.strings.selectValue;
-            selectToggleButton.setAttribute(selectors$g.elements.ariaExpanded, false);
-          }
-
-          this.resetOptions(option);
-        });
-
-        this.filterFirstOptionValues();
-        this.filteredOptions = [];
-      }
-    }
-
-    /**
-     * Reset buttons to default states
-     */
-    resetButtonsOfInstance() {
-      this.quickAddLabel.classList.remove(selectors$g.classes.select, selectors$g.classes.added, selectors$g.classes.visible);
-
-      this.buttonQuickAddMobile.classList.remove(selectors$g.classes.hide);
-    }
-
-    /**
-     * Handle error cart response
-     */
-    errorHandle() {
-      this.html.addEventListener('cart:add-to-error', (event) => {
-        const holder = event.detail.holder;
-        const errorMessageHolder = holder.querySelector(selectors$g.elements.messageError);
-
-        holder.querySelector(`[${selectors$g.elements.quickAddLabel}]`).classList.remove(selectors$g.classes.visible, selectors$g.classes.added, selectors$g.classes.loading);
-
-        holder.classList.add(selectors$g.classes.error);
-
-        errorMessageHolder.innerText = event.detail.description;
-
-        setTimeout(() => {
-          holder.classList.remove(selectors$g.classes.error);
-          holder.classList.add(selectors$g.classes.visible);
-          holder.previousElementSibling.classList.remove(selectors$g.classes.hide);
-        }, selectors$g.times.delayLarge);
+      this.productImageSibling.classList.remove(classes$y.visible);
+      this.productImageSibling.querySelectorAll('img').forEach((image) => {
+        image.classList.remove(classes$y.fade);
       });
     }
   }
 
-  const quickAddProduct = {
+  class Sibling {
+    constructor(holder, product) {
+      this.holder = holder;
+      this.product = product;
+      this.siblingScrollbar = this.holder.querySelector(selectors$E.siblingsInnerHolder);
+      this.siblingCount = this.holder.querySelector(selectors$E.siblingCount);
+      this.siblingFieldset = this.holder.querySelector(selectors$E.siblingFieldset);
+      this.siblingLinks = this.holder.querySelectorAll(selectors$E.siblingLink);
+      this.productInfo = this.holder.closest(selectors$E.productInfo);
+      this.productLink = this.holder.closest(selectors$E.link);
+      this.hideSwatchesTimer = 0;
+
+      this.init();
+    }
+
+    init() {
+      this.initScrollbar();
+
+      if (this.siblingCount && this.siblingFieldset && this.productInfo) {
+        this.siblingCount.addEventListener('mouseenter', () => this.showSiblings());
+
+        // Prevent color swatches blinking on mouse move
+        this.productInfo.addEventListener('mouseleave', () => this.hideSiblings());
+      }
+
+      if (this.siblingLinks.length) {
+        new SiblingSwatches(this.siblingLinks, this.product);
+      }
+    }
+
+    showSiblings() {
+      if (this.hideSwatchesTimer) clearTimeout(this.hideSwatchesTimer);
+
+      if (this.productLink) {
+        this.productLink.classList.add(classes$y.stopEvents);
+      }
+
+      this.siblingFieldset.classList.add(classes$y.visible);
+    }
+
+    hideSiblings() {
+      this.hideSwatchesTimer = setTimeout(() => {
+        if (this.productLink) {
+          this.productLink.classList.remove(classes$y.stopEvents);
+        }
+
+        this.siblingFieldset.classList.remove(classes$y.visible);
+      }, 100);
+    }
+
+    initScrollbar() {
+      if (this.siblingScrollbar) {
+        new NativeScrollbar(this.siblingScrollbar);
+      }
+    }
+  }
+
+  class Siblings {
+    constructor(section) {
+      this.container = section.container;
+      this.siblingHolders = this.container.querySelectorAll(`${selectors$E.productGridItem} ${selectors$E.siblingHolder}`);
+
+      if (this.siblingHolders.length) {
+        this.siblingHolders.forEach((siblingHolder) => {
+          new Sibling(siblingHolder, siblingHolder.closest(selectors$E.productGridItem));
+        });
+      }
+    }
+  }
+
+  const siblings = {
     onLoad() {
-      this.container.querySelectorAll(`[${selectors$g.elements.productGrid}]`).forEach((item) => {
-        instances$1.push(new QuickAddProduct(item));
-      });
+      new Siblings(this);
     },
   };
 
-  const selectors$h = {
+  const selectors$D = {
     rangeSlider: '[data-range-slider]',
     rangeDotLeft: '[data-range-left]',
     rangeDotRight: '[data-range-right]',
@@ -6767,15 +6469,15 @@
     priceMax: '[data-field-price-max]',
   };
 
-  const classes$7 = {
-    classInitialized: 'is-initialized',
+  const classes$x = {
+    initialized: 'is-initialized',
   };
 
   class RangeSlider {
     constructor(section) {
       this.container = section.container;
-      this.slider = section.querySelector(selectors$h.rangeSlider);
-      this.resizeFilters = debounce(() => this.init(), 250);
+      this.slider = section.querySelector(selectors$D.rangeSlider);
+      this.resizeFilters = () => this.init();
 
       if (this.slider) {
         this.onMoveEvent = (event) => this.onMove(event);
@@ -6785,13 +6487,13 @@
         this.x = 0;
 
         // retrieve touch button
-        this.touchLeft = this.slider.querySelector(selectors$h.rangeDotLeft);
-        this.touchRight = this.slider.querySelector(selectors$h.rangeDotRight);
-        this.lineSpan = this.slider.querySelector(selectors$h.rangeLine);
+        this.touchLeft = this.slider.querySelector(selectors$D.rangeDotLeft);
+        this.touchRight = this.slider.querySelector(selectors$D.rangeDotRight);
+        this.lineSpan = this.slider.querySelector(selectors$D.rangeLine);
 
         // get some properties
-        this.min = parseFloat(this.slider.getAttribute(selectors$h.dataMin));
-        this.max = parseFloat(this.slider.getAttribute(selectors$h.dataMax));
+        this.min = parseFloat(this.slider.getAttribute(selectors$D.dataMin));
+        this.max = parseFloat(this.slider.getAttribute(selectors$D.dataMax));
 
         this.step = 0.0;
 
@@ -6805,13 +6507,13 @@
     init() {
       // retrieve default values
       let defaultMinValue = this.min;
-      if (this.slider.hasAttribute(selectors$h.dataMinValue)) {
-        defaultMinValue = parseFloat(this.slider.getAttribute(selectors$h.dataMinValue));
+      if (this.slider.hasAttribute(selectors$D.dataMinValue)) {
+        defaultMinValue = parseFloat(this.slider.getAttribute(selectors$D.dataMinValue));
       }
       let defaultMaxValue = this.max;
 
-      if (this.slider.hasAttribute(selectors$h.dataMaxValue)) {
-        defaultMaxValue = parseFloat(this.slider.getAttribute(selectors$h.dataMaxValue));
+      if (this.slider.hasAttribute(selectors$D.dataMaxValue)) {
+        defaultMaxValue = parseFloat(this.slider.getAttribute(selectors$D.dataMaxValue));
       }
 
       // check values are correct
@@ -6827,13 +6529,13 @@
         defaultMinValue = defaultMaxValue;
       }
 
-      if (this.slider.getAttribute(selectors$h.dataStep)) {
-        this.step = Math.abs(parseFloat(this.slider.getAttribute(selectors$h.dataStep)));
+      if (this.slider.getAttribute(selectors$D.dataStep)) {
+        this.step = Math.abs(parseFloat(this.slider.getAttribute(selectors$D.dataStep)));
       }
 
       // initial reset
       this.reset();
-      window.addEventListener('resize', this.resizeFilters);
+      document.addEventListener('theme:resize', this.resizeFilters);
 
       // usefull values, min, max, normalize fact is the width of both touch buttons
       this.maxX = this.slider.offsetWidth - this.touchRight.offsetWidth;
@@ -6847,11 +6549,11 @@
       // link events
       this.touchLeft.addEventListener('mousedown', this.onStartEvent);
       this.touchRight.addEventListener('mousedown', this.onStartEvent);
-      this.touchLeft.addEventListener('touchstart', this.onStartEvent);
-      this.touchRight.addEventListener('touchstart', this.onStartEvent);
+      this.touchLeft.addEventListener('touchstart', this.onStartEvent, {passive: true});
+      this.touchRight.addEventListener('touchstart', this.onStartEvent, {passive: true});
 
       // initialize
-      this.slider.classList.add(classes$7.classInitialized);
+      this.slider.classList.add(classes$x.initialized);
     }
 
     reset() {
@@ -6868,7 +6570,7 @@
       this.touchLeft.style.left = Math.ceil(ratio * (this.slider.offsetWidth - (this.touchLeft.offsetWidth + this.normalizeFact))) + 'px';
       this.lineSpan.style.marginLeft = this.touchLeft.offsetLeft + 'px';
       this.lineSpan.style.width = this.touchRight.offsetLeft - this.touchLeft.offsetLeft + 'px';
-      this.slider.setAttribute(selectors$h.dataMinValue, minValue);
+      this.slider.setAttribute(selectors$D.dataMinValue, minValue);
     }
 
     setMaxValue(maxValue) {
@@ -6876,12 +6578,11 @@
       this.touchRight.style.left = Math.ceil(ratio * (this.slider.offsetWidth - (this.touchLeft.offsetWidth + this.normalizeFact)) + this.normalizeFact) + 'px';
       this.lineSpan.style.marginLeft = this.touchLeft.offsetLeft + 'px';
       this.lineSpan.style.width = this.touchRight.offsetLeft - this.touchLeft.offsetLeft + 'px';
-      this.slider.setAttribute(selectors$h.dataMaxValue, maxValue);
+      this.slider.setAttribute(selectors$D.dataMaxValue, maxValue);
     }
 
     onStart(event) {
       // Prevent default dragging of selected content
-      event.preventDefault();
       let eventTouch = event;
 
       if (event.touches) {
@@ -6890,16 +6591,16 @@
 
       if (event.currentTarget === this.touchLeft) {
         this.x = this.touchLeft.offsetLeft;
-      } else {
+      } else if (event.currentTarget === this.touchRight) {
         this.x = this.touchRight.offsetLeft;
       }
 
       this.startX = eventTouch.pageX - this.x;
       this.selectedTouch = event.currentTarget;
-      this.slider.addEventListener('mousemove', this.onMoveEvent);
-      this.slider.addEventListener('mouseup', this.onStopEvent);
-      this.slider.addEventListener('touchmove', this.onMoveEvent);
-      this.slider.addEventListener('touchend', this.onStopEvent);
+      document.addEventListener('mousemove', this.onMoveEvent);
+      document.addEventListener('mouseup', this.onStopEvent);
+      document.addEventListener('touchmove', this.onMoveEvent, {passive: true});
+      document.addEventListener('touchend', this.onStopEvent, {passive: true});
     }
 
     onMove(event) {
@@ -6938,17 +6639,17 @@
       // call on change
       if (this.slider.getAttribute('on-change')) {
         const fn = new Function('min, max', this.slider.getAttribute('on-change'));
-        fn(this.slider.getAttribute(selectors$h.dataMinValue), this.slider.getAttribute(selectors$h.dataMaxValue));
+        fn(this.slider.getAttribute(selectors$D.dataMinValue), this.slider.getAttribute(selectors$D.dataMaxValue));
       }
 
-      this.onChange(this.slider.getAttribute(selectors$h.dataMinValue), this.slider.getAttribute(selectors$h.dataMaxValue));
+      this.onChange(this.slider.getAttribute(selectors$D.dataMinValue), this.slider.getAttribute(selectors$D.dataMaxValue));
     }
 
-    onStop(event) {
-      this.slider.removeEventListener('mousemove', this.onMoveEvent);
-      this.slider.removeEventListener('mouseup', this.onStopEvent);
-      this.slider.removeEventListener('touchmove', this.onMoveEvent);
-      this.slider.removeEventListener('touchend', this.onStopEvent);
+    onStop() {
+      document.removeEventListener('mousemove', this.onMoveEvent);
+      document.removeEventListener('mouseup', this.onStopEvent);
+      document.removeEventListener('touchmove', this.onMoveEvent);
+      document.removeEventListener('touchend', this.onStopEvent);
 
       this.selectedTouch = null;
 
@@ -6956,14 +6657,14 @@
       this.calculateValue();
 
       // call did changed
-      this.onChanged(this.slider.getAttribute(selectors$h.dataMinValue), this.slider.getAttribute(selectors$h.dataMaxValue));
+      this.onChanged(this.slider.getAttribute(selectors$D.dataMinValue), this.slider.getAttribute(selectors$D.dataMaxValue));
     }
 
     onChange(min, max) {
-      const rangeHolder = this.slider.closest(selectors$h.rangeHolder);
+      const rangeHolder = this.slider.closest(selectors$D.rangeHolder);
       if (rangeHolder) {
-        const priceMin = rangeHolder.querySelector(selectors$h.priceMin);
-        const priceMax = rangeHolder.querySelector(selectors$h.priceMax);
+        const priceMin = rangeHolder.querySelector(selectors$D.priceMin);
+        const priceMax = rangeHolder.querySelector(selectors$D.priceMax);
 
         if (priceMin && priceMax) {
           priceMin.value = min;
@@ -6973,8 +6674,8 @@
     }
 
     onChanged(min, max) {
-      if (this.slider.hasAttribute(selectors$h.dataFilterUpdate)) {
-        this.slider.dispatchEvent(new CustomEvent('filter:update:range', {bubbles: true}));
+      if (this.slider.hasAttribute(selectors$D.dataFilterUpdate)) {
+        this.slider.dispatchEvent(new CustomEvent('theme:range:update', {bubbles: true}));
       }
     }
 
@@ -6995,22 +6696,22 @@
       }
 
       if (this.selectedTouch === this.touchLeft) {
-        this.slider.setAttribute(selectors$h.dataMinValue, minValue);
+        this.slider.setAttribute(selectors$D.dataMinValue, minValue);
       }
 
       if (this.selectedTouch === this.touchRight) {
-        this.slider.setAttribute(selectors$h.dataMaxValue, maxValue);
+        this.slider.setAttribute(selectors$D.dataMaxValue, maxValue);
       }
     }
 
     onUnload() {
       if (this.resizeFilters) {
-        window.removeEventListener('resize', this.resizeFilters);
+        document.removeEventListener('theme:resize', this.resizeFilters);
       }
     }
   }
 
-  const selectors$i = {
+  const selectors$C = {
     collectionSidebar: '[data-collection-sidebar]',
     form: '[data-collection-filters-form]',
     input: 'input',
@@ -7025,35 +6726,33 @@
     rangeMax: '[data-se-max-value]',
     rangeMinValue: 'data-se-min-value',
     rangeMaxValue: 'data-se-max-value',
+    rangeMinDefault: 'data-se-min',
+    rangeMaxDefault: 'data-se-max',
     productsContainer: '[data-products-grid]',
     product: '[data-product-grid-item]',
-    tooltip: 'data-tooltip',
     filterUpdateUrlButton: '[data-filter-update-url]',
-    dataActiveFilters: '[data-active-filters]',
-    dataActiveFiltersCount: 'data-active-filters-count',
-    dataSort: 'data-sort-enabled',
-    headerSticky: '[data-header-sticky="sticky"]',
-    headerHeight: '[data-header-height]',
+    activeFilters: '[data-active-filters]',
+    activeFiltersCount: 'data-active-filters-count',
+    sort: 'data-sort-enabled',
     collectionNav: '[data-collection-nav]',
   };
 
-  const classes$8 = {
-    classHidden: 'hidden',
-    classLoading: 'is-loading',
+  const classes$w = {
+    hidden: 'hidden',
+    loading: 'is-loading',
   };
 
-  let sections$7 = {};
+  let sections$m = {};
 
   class FiltersForm {
     constructor(section) {
       this.section = section;
       this.container = this.section.container;
-      this.sidebar = this.container.querySelector(selectors$i.collectionSidebar);
-      this.form = this.container.querySelector(selectors$i.form);
-      this.sort = this.container.querySelector(`[${selectors$i.dataSort}]`);
-      this.productsContainer = this.container.querySelector(selectors$i.productsContainer);
-      this.headerSticky = document.querySelector(selectors$i.headerSticky) !== null;
-      this.collectionNav = this.container.querySelector(selectors$i.collectionNav);
+      this.sidebar = this.container.querySelector(selectors$C.collectionSidebar);
+      this.form = this.container.querySelector(selectors$C.form);
+      this.sort = this.container.querySelector(`[${selectors$C.sort}]`);
+      this.productsContainer = this.container.querySelector(selectors$C.productsContainer);
+      this.collectionNav = this.container.querySelector(selectors$C.collectionNav);
       this.init();
     }
 
@@ -7067,14 +6766,14 @@
             const type = e.type;
             const target = e.target;
 
-            if (type === selectors$i.input || type === selectors$i.select || type === selectors$i.label || type === selectors$i.textarea) {
+            if (type === selectors$C.input || type === selectors$C.select || type === selectors$C.label || type === selectors$C.textarea) {
               if (this.form && typeof this.form.submit === 'function') {
-                const priceMin = this.form.querySelector(selectors$i.priceMin);
-                const priceMax = this.form.querySelector(selectors$i.priceMax);
+                const priceMin = this.form.querySelector(selectors$C.priceMin);
+                const priceMax = this.form.querySelector(selectors$C.priceMax);
                 if (priceMin && priceMax) {
-                  if (target.hasAttribute(selectors$i.priceMinValue) && !priceMax.value) {
+                  if (target.hasAttribute(selectors$C.priceMinValue) && !priceMax.value) {
                     priceMax.value = priceMax.placeholder;
-                  } else if (target.hasAttribute(selectors$i.priceMaxValue) && !priceMin.value) {
+                  } else if (target.hasAttribute(selectors$C.priceMaxValue) && !priceMin.value) {
                     priceMin.value = priceMin.placeholder;
                   }
                 }
@@ -7085,7 +6784,7 @@
           }, 500)
         );
 
-        this.sidebar.addEventListener('filter:update:range', (e) => this.updateRange(e));
+        this.sidebar.addEventListener('theme:range:update', (e) => this.updateRange(e));
       }
 
       if (this.sidebar) {
@@ -7097,7 +6796,7 @@
       }
 
       if (this.sort) {
-        this.container.addEventListener('filter:submit:form', (e) => this.submitForm(e));
+        this.container.addEventListener('theme:filter:update', (e) => this.submitForm(e));
       }
 
       if (this.sidebar || this.sort) {
@@ -7111,16 +6810,16 @@
 
     filterUpdateFromUrl(e) {
       const target = e.target;
-      if (target.matches(selectors$i.filterUpdateUrlButton) || (target.closest(selectors$i.filterUpdateUrlButton) && target)) {
+      if (target.matches(selectors$C.filterUpdateUrlButton) || (target.closest(selectors$C.filterUpdateUrlButton) && target)) {
         e.preventDefault();
-        const button = target.matches(selectors$i.filterUpdateUrlButton) ? target : target.closest(selectors$i.filterUpdateUrlButton);
+        const button = target.matches(selectors$C.filterUpdateUrlButton) ? target : target.closest(selectors$C.filterUpdateUrlButton);
         this.submitForm(e, button.getAttribute('href'));
       }
     }
 
     submitForm(e, replaceHref = '') {
-      this.sort = this.container.querySelector(`[${selectors$i.dataSort}]`);
-      const sortValue = this.sort ? this.sort.getAttribute(selectors$i.dataSort) : '';
+      this.sort = this.container.querySelector(`[${selectors$C.sort}]`);
+      const sortValue = this.sort ? this.sort.getAttribute(selectors$C.sort) : '';
       if (!e || (e && e.type !== 'popstate')) {
         if (replaceHref === '') {
           const url = new window.URL(window.location.href);
@@ -7129,9 +6828,9 @@
           const filterUrlParams = Object.fromEntries(filterUrlEntries);
           const filterUrlRemoveString = filterUrl.toString();
 
-          if (filterUrlRemoveString.includes('filter.') || filterUrlRemoveString.includes('sort_by')) {
+          if (filterUrlRemoveString.includes('filter.') || filterUrlRemoveString.includes('page=')) {
             for (const key in filterUrlParams) {
-              if (key.includes('filter.') || key.includes('sort_by')) {
+              if (key.includes('filter.') || key === 'page') {
                 filterUrl.delete(key);
               }
             }
@@ -7140,11 +6839,25 @@
           if (this.form) {
             const formData = new FormData(this.form);
             const formParams = new URLSearchParams(formData);
+            const rangeMin = this.form.querySelector(selectors$C.rangeMin);
+            const rangeMax = this.form.querySelector(selectors$C.rangeMax);
+            const rangeMinDefaultValue = rangeMin && rangeMin.hasAttribute(selectors$C.rangeMinDefault) ? rangeMin.getAttribute(selectors$C.rangeMinDefault) : '';
+            const rangeMaxDefaultValue = rangeMax && rangeMax.hasAttribute(selectors$C.rangeMaxDefault) ? rangeMax.getAttribute(selectors$C.rangeMaxDefault) : '';
+            let priceFilterDefaultCounter = 0;
 
             for (let [key, val] of formParams.entries()) {
               if (key.includes('filter.') && val) {
                 filterUrl.append(key, val);
+
+                if ((val === rangeMinDefaultValue && key === 'filter.v.price.gte') || (val === rangeMaxDefaultValue && key === 'filter.v.price.lte')) {
+                  priceFilterDefaultCounter += 1;
+                }
               }
+            }
+
+            if (priceFilterDefaultCounter === 2) {
+              filterUrl.delete('filter.v.price.gte');
+              filterUrl.delete('filter.v.price.lte');
             }
           }
 
@@ -7160,37 +6873,33 @@
           window.history.pushState(null, '', replaceHref);
         }
       } else if (this.sort) {
-        this.sort.dispatchEvent(new CustomEvent('filter:sort:check', {bubbles: false}));
+        this.sort.dispatchEvent(new CustomEvent('theme:filter:sort', {bubbles: false}));
       }
 
       if (this.productsContainer) {
-        this.productsContainer.classList.add(classes$8.classLoading);
+        this.productsContainer.classList.add(classes$w.loading);
         fetch(`${window.location.pathname}${window.location.search}`)
           .then((response) => response.text())
           .then((data) => {
-            this.productsContainer.innerHTML = new DOMParser().parseFromString(data, 'text/html').querySelector(selectors$i.productsContainer).innerHTML;
+            this.productsContainer.innerHTML = new DOMParser().parseFromString(data, 'text/html').querySelector(selectors$C.productsContainer).innerHTML;
 
             if (this.sidebar) {
-              this.sidebar.innerHTML = new DOMParser().parseFromString(data, 'text/html').querySelector(selectors$i.collectionSidebar).innerHTML;
+              this.sidebar.innerHTML = new DOMParser().parseFromString(data, 'text/html').querySelector(selectors$C.collectionSidebar).innerHTML;
 
-              const tooltips = this.sidebar.querySelectorAll(`[${selectors$i.tooltip}]`);
-              if (tooltips.length) {
-                tooltips.forEach((tooltip) => {
-                  new Tooltip(tooltip);
+              const activeFiltersCountContainer = this.sidebar.querySelector(`[${selectors$C.activeFiltersCount}]`);
+              const activeFiltersContainer = this.container.querySelectorAll(selectors$C.activeFilters);
+              if (activeFiltersCountContainer && activeFiltersContainer.length) {
+                const activeFiltersCount = parseInt(activeFiltersCountContainer.getAttribute(selectors$C.activeFiltersCount));
+
+                activeFiltersContainer.forEach((counter) => {
+                  counter.textContent = activeFiltersCount;
+                  counter.classList.toggle(classes$w.hidden, activeFiltersCount < 1);
                 });
-              }
-
-              const activeFiltersCountContainer = this.sidebar.querySelector(`[${selectors$i.dataActiveFiltersCount}]`);
-              const activeFiltersContainer = this.container.querySelector(selectors$i.dataActiveFilters);
-              if (activeFiltersCountContainer && activeFiltersContainer) {
-                const activeFiltersCount = parseInt(activeFiltersCountContainer.getAttribute(selectors$i.dataActiveFiltersCount));
-                activeFiltersContainer.textContent = activeFiltersCount;
-                activeFiltersContainer.classList.toggle(classes$8.classHidden, activeFiltersCount < 1);
               }
             }
 
             if (this.form) {
-              this.form = this.container.querySelector(selectors$i.form);
+              this.form = this.container.querySelector(selectors$C.form);
 
               // Init Range Slider
               this.initRangeSlider();
@@ -7200,20 +6909,15 @@
             const collectionClass = new Collection(this.section);
             collectionClass.onUnload(false);
 
-            // Init Quick Add
-            const products = this.productsContainer.querySelectorAll(selectors$i.product);
-            if (products.length) {
-              products.forEach((item) => {
-                new QuickAddProduct(item);
-              });
-            }
-
             // Init Grid Swatches
             makeGridSwatches(this.section);
 
+            // Init Siblings
+            new Siblings(this.section);
+
             // Init Tooltips
             document.dispatchEvent(
-              new CustomEvent('tooltip:close', {
+              new CustomEvent('theme:tooltip:close', {
                 bubbles: false,
                 detail: {
                   hideTransition: false,
@@ -7222,39 +6926,32 @@
             );
 
             if (this.collectionNav) {
-              const headerHeight = this.headerSticky ? document.querySelector(selectors$i.headerHeight).getBoundingClientRect().height : 0;
-              const collectionNavTop = this.collectionNav.getBoundingClientRect().top + window.scrollY - headerHeight;
-
-              window.scrollTo({
-                top: collectionNavTop,
-                left: 0,
-                behavior: 'smooth',
-              });
+              scrollTo(this.productsContainer.getBoundingClientRect().top - this.collectionNav.offsetHeight);
             }
 
             setTimeout(() => {
-              this.productsContainer.classList.remove(classes$8.classLoading);
+              this.productsContainer.classList.remove(classes$w.loading);
             }, 500);
           })
-          .catch(() => {
-            console.log('error');
+          .catch((error) => {
+            console.log(error);
           });
       }
     }
 
     updateRange(e) {
       if (this.form && typeof this.form.submit === 'function') {
-        const rangeMin = this.form.querySelector(selectors$i.rangeMin);
-        const rangeMax = this.form.querySelector(selectors$i.rangeMax);
-        const priceMin = this.form.querySelector(selectors$i.priceMin);
-        const priceMax = this.form.querySelector(selectors$i.priceMax);
+        const rangeMin = this.form.querySelector(selectors$C.rangeMin);
+        const rangeMax = this.form.querySelector(selectors$C.rangeMax);
+        const priceMin = this.form.querySelector(selectors$C.priceMin);
+        const priceMax = this.form.querySelector(selectors$C.priceMax);
         const checkElements = rangeMin && rangeMax && priceMin && priceMax;
 
-        if (checkElements && rangeMin.hasAttribute(selectors$i.rangeMinValue) && rangeMax.hasAttribute(selectors$i.rangeMaxValue)) {
+        if (checkElements && rangeMin.hasAttribute(selectors$C.rangeMinValue) && rangeMax.hasAttribute(selectors$C.rangeMaxValue)) {
           const priceMinValue = parseInt(priceMin.placeholder);
           const priceMaxValue = parseInt(priceMax.placeholder);
-          const rangeMinValue = parseInt(rangeMin.getAttribute(selectors$i.rangeMinValue));
-          const rangeMaxValue = parseInt(rangeMax.getAttribute(selectors$i.rangeMaxValue));
+          const rangeMinValue = parseInt(rangeMin.getAttribute(selectors$C.rangeMinValue));
+          const rangeMaxValue = parseInt(rangeMax.getAttribute(selectors$C.rangeMaxValue));
 
           if (priceMinValue !== rangeMinValue || priceMaxValue !== rangeMaxValue) {
             priceMin.value = rangeMinValue;
@@ -7265,32 +6962,20 @@
         }
       }
     }
-
-    unload() {
-      if (this.form) {
-        document.removeEventListener('theme:resize', this.resizeEvent);
-      }
-    }
   }
 
   const collectionFiltersForm = {
     onLoad() {
-      sections$7[this.id] = new FiltersForm(this);
-    },
-    onUnload: function () {
-      if (sections$7[this.id] && typeof sections$7[this.id].unload === 'function') {
-        sections$7[this.id].unload();
-      }
+      sections$m[this.id] = new FiltersForm(this);
     },
   };
 
-  const selectors$j = {
+  const selectors$B = {
     dataSort: 'data-sort-enabled',
     sortLinks: '[data-sort-link]',
     sortValue: 'data-value',
     sortButton: '[data-popout-toggle]',
     sortButtonText: '[data-sort-button-text]',
-    collectionSidebarHeading: '[data-collection-sidebar-heading]',
     collectionSidebar: '[data-collection-sidebar]',
     collectionSidebarSlider: '[data-collection-sidebar-slider]',
     collectionSidebarSlideOut: '[data-collection-sidebar-slide-out]',
@@ -7298,45 +6983,44 @@
     showMoreOptions: '[data-show-more]',
     groupTagsButton: '[data-aria-toggle]',
     collectionNav: '[data-collection-nav]',
-    headerSticky: '[data-header-sticky="sticky"]',
-    headerHeight: '[data-header-height]',
-    linkAdd: '[data-link-add]',
-    linkRemove: '[data-link-remove]',
     linkHidden: '[data-link-hidden]',
+    underlay: '[data-drawer-underlay]',
     swatch: 'data-swatch',
+    animation: '[data-animation]',
   };
 
-  const classes$9 = {
+  const classes$v = {
+    animated: 'drawer--animated',
+    hiding: 'is-hiding',
     expanded: 'expanded',
-    expanding: 'expanding',
     noMobileAnimation: 'no-mobile-animation',
     hidden: 'is-hidden',
     active: 'is-active',
-    sortActive: 'popout-list__item--current',
-    sortPopoutActive: 'popout--active',
+    focused: 'is-focused',
   };
 
-  let sections$8 = {};
+  let sections$l = {};
   class Collection {
     constructor(section) {
       this.container = section.container;
-      this.sort = this.container.querySelector(`[${selectors$j.dataSort}]`);
-      this.sortLinks = this.container.querySelectorAll(selectors$j.sortLinks);
-      this.collectionSidebar = this.container.querySelector(selectors$j.collectionSidebar);
-      this.collectionSidebarCloseButton = this.container.querySelector(selectors$j.collectionSidebarCloseButton);
-      this.groupTagsButton = this.container.querySelector(selectors$j.groupTagsButton);
-      this.collectionNav = this.container.querySelector(selectors$j.collectionNav);
-      this.headerSticky = document.querySelector(selectors$j.headerSticky) !== null;
-      this.showMoreOptions = this.container.querySelectorAll(selectors$j.showMoreOptions);
-      this.collectionSidebarHeading = this.container.querySelectorAll(selectors$j.collectionSidebarHeading);
-      this.swatches = this.container.querySelectorAll(`[${selectors$j.swatch}]`);
-      this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      this.sort = this.container.querySelector(`[${selectors$B.dataSort}]`);
+      this.sortButton = this.container.querySelector(selectors$B.sortButton);
+      this.sortLinks = this.container.querySelectorAll(selectors$B.sortLinks);
+      this.collectionSidebar = this.container.querySelector(selectors$B.collectionSidebar);
+      this.collectionSidebarCloseButtons = this.container.querySelectorAll(selectors$B.collectionSidebarCloseButton);
+      this.groupTagsButton = this.container.querySelector(selectors$B.groupTagsButton);
+      this.collectionNav = this.container.querySelector(selectors$B.collectionNav);
+      this.showMoreOptions = this.container.querySelectorAll(selectors$B.showMoreOptions);
+      this.underlay = this.container.querySelector(selectors$B.underlay);
+      this.swatches = this.container.querySelectorAll(`[${selectors$B.swatch}]`);
+      this.accessibility = a11y;
 
       this.groupTagsButtonClickEvent = (evt) => this.groupTagsButtonClick(evt);
       this.collectionSidebarCloseEvent = (evt) => this.collectionSidebarClose(evt);
       this.collectionSidebarScrollEvent = () => this.collectionSidebarScroll();
-      this.onClickEvent = (e) => this.onClick(e);
+      this.onSortButtonClickEvent = (e) => this.onSortButtonClick(e);
       this.onSortCheckEvent = (e) => this.onSortCheck(e);
+      this.sidebarResizeEvent = () => this.toggleSidebarSlider();
 
       this.init();
     }
@@ -7347,30 +7031,57 @@
       }
 
       if (this.groupTagsButton !== null) {
-        this.hideSidebarSliderOnMobile();
+        document.addEventListener('theme:resize', this.sidebarResizeEvent);
 
         this.groupTagsButton.addEventListener('click', this.groupTagsButtonClickEvent);
 
         // Prevent filters closing animation on page load
-        setTimeout(() => {
-          this.collectionSidebar.classList.remove(classes$9.noMobileAnimation);
-        }, 1000);
+        if (this.collectionSidebar) {
+          setTimeout(() => {
+            this.collectionSidebar.classList.remove(classes$v.noMobileAnimation);
+          }, 1000);
+        }
+
+        const toggleFiltersObserver = new MutationObserver((mutationList) => {
+          for (const mutation of mutationList) {
+            if (mutation.type === 'attributes') {
+              const expanded = mutation.target.ariaExpanded == 'true';
+
+              if (expanded) {
+                this.showSidebarCallback();
+              }
+            }
+          }
+        });
+
+        toggleFiltersObserver.observe(this.groupTagsButton, {
+          attributes: true,
+          childList: false,
+          subtree: false,
+        });
       }
 
-      if (this.collectionSidebarCloseButton !== null) {
-        this.collectionSidebarCloseButton.addEventListener('click', this.collectionSidebarCloseEvent);
+      if (this.collectionSidebarCloseButtons.length) {
+        this.collectionSidebarCloseButtons.forEach((button) => {
+          button.addEventListener('click', this.collectionSidebarCloseEvent);
+        });
       }
 
       // Hide filters sidebar on ESC keypress
       this.container.addEventListener(
         'keyup',
         function (evt) {
-          if (evt.which !== window.theme.keyboardKeys.ESCAPE) {
+          if (evt.code !== window.theme.keyboardKeys.ESCAPE) {
             return;
           }
           this.hideSidebar();
         }.bind(this)
       );
+
+      // Hide filters sidebar on underlay click
+      if (this.underlay) {
+        this.underlay.addEventListener('click', this.collectionSidebarCloseEvent);
+      }
 
       // Show more options from the group
       if (this.showMoreOptions) {
@@ -7378,26 +7089,21 @@
           element.addEventListener('click', (event) => {
             event.preventDefault();
 
-            element.parentElement.classList.add(classes$9.hidden);
+            element.parentElement.classList.add(classes$v.hidden);
 
-            element.parentElement.previousElementSibling.querySelectorAll(selectors$j.linkHidden).forEach((link) => {
-              link.classList.remove(classes$9.hidden);
+            element.parentElement.previousElementSibling.querySelectorAll(selectors$B.linkHidden).forEach((link, index) => {
+              link.classList.remove(classes$v.hidden);
+              if (index === 0) {
+                window.accessibility.lastFocused = link;
+              }
             });
-          });
-        });
-      }
 
-      if (this.collectionSidebarHeading) {
-        this.collectionSidebarHeading.forEach((element) => {
-          element.addEventListener('click', (event) => {
-            event.preventDefault();
-
-            element.classList.toggle(classes$9.active);
-
-            slideToggle(element.nextElementSibling);
-
-            if (element.nextElementSibling.nextElementSibling) {
-              slideToggle(element.nextElementSibling.nextElementSibling);
+            const collectionSidebarSlideOut = this.container.querySelector(selectors$B.collectionSidebarSlideOut);
+            if (collectionSidebarSlideOut) {
+              this.accessibility.removeTrapFocus();
+              this.accessibility.trapFocus(this.collectionSidebar, {
+                elementToFocus: window.accessibility.lastFocused,
+              });
             }
           });
         });
@@ -7409,11 +7115,21 @@
           new Swatch(swatch);
         });
       }
+
+      if (this.collectionSidebar) {
+        this.collectionSidebar.addEventListener('transitionend', () => {
+          if (!this.collectionSidebar.classList.contains(classes$v.expanded)) {
+            this.collectionSidebar.classList.remove(classes$v.animated);
+          }
+        });
+
+        this.toggleSidebarSlider();
+      }
     }
 
     collectionSidebarScroll() {
       document.dispatchEvent(
-        new CustomEvent('tooltip:close', {
+        new CustomEvent('theme:tooltip:close', {
           bubbles: false,
           detail: {
             hideTransition: false,
@@ -7423,26 +7139,26 @@
     }
 
     sortActions(link, submitForm = true) {
-      const sort = link ? link.getAttribute(selectors$j.sortValue) : '';
-      this.sort.setAttribute(selectors$j.dataSort, sort);
+      const sort = link ? link.getAttribute(selectors$B.sortValue) : '';
+      this.sort.setAttribute(selectors$B.dataSort, sort);
 
-      const sortButtonText = this.sort.querySelector(selectors$j.sortButtonText);
-      const sortActive = this.sort.querySelector(`.${classes$9.sortActive}`);
+      const sortButtonText = this.sort.querySelector(selectors$B.sortButtonText);
+      const sortActive = this.sort.querySelector(`.${classes$v.active}`);
       if (sortButtonText) {
         const linkText = link ? link.textContent.trim() : '';
         sortButtonText.textContent = linkText;
       }
       if (sortActive) {
-        sortActive.classList.remove(classes$9.sortActive);
+        sortActive.classList.remove(classes$v.active);
       }
-      this.sort.classList.toggle(classes$9.sortPopoutActive, link);
+      this.sort.classList.toggle(classes$v.active, link);
 
       if (link) {
-        link.parentElement.classList.add(classes$9.sortActive);
+        link.parentElement.classList.add(classes$v.active);
 
         if (submitForm) {
           link.dispatchEvent(
-            new CustomEvent('filter:submit:form', {
+            new CustomEvent('theme:filter:update', {
               bubbles: true,
               detail: {
                 href: sort,
@@ -7453,11 +7169,11 @@
       }
     }
 
-    onClick(e) {
+    onSortButtonClick(e) {
       e.preventDefault();
-      const sortButton = this.sort.querySelector(selectors$j.sortButton);
-      if (sortButton) {
-        sortButton.dispatchEvent(new Event('click'));
+
+      if (this.sortButton) {
+        this.sortButton.dispatchEvent(new Event('click'));
       }
       this.sortActions(e.currentTarget);
     }
@@ -7469,7 +7185,7 @@
         const urlParams = url.searchParams;
 
         for (const [key, val] of urlParams.entries()) {
-          const linkSort = this.sort.querySelector(`[${selectors$j.sortValue}="${val}"]`);
+          const linkSort = this.sort.querySelector(`[${selectors$B.sortValue}="${val}"]`);
           if (key.includes('sort_by') && linkSort) {
             link = linkSort;
             break;
@@ -7482,30 +7198,44 @@
 
     initSort() {
       this.sortLinks.forEach((link) => {
-        link.addEventListener('click', this.onClickEvent);
+        link.addEventListener('click', this.onSortButtonClickEvent);
       });
-      this.sort.addEventListener('filter:sort:check', this.onSortCheckEvent);
+      this.sort.addEventListener('theme:filter:sort', this.onSortCheckEvent);
+
+      if (this.sortButton) {
+        this.sortButton.addEventListener('click', () => {
+          const isFiltersSidebarOpen = this.collectionSidebar.classList.contains(classes$v.expanded);
+
+          if (isMobile() && isFiltersSidebarOpen) {
+            this.hideSidebar();
+          }
+        });
+      }
     }
 
     showSidebarCallback() {
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      const collectionSidebarSlider = this.container.querySelector(selectors$j.collectionSidebarSlider);
-      const collectionSidebarSlideOut = this.container.querySelector(selectors$j.collectionSidebarSlideOut);
+      const collectionSidebarSlider = this.container.querySelector(selectors$B.collectionSidebarSlider);
+      const collectionSidebarSlideOut = this.container.querySelector(selectors$B.collectionSidebarSlideOut);
       const collectionSidebarScrollable = collectionSidebarSlider || collectionSidebarSlideOut;
+      const isScrollLocked = document.documentElement.hasAttribute('data-scroll-locked');
 
-      if (windowWidth < theme.sizes.small && collectionSidebarSlideOut === null) {
-        const headerHeight = this.headerSticky ? document.querySelector(selectors$j.headerHeight).getBoundingClientRect().height : 0;
-        const scrollTopPosition = this.collectionNav ? this.collectionNav.getBoundingClientRect().top : this.groupTagsButton.getBoundingClientRect().top;
+      const isMobileView = isMobile();
+      this.collectionSidebar.classList.add(classes$v.animated);
 
-        window.scrollTo({
-          top: scrollTopPosition + window.scrollY - headerHeight,
-          left: 0,
-          behavior: 'smooth',
-        });
+      if (collectionSidebarSlideOut === null) {
+        if (!isMobileView && isScrollLocked) {
+          this.accessibility.removeTrapFocus();
+          document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
+        }
       }
 
-      if (windowWidth < theme.sizes.small || collectionSidebarSlideOut !== null) {
-        document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true, detail: collectionSidebarScrollable}));
+      if (isMobileView || collectionSidebarSlideOut !== null) {
+        if (collectionSidebarSlideOut) {
+          this.accessibility.trapFocus(this.collectionSidebar, {
+            elementToFocus: this.collectionSidebar.querySelector(selectors$B.collectionSidebarCloseButton),
+          });
+        }
+        document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
       }
 
       if (collectionSidebarScrollable) {
@@ -7514,96 +7244,110 @@
     }
 
     hideSidebar() {
-      const collectionSidebarSlider = this.container.querySelector(selectors$j.collectionSidebarSlider);
-      const collectionSidebarSlideOut = this.container.querySelector(selectors$j.collectionSidebarSlideOut);
+      const collectionSidebarSlider = this.container.querySelector(selectors$B.collectionSidebarSlider);
+      const collectionSidebarSlideOut = this.container.querySelector(selectors$B.collectionSidebarSlideOut);
       const collectionSidebarScrollable = collectionSidebarSlider || collectionSidebarSlideOut;
+      const isScrollLocked = document.documentElement.hasAttribute('data-scroll-locked');
 
       this.groupTagsButton.setAttribute('aria-expanded', 'false');
-      this.collectionSidebar.classList.add(classes$9.expanding);
-      this.collectionSidebar.classList.remove(classes$9.expanded);
+      this.collectionSidebar.classList.remove(classes$v.expanded);
 
       if (collectionSidebarScrollable) {
         collectionSidebarScrollable.removeEventListener('scroll', this.collectionSidebarScrollEvent);
       }
 
-      setTimeout(() => {
-        this.collectionSidebar.classList.remove(classes$9.expanding);
-      }, 500);
-      document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
+      if (collectionSidebarSlideOut) {
+        this.accessibility.removeTrapFocus();
+      }
+
+      if (isScrollLocked) {
+        document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
+      }
     }
 
-    hideSidebarSliderOnMobile(evt) {
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
-      if (windowWidth < theme.sizes.small) {
-        if (evt && evt.type === 'theme:resize') {
-          if (windowWidth !== this.windowWidth) {
-            this.windowWidth = windowWidth;
-            this.hideSidebar();
-          }
-        } else {
-          this.hideSidebar();
-        }
+    toggleSidebarSlider() {
+      if (isMobile()) {
+        this.hideSidebar();
+      } else if (this.collectionSidebar.classList.contains(classes$v.expanded)) {
+        this.showSidebarCallback();
       }
     }
 
     collectionSidebarClose(evt) {
       evt.preventDefault();
       this.hideSidebar();
+      if (document.body.classList.contains(classes$v.focused) && this.groupTagsButton) {
+        this.groupTagsButton.focus();
+      }
     }
 
     groupTagsButtonClick() {
-      if (this.collectionSidebar.classList.contains(classes$9.expanded)) {
-        this.showSidebarCallback();
-      } else {
+      const isScrollLocked = document.documentElement.hasAttribute('data-scroll-locked');
+
+      if (isScrollLocked) {
         document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
       }
     }
 
     onUnload(flag = true) {
       if (this.groupTagsButton !== null) {
+        document.removeEventListener('theme:resize', this.sidebarResizeEvent);
         this.groupTagsButton.removeEventListener('click', this.groupTagsButtonClickEvent);
-
-        // document.removeEventListener('theme:resize', this.resizeEvent);
       }
 
-      if (this.collectionSidebarCloseButton !== null && flag) {
-        this.collectionSidebarCloseButton.removeEventListener('click', this.collectionSidebarCloseEvent);
+      if (this.collectionSidebarCloseButtons.length && flag) {
+        this.collectionSidebarCloseButtons.forEach((button) => {
+          button.removeEventListener('click', this.collectionSidebarCloseEvent);
+        });
       }
 
       if (this.collectionSidebarScrollable & flag) {
         this.collectionSidebarScrollable.removeEventListener('scroll', this.collectionSidebarScrollEvent);
       }
 
+      if (this.underlay) {
+        this.underlay.removeEventListener('click', this.collectionSidebarCloseEvent);
+      }
+
       if (this.sort) {
         this.sortLinks.forEach((link) => {
-          link.removeEventListener('click', this.onClickEvent);
+          link.removeEventListener('click', this.onSortButtonClickEvent);
         });
-        this.sort.removeEventListener('filter:sort:check', this.onSortCheckEvent);
+        this.sort.removeEventListener('theme:filter:sort', this.onSortCheckEvent);
       }
     }
   }
 
   const collectionSection = {
     onLoad() {
-      sections$8[this.id] = new Collection(this);
+      sections$l[this.id] = new Collection(this);
     },
     onUnload() {
-      sections$8[this.id].onUnload();
+      sections$l[this.id].onUnload();
     },
   };
 
-  register('collection', [slider, parallaxHero, quickAddProduct, collectionSection, popoutSection, swatchGridSection, collectionFiltersForm, tooltipSection]);
+  register('collection', [slider, parallaxHero, collectionSection, popoutSection, swatchGridSection, collectionFiltersForm, tooltipSection, siblings]);
 
-  const selectors$k = {
+  const selectors$A = {
     frame: '[data-ticker-frame]',
     scale: '[data-ticker-scale]',
     text: '[data-ticker-text]',
     clone: 'data-clone',
-    animationClass: 'ticker--animated',
-    unloadedClass: 'ticker--unloaded',
-    comparitorClass: 'ticker__comparitor',
-    moveTime: 1.63, // 100px going to move for 1.63s
+  };
+
+  const attributes$g = {
+    speed: 'data-marquee-speed',
+  };
+
+  const classes$u = {
+    animation: 'ticker--animated',
+    unloaded: 'ticker--unloaded',
+    comparitor: 'ticker__comparitor',
+  };
+
+  const settings$1 = {
+    textAnimationTime: 1.63, // 100px going to move for 1.63s
     space: 100, // 100px
   };
 
@@ -7611,13 +7355,13 @@
     constructor(el, stopClone = false) {
       this.frame = el;
       this.stopClone = stopClone;
-      this.scale = this.frame.querySelector(selectors$k.scale);
-      this.text = this.frame.querySelector(selectors$k.text);
+      this.scale = this.frame.querySelector(selectors$A.scale);
+      this.text = this.frame.querySelector(selectors$A.text);
 
       this.comparitor = this.text.cloneNode(true);
-      this.comparitor.classList.add(selectors$k.comparitorClass);
+      this.comparitor.classList.add(classes$u.comparitor);
       this.frame.appendChild(this.comparitor);
-      this.scale.classList.remove(selectors$k.unloadedClass);
+      this.scale.classList.remove(classes$u.unloaded);
       this.resizeEvent = debounce(() => this.checkWidth(), 100);
       this.listen();
     }
@@ -7633,58 +7377,70 @@
 
     checkWidth() {
       const padding = window.getComputedStyle(this.frame).paddingLeft.replace('px', '') * 2;
+      const speed = this.frame.getAttribute(attributes$g.speed) ? this.frame.getAttribute(attributes$g.speed) : settings$1.textAnimationTime;
 
       if (this.frame.clientWidth - padding < this.comparitor.clientWidth || this.stopClone) {
-        this.text.classList.add(selectors$k.animationClass);
+        this.text.classList.add(classes$u.animation);
         if (this.scale.childElementCount === 1) {
           this.clone = this.text.cloneNode(true);
-          this.clone.setAttribute(selectors$k.clone, '');
+          this.clone.setAttribute(selectors$A.clone, '');
           this.scale.appendChild(this.clone);
 
           if (this.stopClone) {
             for (let index = 0; index < 10; index++) {
               const cloneSecond = this.text.cloneNode(true);
-              cloneSecond.setAttribute(selectors$k.clone, '');
+              cloneSecond.setAttribute(selectors$A.clone, '');
               this.scale.appendChild(cloneSecond);
             }
           }
 
-          const animationTimeFrame = (this.text.clientWidth / selectors$k.space) * selectors$k.moveTime;
+          const animationTimeFrame = ((this.text.clientWidth / settings$1.space) * Number(speed)).toFixed(2);
 
           this.scale.style.setProperty('--animation-time', `${animationTimeFrame}s`);
         }
       } else {
-        this.text.classList.add(selectors$k.animationClass);
-        let clone = this.scale.querySelector(`[${selectors$k.clone}]`);
+        this.text.classList.add(classes$u.animation);
+        let clone = this.scale.querySelector(`[${selectors$A.clone}]`);
         if (clone) {
           this.scale.removeChild(clone);
         }
-        this.text.classList.remove(selectors$k.animationClass);
+        this.text.classList.remove(classes$u.animation);
       }
     }
   }
 
-  const selectors$l = {
+  const selectors$z = {
     bar: '[data-bar]',
     barSlide: '[data-slide]',
     frame: '[data-ticker-frame]',
     header: '[data-header-wrapper]',
     slider: '[data-slider]',
-    slideValue: 'data-slide',
+    marquee: '[data-marquee]',
     tickerScale: '[data-ticker-scale]',
     tickerText: '[data-ticker-text]',
-    dataTargetReferrer: 'data-target-referrer',
   };
 
-  const sections$9 = {};
+  const classes$t = {
+    tickerAnimated: 'ticker--animated',
+  };
+
+  const attributes$f = {
+    slide: 'data-slide',
+    stop: 'data-stop',
+    style: 'style',
+    targetReferrer: 'data-target-referrer',
+  };
+
+  const sections$k = {};
 
   class Bar {
     constructor(holder) {
       this.barHolder = holder;
       this.locationPath = location.href;
 
-      this.slides = this.barHolder.querySelectorAll(selectors$l.barSlide);
-      this.slider = this.barHolder.querySelector(selectors$l.slider);
+      this.slides = this.barHolder.querySelectorAll(selectors$z.barSlide);
+      this.slider = this.barHolder.querySelector(selectors$z.slider);
+      this.marquee = this.barHolder.querySelector(selectors$z.marquee);
 
       this.init();
     }
@@ -7696,9 +7452,11 @@
         this.initSliders();
       }
 
-      if (!this.slider) {
+      if (this.marquee) {
         this.initTickers(true);
       }
+
+      document.dispatchEvent(new CustomEvent('theme:announcement:init', {bubbles: true}));
     }
 
     /**
@@ -7708,11 +7466,11 @@
       for (let index = 0; index < this.slides.length; index++) {
         const element = this.slides[index];
 
-        if (!element.hasAttribute(selectors$l.dataTargetReferrer)) {
+        if (!element.hasAttribute(attributes$f.targetReferrer)) {
           continue;
         }
 
-        if (this.locationPath.indexOf(element.getAttribute(selectors$l.dataTargetReferrer)) === -1 && !window.Shopify.designMode) {
+        if (this.locationPath.indexOf(element.getAttribute(attributes$f.targetReferrer)) === -1 && !window.Shopify.designMode) {
           element.parentNode.removeChild(element);
         }
       }
@@ -7723,42 +7481,47 @@
      */
     initSliders() {
       this.slider = new Slider(this.barHolder);
-      this.slider.flkty.reposition();
 
-      this.barHolder.addEventListener('slider-is-loaded', () => {
+      if (this.slider.flkty) {
+        this.slider.flkty.reposition();
+
+        this.barHolder.addEventListener('theme:slider:loaded', () => {
+          this.initTickers();
+        });
+      } else {
         this.initTickers();
-      });
+      }
     }
 
     /**
      * Init tickers in sliders
      */
     initTickers(stopClone = false) {
-      const frames = this.barHolder.querySelectorAll(selectors$l.frame);
+      const frames = this.barHolder.querySelectorAll(selectors$z.frame);
 
       frames.forEach((element) => {
         new Ticker(element, stopClone);
       });
     }
 
-    toggleTicker(e, isStoped) {
-      const tickerScale = document.querySelector(selectors$l.tickerScale);
-      const element = document.querySelector(`[${selectors$l.slideValue}="${e.detail.blockId}"]`);
+    toggleTicker(e, isStopped) {
+      const tickerScale = document.querySelector(selectors$z.tickerScale);
+      const element = document.querySelector(`[${attributes$f.slide}="${e.detail.blockId}"]`);
 
-      if (isStoped && element) {
-        tickerScale.setAttribute('data-stop', '');
-        tickerScale.querySelectorAll(selectors$l.tickerText).forEach((textHolder) => {
-          textHolder.classList.remove('ticker--animated');
+      if (isStopped && element) {
+        tickerScale.setAttribute(attributes$f.stop, '');
+        tickerScale.querySelectorAll(selectors$z.tickerText).forEach((textHolder) => {
+          textHolder.classList.remove(classes$t.tickerAnimated);
           textHolder.style.transform = `translate3d(${-(element.offsetLeft - element.clientWidth)}px, 0, 0)`;
         });
       }
 
-      if (!isStoped && element) {
-        tickerScale.querySelectorAll(selectors$l.tickerText).forEach((textHolder) => {
-          textHolder.classList.add('ticker--animated');
-          textHolder.removeAttribute('style');
+      if (!isStopped && element) {
+        tickerScale.querySelectorAll(selectors$z.tickerText).forEach((textHolder) => {
+          textHolder.classList.add(classes$t.tickerAnimated);
+          textHolder.removeAttribute(attributes$f.style);
         });
-        tickerScale.removeAttribute('data-stop');
+        tickerScale.removeAttribute(attributes$f.stop);
       }
     }
 
@@ -7781,15 +7544,15 @@
 
   const bar = {
     onLoad() {
-      sections$9[this.id] = [];
-      const element = this.container.querySelector(selectors$l.bar);
+      sections$k[this.id] = [];
+      const element = this.container.querySelector(selectors$z.bar);
       if (element) {
-        sections$9[this.id].push(new Bar(element));
+        sections$k[this.id].push(new Bar(element));
       }
     },
     onBlockSelect(e) {
-      if (sections$9[this.id].length) {
-        sections$9[this.id].forEach((el) => {
+      if (sections$k[this.id].length) {
+        sections$k[this.id].forEach((el) => {
           if (typeof el.onBlockSelect === 'function') {
             el.onBlockSelect(e);
           }
@@ -7797,8 +7560,8 @@
       }
     },
     onBlockDeselect(e) {
-      if (sections$9[this.id].length) {
-        sections$9[this.id].forEach((el) => {
+      if (sections$k[this.id].length) {
+        sections$k[this.id].forEach((el) => {
           if (typeof el.onBlockSelect === 'function') {
             el.onBlockDeselect(e);
           }
@@ -7809,45 +7572,47 @@
 
   register('announcement', [bar]);
 
-  const selectors$m = {
+  const selectors$y = {
     body: 'body',
     drawerWrappper: '[data-drawer]',
     drawerInner: '[data-drawer-inner]',
     underlay: '[data-drawer-underlay]',
     stagger: '[data-stagger-animation]',
     wrapper: '[data-header-transparent]',
-    transparent: 'data-header-transparent',
     drawerToggle: 'data-drawer-toggle',
     focusable: 'button, [href], select, textarea, [tabindex]:not([tabindex="-1"])',
   };
 
-  const classes$a = {
-    isVisible: 'drawer--visible',
+  const classes$s = {
+    animated: 'drawer--animated',
+    open: 'is-open',
     isFocused: 'is-focused',
     headerStuck: 'js__header__stuck',
   };
 
-  let sections$a = {};
+  let sections$j = {};
 
   class Drawer {
     constructor(el) {
       this.drawer = el;
-      this.drawerWrapper = this.drawer.closest(selectors$m.drawerWrappper);
-      this.drawerInner = this.drawer.querySelector(selectors$m.drawerInner);
-      this.underlay = this.drawer.querySelector(selectors$m.underlay);
-      this.wrapper = this.drawer.closest(selectors$m.wrapper);
+      this.drawerWrapper = this.drawer.closest(selectors$y.drawerWrappper);
+      this.drawerInner = this.drawer.querySelector(selectors$y.drawerInner);
+      this.underlay = this.drawer.querySelector(selectors$y.underlay);
+      this.wrapper = this.drawer.closest(selectors$y.wrapper);
       this.key = this.drawer.dataset.drawer;
-      const btnSelector = `[${selectors$m.drawerToggle}='${this.key}']`;
-      this.buttons = document.querySelectorAll(btnSelector);
-      this.staggers = this.drawer.querySelectorAll(selectors$m.stagger);
-      this.body = document.querySelector(selectors$m.body);
+      this.btnSelector = `[${selectors$y.drawerToggle}='${this.key}']`;
+      this.buttons = document.querySelectorAll(this.btnSelector);
+      this.staggers = this.drawer.querySelectorAll(selectors$y.stagger);
+      this.body = document.querySelector(selectors$y.body);
+      this.accessibility = a11y;
 
       this.initWatchFocus = (evt) => this.watchFocus(evt);
+      this.showDrawer = this.showDrawer.bind(this);
+      this.hideDrawer = this.hideDrawer.bind(this);
 
       this.connectToggle();
       this.connectDrawer();
       this.closers();
-      this.staggerChildAnimations();
     }
 
     connectToggle() {
@@ -7864,7 +7629,7 @@
 
     connectDrawer() {
       this.drawer.addEventListener('theme:drawer:toggle', () => {
-        if (this.drawer.classList.contains(classes$a.isVisible)) {
+        if (this.drawer.classList.contains(classes$s.open)) {
           this.drawer.dispatchEvent(
             new CustomEvent('theme:drawer:close', {
               bubbles: true,
@@ -7879,22 +7644,26 @@
         }
       });
 
-      document.addEventListener('theme:drawer:close', this.hideDrawer.bind(this));
-      document.addEventListener('theme:drawer:open', this.showDrawer.bind(this));
-    }
+      if (this.drawerInner) {
+        this.drawerInner.addEventListener('transitionend', (event) => {
+          if (event.target != this.drawerInner) return;
 
-    staggerChildAnimations() {
-      this.staggers.forEach((el) => {
-        const children = el.querySelectorAll(':scope > * > [data-animates]');
-        children.forEach((child, index) => {
-          child.style.transitionDelay = `${index * 50 + 10}ms`;
+          if (!this.drawer.classList.contains(classes$s.open)) {
+            this.drawer.classList.remove(classes$s.animated);
+            // Reset menu items state after drawer hiding animation completes
+            document.dispatchEvent(new CustomEvent('theme:sliderule:close', {bubbles: false}));
+          }
         });
-      });
+      }
+
+      document.addEventListener('theme:cart:open', this.hideDrawer);
+      document.addEventListener('theme:drawer:close', this.hideDrawer);
+      document.addEventListener('theme:drawer:open', this.showDrawer);
     }
 
     watchFocus(evt) {
       let drawerInFocus = this.wrapper.contains(evt.target);
-      if (!drawerInFocus && this.body.classList.contains(classes$a.isFocused)) {
+      if (!drawerInFocus && this.body.classList.contains(classes$s.isFocused)) {
         this.hideDrawer();
       }
     }
@@ -7903,7 +7672,7 @@
       this.wrapper.addEventListener(
         'keyup',
         function (evt) {
-          if (evt.which !== window.theme.keyboardKeys.ESCAPE) {
+          if (evt.code !== window.theme.keyboardKeys.ESCAPE) {
             return;
           }
           this.hideDrawer();
@@ -7917,98 +7686,126 @@
     }
 
     showDrawer() {
-      document.dispatchEvent(
-        new CustomEvent('theme:drawer:close', {
-          bubbles: false,
-        })
-      );
+      if (this.drawerInner && this.drawerInner.querySelector(this.btnSelector)) {
+        this.accessibility.removeTrapFocus();
+        this.drawerInner.addEventListener('transitionend', (event) => {
+          if (event.target != this.drawerInner) return;
+
+          if (this.drawer.classList.contains(classes$s.open)) {
+            this.accessibility.trapFocus(this.drawerInner, {
+              elementToFocus: this.drawerInner.querySelector(this.btnSelector),
+            });
+          }
+        });
+      }
 
       this.buttons.forEach((el) => {
         el.setAttribute('aria-expanded', true);
-        el.classList.add(classes$a.isVisible);
       });
 
-      this.drawer.classList.add(classes$a.isVisible);
-      this.drawer.querySelector(selectors$m.focusable).focus();
-      this.wrapper.setAttribute(selectors$m.transparent, false);
+      this.drawer.classList.add(classes$s.open);
+      this.drawer.classList.add(classes$s.animated);
+
+      this.drawer.querySelector(selectors$y.focusable).focus();
 
       document.addEventListener('focusin', this.initWatchFocus);
-      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true, detail: this.drawerInner}));
+
+      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
     }
 
     hideDrawer() {
-      this.buttons.forEach((el) => {
-        el.setAttribute('aria-expanded', true);
-        el.classList.remove(classes$a.isVisible);
-      });
-
-      this.drawer.classList.remove(classes$a.isVisible);
-      document.removeEventListener('focusin', this.initWatchFocus);
-
-      if (!this.wrapper.classList.contains(classes$a.headerStuck)) {
-        this.wrapper.setAttribute(selectors$m.transparent, theme.transparentHeader);
+      if (!this.drawer.classList.contains(classes$s.open)) {
+        return;
       }
 
+      this.accessibility.removeTrapFocus();
+      if (this.body.classList.contains(classes$s.isFocused) && this.buttons.length) {
+        this.buttons[0].focus();
+      }
+
+      this.buttons.forEach((el) => {
+        el.setAttribute('aria-expanded', false);
+      });
+
+      this.drawer.classList.remove(classes$s.open);
+      document.removeEventListener('focusin', this.initWatchFocus);
+
       document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
-      document.dispatchEvent(new CustomEvent('theme:sliderule:close', {bubbles: false}));
+    }
+
+    onUnload() {
+      document.removeEventListener('theme:cart:open', this.hideDrawer);
+      document.removeEventListener('theme:drawer:close', this.hideDrawer);
+      document.removeEventListener('theme:drawer:open', this.showDrawer);
     }
   }
 
   const drawer = {
     onLoad() {
-      sections$a[this.id] = [];
-      const els = this.container.querySelectorAll(selectors$m.drawerWrappper);
+      sections$j[this.id] = [];
+      const els = this.container.querySelectorAll(selectors$y.drawerWrappper);
       els.forEach((el) => {
-        sections$a[this.id].push(new Drawer(el));
+        sections$j[this.id].push(new Drawer(el));
+      });
+    },
+    onUnload() {
+      sections$j[this.id].forEach((el) => {
+        if (typeof el.onUnload === 'function') {
+          el.onUnload();
+        }
       });
     },
   };
 
-  const selectors$n = {
-    announcement: '[data-announcement-wrapper]',
-    transparent: 'data-header-transparent',
+  const selectors$x = {
+    headerWrapper: '[data-header-wrapper]',
     header: '[data-header-wrapper] header',
-    headerIsNotFixed: '[data-header-sticky="static"]',
+    pageHeader: '.page-header',
   };
 
-  const classes$b = {
+  const classes$r = {
     stuck: 'js__header__stuck',
     stuckAnimated: 'js__header__stuck--animated',
     triggerAnimation: 'js__header__stuck--trigger-animation',
     stuckBackdrop: 'js__header__stuck__backdrop',
     headerIsNotVisible: 'is-not-visible',
     hasStickyHeader: 'has-sticky-header',
+    headerGroup: 'shopify-section-group-header-group',
   };
 
-  let sections$b = {};
+  const attributes$e = {
+    transparent: 'data-header-transparent',
+    stickyHeader: 'data-header-sticky',
+    scrollLock: 'data-scroll-locked',
+  };
+
+  let sections$i = {};
 
   class Sticky {
     constructor(el) {
       this.wrapper = el;
       this.type = this.wrapper.dataset.headerSticky;
-      this.sticks = this.type === 'sticky';
-      this.static = this.type === 'static';
+      this.sticks = false;
+      this.static = true;
+      if (this.wrapper.hasAttribute(attributes$e.stickyHeader)) {
+        this.sticks = true;
+        this.static = false;
+      }
       this.win = window;
       this.animated = this.type === 'directional';
       this.currentlyStuck = false;
       this.cls = this.wrapper.classList;
-      const announcementEl = document.querySelector(selectors$n.announcement);
-      const announcementHeight = announcementEl ? announcementEl.clientHeight : 0;
-      this.headerHeight = document.querySelector(selectors$n.header).clientHeight;
-      this.blur = this.headerHeight + announcementHeight;
-      this.stickDown = this.headerHeight + announcementHeight;
-      this.stickUp = announcementHeight;
+      this.headerOffset = document.querySelector(selectors$x.pageHeader)?.offsetTop;
+      this.headerHeight = document.querySelector(selectors$x.header).clientHeight;
       this.scrollEventStatic = () => this.checkIsVisible();
       this.scrollEventListen = (e) => this.listenScroll(e);
       this.scrollEventUpListen = () => this.scrollUpDirectional();
       this.scrollEventDownListen = () => this.scrollDownDirectional();
-      if (this.wrapper.getAttribute(selectors$n.transparent) !== 'false') {
-        this.blur = announcementHeight;
-      }
+      this.updateHeaderOffset = this.updateHeaderOffset.bind(this);
+
       if (this.sticks) {
-        this.stickDown = announcementHeight;
         this.scrollDownInit();
-        document.body.classList.add(classes$b.hasStickyHeader);
+        document.body.classList.add(classes$r.hasStickyHeader);
       }
 
       if (this.static) {
@@ -8031,6 +7828,9 @@
       if (this.static) {
         document.removeEventListener('theme:scroll', this.scrollEventStatic);
       }
+
+      document.removeEventListener('shopify:section:load', this.updateHeaderOffset);
+      document.removeEventListener('shopify:section:unload', this.updateHeaderOffset);
     }
 
     listen() {
@@ -8042,62 +7842,74 @@
         document.addEventListener('theme:scroll:up', this.scrollEventUpListen);
         document.addEventListener('theme:scroll:down', this.scrollEventDownListen);
       }
+
+      document.addEventListener('shopify:section:load', this.updateHeaderOffset);
+      document.addEventListener('shopify:section:unload', this.updateHeaderOffset);
     }
 
     listenScroll(e) {
       if (e.detail.down) {
-        if (!this.currentlyStuck && e.detail.position > this.stickDown) {
+        if (!this.currentlyStuck && e.detail.position > this.headerOffset) {
           this.stickSimple();
         }
-        if (!this.currentlyBlurred && e.detail.position > this.blur) {
+        if (!this.currentlyBlurred && e.detail.position > this.headerOffset) {
           this.addBlur();
         }
       } else {
-        if (e.detail.position <= this.stickUp) {
+        if (e.detail.position <= this.headerOffset) {
           this.unstickSimple();
         }
-        if (e.detail.position <= this.blur) {
+        if (e.detail.position <= this.headerOffset) {
           this.removeBlur();
         }
       }
     }
 
+    updateHeaderOffset(event) {
+      if (!event.target.classList.contains(classes$r.headerGroup)) return;
+
+      // Update header offset after any "Header group" section has been changed
+      setTimeout(() => {
+        this.headerOffset = document.querySelector(selectors$x.pageHeader)?.offsetTop;
+      });
+    }
+
     stickSimple() {
       if (this.animated) {
-        this.cls.add(classes$b.stuckAnimated);
+        this.cls.add(classes$r.stuckAnimated);
       }
-      this.cls.add(classes$b.stuck);
-      this.wrapper.setAttribute(selectors$n.transparent, false);
+      this.cls.add(classes$r.stuck);
+      this.wrapper.setAttribute(attributes$e.transparent, false);
       this.currentlyStuck = true;
     }
 
     unstickSimple() {
-      if (!document.documentElement.hasAttribute('data-scroll-locked')) {
+      if (!document.documentElement.hasAttribute(attributes$e.scrollLock)) {
         // check for scroll lock
-        this.cls.remove(classes$b.stuck);
-        this.wrapper.setAttribute(selectors$n.transparent, theme.transparentHeader);
+        this.cls.remove(classes$r.stuck);
+        this.wrapper.setAttribute(attributes$e.transparent, theme.settings.transparentHeader);
         if (this.animated) {
-          this.cls.remove(classes$b.stuckAnimated);
+          this.cls.remove(classes$r.stuckAnimated);
         }
         this.currentlyStuck = false;
       }
     }
 
     scrollDownInit() {
-      if (window.scrollY > this.stickDown) {
+      if (window.scrollY > this.headerOffset) {
         this.stickSimple();
       }
-      if (window.scrollY > this.blur) {
+      if (window.scrollY > this.headerOffset) {
         this.addBlur();
       }
     }
 
     stickDirectional() {
-      this.cls.add(classes$b.triggerAnimation);
+      this.cls.add(classes$r.triggerAnimation);
     }
 
     unstickDirectional() {
-      this.cls.remove(classes$b.triggerAnimation);
+      this.cls.remove(classes$r.triggerAnimation);
     }
 
     scrollDownDirectional() {
@@ -8105,7 +7917,7 @@
     }
 
     scrollUpDirectional() {
-      if (window.scrollY <= this.stickDown) {
+      if (window.scrollY <= this.headerOffset) {
         this.unstickDirectional();
       } else {
         this.stickDirectional();
@@ -8113,37 +7925,38 @@
     }
 
     addBlur() {
-      this.cls.add(classes$b.stuckBackdrop);
+      this.cls.add(classes$r.stuckBackdrop);
       this.currentlyBlurred = true;
     }
 
     removeBlur() {
-      this.cls.remove(classes$b.stuckBackdrop);
+      this.cls.remove(classes$r.stuckBackdrop);
       this.currentlyBlurred = false;
     }
 
     checkIsVisible() {
-      const header = document.querySelector(selectors$n.headerIsNotFixed);
+      const header = document.querySelector(selectors$x.headerWrapper);
+      const isHeaderSticky = header.getAttribute(attributes$e.stickyHeader);
       const currentScroll = this.win.pageYOffset;
 
-      if (header) {
-        header.classList.toggle(classes$b.headerIsNotVisible, currentScroll >= this.headerHeight);
+      if (!isHeaderSticky) {
+        header.classList.toggle(classes$r.headerIsNotVisible, currentScroll >= this.headerHeight);
       }
     }
   }
 
   const stickyHeader = {
     onLoad() {
-      sections$b = new Sticky(this.container);
+      sections$i = new Sticky(this.container);
     },
     onUnload: function () {
-      if (typeof sections$b.unload === 'function') {
-        sections$b.unload();
+      if (typeof sections$i.unload === 'function') {
+        sections$i.unload();
       }
     },
   };
 
-  const selectors$o = {
+  const selectors$w = {
     disclosureToggle: 'data-hover-disclosure-toggle',
     disclosureWrappper: '[data-hover-disclosure]',
     link: '[data-top-link]',
@@ -8154,21 +7967,21 @@
     focusable: 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
   };
 
-  const classes$c = {
+  const classes$q = {
     isVisible: 'is-visible',
     meganavVisible: 'meganav--visible',
     meganavIsTransitioning: 'meganav--is-transitioning',
   };
 
-  let sections$c = {};
+  let sections$h = {};
   let disclosures = {};
   class HoverDisclosure {
     constructor(el) {
       this.disclosure = el;
-      this.wrapper = el.closest(selectors$o.wrapper);
+      this.wrapper = el.closest(selectors$w.wrapper);
       this.key = this.disclosure.id;
-      this.trigger = document.querySelector(`[${selectors$o.disclosureToggle}='${this.key}']`);
-      this.link = this.trigger.querySelector(selectors$o.link);
+      this.trigger = document.querySelector(`[${selectors$w.disclosureToggle}='${this.key}']`);
+      this.link = this.trigger.querySelector(selectors$w.link);
       this.grandparent = this.trigger.classList.contains('grandparent');
       this.transitionTimeout = 0;
 
@@ -8195,45 +8008,45 @@
 
     showDisclosure(e) {
       if (e && e.type && e.type === 'mouseenter') {
-        this.wrapper.classList.add(classes$c.meganavIsTransitioning);
+        this.wrapper.classList.add(classes$q.meganavIsTransitioning);
       }
 
       if (this.grandparent) {
-        this.wrapper.classList.add(classes$c.meganavVisible);
+        this.wrapper.classList.add(classes$q.meganavVisible);
       } else {
-        this.wrapper.classList.remove(classes$c.meganavVisible);
+        this.wrapper.classList.remove(classes$q.meganavVisible);
       }
       this.trigger.setAttribute('aria-expanded', true);
-      this.trigger.classList.add(classes$c.isVisible);
-      this.disclosure.classList.add(classes$c.isVisible);
+      this.trigger.classList.add(classes$q.isVisible);
+      this.disclosure.classList.add(classes$q.isVisible);
 
       if (this.transitionTimeout) {
         clearTimeout(this.transitionTimeout);
       }
 
       this.transitionTimeout = setTimeout(() => {
-        this.wrapper.classList.remove(classes$c.meganavIsTransitioning);
+        this.wrapper.classList.remove(classes$q.meganavIsTransitioning);
       }, 200);
     }
 
     hideDisclosure() {
-      this.disclosure.classList.remove(classes$c.isVisible);
-      this.trigger.classList.remove(classes$c.isVisible);
+      this.disclosure.classList.remove(classes$q.isVisible);
+      this.trigger.classList.remove(classes$q.isVisible);
       this.trigger.setAttribute('aria-expanded', false);
-      this.wrapper.classList.remove(classes$c.meganavVisible, classes$c.meganavIsTransitioning);
+      this.wrapper.classList.remove(classes$q.meganavVisible, classes$q.meganavIsTransitioning);
     }
 
     staggerChildAnimations() {
-      const simple = this.disclosure.querySelectorAll(selectors$o.stagger);
+      const simple = this.disclosure.querySelectorAll(selectors$w.stagger);
       simple.forEach((el, index) => {
         el.style.transitionDelay = `${index * 50 + 10}ms`;
       });
 
-      const pairs = this.disclosure.querySelectorAll(selectors$o.staggerPair);
+      const pairs = this.disclosure.querySelectorAll(selectors$w.staggerPair);
       pairs.forEach((child, i) => {
-        const d1 = i * 150;
+        const d1 = i * 100;
         child.style.transitionDelay = `${d1}ms`;
-        child.parentElement.querySelectorAll(selectors$o.staggerAfter).forEach((grandchild, i2) => {
+        child.parentElement.querySelectorAll(selectors$w.staggerAfter).forEach((grandchild, i2) => {
           const di1 = i2 + 1;
           const d2 = di1 * 20;
           grandchild.style.transitionDelay = `${d1 + d2}ms`;
@@ -8246,7 +8059,7 @@
       this.trigger.addEventListener(
         'touchstart',
         function (e) {
-          const isOpen = this.disclosure.classList.contains(classes$c.isVisible);
+          const isOpen = this.disclosure.classList.contains(classes$q.isVisible);
           if (!isOpen) {
             e.preventDefault();
             this.showDisclosure(e);
@@ -8268,7 +8081,7 @@
         }
       });
       this.disclosure.addEventListener('keyup', (evt) => {
-        if (evt.which !== window.theme.keyboardKeys.ESCAPE) {
+        if (evt.code !== window.theme.keyboardKeys.ESCAPE) {
           return;
         }
         this.hideDisclosure();
@@ -8278,21 +8091,21 @@
 
   const hoverDisclosure = {
     onLoad() {
-      sections$c[this.id] = [];
-      disclosures = this.container.querySelectorAll(selectors$o.disclosureWrappper);
+      sections$h[this.id] = [];
+      disclosures = this.container.querySelectorAll(selectors$w.disclosureWrappper);
       disclosures.forEach((el) => {
-        sections$c[this.id].push(new HoverDisclosure(el));
+        sections$h[this.id].push(new HoverDisclosure(el));
       });
     },
     onBlockSelect(evt) {
-      sections$c[this.id].forEach((el) => {
+      sections$h[this.id].forEach((el) => {
         if (typeof el.onBlockSelect === 'function') {
           el.onBlockSelect(evt);
         }
       });
     },
     onBlockDeselect(evt) {
-      sections$c[this.id].forEach((el) => {
+      sections$h[this.id].forEach((el) => {
         if (typeof el.onBlockDeselect === 'function') {
           el.onBlockDeselect(evt);
         }
@@ -8300,33 +8113,30 @@
     },
   };
 
-  const selectors$p = {
+  const selectors$v = {
     count: 'data-cart-count',
   };
 
   class Totals {
     constructor(el) {
       this.section = el;
-      this.counts = this.section.querySelectorAll(`[${selectors$p.count}]`);
-      this.cart = null;
+      this.counts = this.section.querySelectorAll(`[${selectors$v.count}]`);
+      this.cartCount = null;
       this.listen();
     }
 
     listen() {
-      document.addEventListener(
-        'theme:cart:change',
-        function (event) {
-          this.cart = event.detail.cart;
-          this.update();
-        }.bind(this)
-      );
+      document.addEventListener('theme:cart:change', (event) => {
+        this.cartCount = event.detail.cartCount;
+        this.update();
+      });
     }
 
     update() {
-      if (this.cart) {
+      if (this.cartCount !== null) {
         this.counts.forEach((count) => {
-          count.setAttribute(selectors$p.count, this.cart.item_count);
-          count.innerHTML = `${this.cart.item_count}`;
+          count.setAttribute(selectors$v.count, this.cartCount);
+          count.innerHTML = this.cartCount < 10 ? `${this.cartCount}` : '9+';
         });
       }
     }
@@ -8337,446 +8147,230 @@
     },
   };
 
-  const selectors$q = {
-    append: '[data-predictive-search-append]',
-    input: 'data-predictive-search-input',
-    productTemplate: '[product-grid-item-template]',
-    productWrapper: '[data-product-wrap]',
-    productWrapperOuter: '[data-product-wrap-outer]',
-    titleTemplate: '[data-predictive-search-title-template]',
-    titleWrapper: '[data-search-title-wrap]',
-    dirtyClass: 'dirty',
-    loadingClass: 'is-loading',
-    searchPopdown: 'search-popdown',
-  };
-
-  class SearchPredictive {
-    constructor(input) {
-      this.input = input;
-      this.key = this.input.getAttribute(selectors$q.input);
-      const appendSelector = `[id='${this.key}']`;
-      this.append = document.querySelector(appendSelector);
-      this.productTemplate = document.querySelector(selectors$q.productTemplate).innerHTML;
-      this.titleTemplate = document.querySelector(selectors$q.titleTemplate).innerHTML;
-      this.titleWrapper = document.querySelector(selectors$q.titleWrapper);
-      this.productWrapper = this.append.querySelector(selectors$q.productWrapper);
-      this.productWrapperOuter = this.append.querySelector(selectors$q.productWrapperOuter);
-      this.popdown = document.getElementById(selectors$q.searchPopdown);
-      this.result = null;
-      this.accessibility = a11y;
-      this.initSearch();
-    }
-
-    initSearch() {
-      this.input.addEventListener(
-        'input',
-        debounce(
-          function (event) {
-            const val = event.target.value;
-            if (val && val.length > 1) {
-              this.productWrapperOuter.classList.add(selectors$q.loadingClass);
-              this.render(val);
-            } else {
-              this.reset();
-              this.append.classList.remove(selectors$q.dirtyClass);
-            }
-          }.bind(this),
-          300
-        )
-      );
-      this.input.addEventListener('clear', this.reset.bind(this));
-    }
-
-    render(terms) {
-      fetch(`/search/suggest.json?q=${encodeURIComponent(terms)}&resources[type]=product&resources[limit]=8&resources[options][unavailable_products]=last`)
-        .then(this.handleErrors)
-        .then((response) => response.json())
-        .then((response) => {
-          this.result = response.resources.results;
-          return this.fetchProducts(response.resources.results.products);
-        })
-        .then((response) => {
-          this.injectTitle(terms);
-
-          setTimeout(() => {
-            this.reset(false);
-            this.productWrapperOuter.classList.remove(selectors$q.loadingClass);
-            this.injectProduct(response);
-            this.append.classList.add(selectors$q.dirtyClass);
-
-            this.accessibility.trapFocus(this.popdown);
-            this.input.focus();
-          }, 1000);
-        })
-        .catch((e) => {
-          console.error(e);
-        });
-    }
-
-    reset(clearTerms = true) {
-      this.productWrapper.innerHTML = '';
-      this.append.classList.remove(selectors$q.dirtyClass);
-      this.input.val = '';
-      this.accessibility.removeTrapFocus();
-
-      if (clearTerms) {
-        this.titleWrapper.innerHTML = '';
-      }
-    }
-
-    injectTitle(terms) {
-      let title = window.theme.strings.noResultsFor;
-      let count = '';
-      if (this.result && this.result.products.length > 0) {
-        count = this.result.products.length;
-        title = window.theme.strings.resultsFor;
-      }
-      this.titleWrapper.innerHTML = Sqrl.render(this.titleTemplate, {
-        count: count,
-        title: title,
-        query: terms,
-      });
-    }
-
-    injectProduct(productHTML) {
-      this.productWrapper.innerHTML += productHTML;
-    }
-
-    fetchProducts(products) {
-      const promises = [];
-      products.forEach((product) => {
-        // because of a translation bug in the predictive search API
-        // we need to fetch the product JSON from the handle
-        promises.push(
-          fetchProduct(product.handle).then((productJSON) => {
-            const formatted = formatPrices(productJSON);
-            return this.renderProduct(formatted);
-          })
-        );
-      });
-
-      return Promise.all(promises).then((result) => {
-        let str = '';
-        result.forEach((render) => {
-          str += render;
-        });
-        return str;
-      });
-    }
-
-    renderProduct(product) {
-      let media = null;
-      let mediaHover = null;
-      let image = '';
-      let secondImage = '';
-
-      if (product.media !== undefined) {
-        media = product.media[0];
-        mediaHover = product.media[1];
-      }
-
-      if (media) {
-        image = {
-          thumb: themeImages.getSizedImageUrl(media.preview_image.src, '800x800'),
-          alt: media.preview_image.src,
-        };
-      } else {
-        image = {
-          thumb: window.theme.assets.no_image,
-          alt: '',
-        };
-      }
-
-      if (mediaHover) {
-        secondImage = {
-          thumb: themeImages.getSizedImageUrl(mediaHover.preview_image.src, '800x800'),
-          alt: mediaHover.preview_image.src,
-        };
-      }
-      const stripHtmlRegex = /(<([^>]+)>)/gi;
-      const title = product.title.replace(stripHtmlRegex, '');
-
-      const updateValues = {
-        ...product,
-        title,
-        image,
-        secondImage,
-      };
-
-      return Sqrl.render(this.productTemplate, {product: updateValues});
-    }
-
-    handleErrors(response) {
-      if (!response.ok) {
-        return response.json().then(function (json) {
-          const e = new FetchError({
-            status: response.statusText,
-            headers: response.headers,
-            json: json,
-          });
-          throw e;
-        });
-      }
-      return response;
-    }
-  }
-
-  const selectors$r = {
-    body: 'body',
-    popdownTrigger: 'data-popdown-toggle',
-    close: '[data-close-popdown]',
-    input: '[data-predictive-search-input]',
-  };
-
-  const classes$d = {
-    isVisible: 'is-visible',
-  };
-
-  let sections$d = {};
-
-  class SearchPopdownTriggers {
-    constructor(trigger) {
-      this.trigger = trigger;
-      this.key = this.trigger.getAttribute(selectors$r.popdownTrigger);
-      this.search = null;
-
-      const popdownSelector = `[id='${this.key}']`;
-      this.document = document;
-      this.popdown = document.querySelector(popdownSelector);
-      this.input = this.popdown.querySelector(selectors$r.input);
-      this.close = this.popdown.querySelector(selectors$r.close);
-      this.body = document.querySelector(selectors$r.body);
-      this.accessibility = a11y;
-
-      this.initTriggerEvents();
-
-      // Initialized once for every search trigger
-      this.initPopdownEvents();
-    }
-
-    initTriggerEvents() {
-      this.trigger.setAttribute('aria-haspopup', true);
-      this.trigger.setAttribute('aria-expanded', false);
-      this.trigger.setAttribute('aria-controls', this.key);
-
-      this.trigger.addEventListener('click', (evt) => {
-        evt.preventDefault();
-
-        if (!this.body.classList.contains('is-focused')) {
-          this.showPopdown();
-        }
-      });
-
-      this.trigger.addEventListener('keyup', (evt) => {
-        if ((evt.which === window.theme.keyboardKeys.SPACE || evt.which === window.theme.keyboardKeys.ENTER) && this.body.classList.contains('is-focused')) {
-          this.showPopdown();
-        }
-      });
-    }
-
-    initPopdownEvents() {
-      this.search = new SearchPredictive(this.input);
-      this.popdown.addEventListener(
-        'keyup',
-        function (evt) {
-          if (evt.which !== window.theme.keyboardKeys.ESCAPE) {
-            return;
-          }
-          this.hidePopdown();
-        }.bind(this)
-      );
-
-      this.close.addEventListener(
-        'click',
-        function () {
-          this.hidePopdown();
-        }.bind(this)
-      );
-
-      this.document.addEventListener('click', (event) => {
-        const clickedElement = event.target;
-        const isNotSearchExpandButton = !(clickedElement.matches(`[${selectors$r.popdownTrigger}]`) || clickedElement.closest(`[${selectors$r.popdownTrigger}]`));
-        const isNotSearchPopdownChild = !(clickedElement.matches(`#${this.key}`) || clickedElement.closest(`#${this.key}`));
-
-        if (isNotSearchExpandButton && isNotSearchPopdownChild && this.popdown.classList.contains(classes$d.isVisible)) {
-          this.hidePopdown();
-        }
-      });
-    }
-
-    hidePopdown() {
-      this.popdown.classList.remove(classes$d.isVisible);
-      this.input.form.reset();
-      this.input.dispatchEvent(new CustomEvent('clear', {bubbles: false}));
-      this.accessibility.removeTrapFocus();
-
-      document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
-
-      if (this.body.classList.contains('is-focused')) {
-        setTimeout(() => {
-          this.trigger.focus();
-        }, 200);
-      }
-    }
-
-    showPopdown() {
-      document.dispatchEvent(
-        new CustomEvent('theme:drawer:close', {
-          bubbles: false,
-        })
-      );
-
-      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true, detail: this.popdown}));
-
-      this.popdown.classList.add(classes$d.isVisible);
-      const val = this.input.value;
-      this.input.value = '';
-      this.input.value = val;
-
-      this.accessibility.trapFocus(this.popdown);
-      this.input.focus();
-    }
-  }
-
-  const searchPopdown = {
-    onLoad() {
-      sections$d[this.id] = [];
-      const triggers = this.container.querySelectorAll(`[${selectors$r.popdownTrigger}]`);
-      triggers.forEach((el) => {
-        sections$d[this.id].push(new SearchPopdownTriggers(el));
-      });
-    },
-  };
-
-  const selectors$s = {
+  const selectors$u = {
     slideruleOpen: 'data-sliderule-open',
     slideruleClose: 'data-sliderule-close',
     sliderulePane: 'data-sliderule-pane',
     slideruleWrappper: '[data-sliderule]',
+    drawerContent: '[data-drawer-content]',
     focusable: 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    dataAnimates: 'data-animates',
     children: `:scope > [data-animates], 
              :scope > * > [data-animates], 
              :scope > * > * >[data-animates],
              :scope > * > .sliderule-grid  > *`,
   };
 
-  const classes$e = {
+  const classes$p = {
     isVisible: 'is-visible',
+    isHiding: 'is-hiding',
+    isHidden: 'is-hidden',
+    focused: 'is-focused',
+    scrolling: 'is-scrolling',
   };
 
-  let sections$e = {};
+  let sections$g = {};
 
   class HeaderMobileSliderule {
     constructor(el) {
       this.sliderule = el;
-      this.wrapper = el.closest(selectors$s.wrapper);
       this.key = this.sliderule.id;
-      const btnSelector = `[${selectors$s.slideruleOpen}='${this.key}']`;
-      const exitSelector = `[${selectors$s.slideruleClose}='${this.key}']`;
+      const btnSelector = `[${selectors$u.slideruleOpen}='${this.key}']`;
+      this.exitSelector = `[${selectors$u.slideruleClose}='${this.key}']`;
       this.trigger = document.querySelector(btnSelector);
-      this.exit = document.querySelector(exitSelector);
-      this.pane = document.querySelector(`[${selectors$s.sliderulePane}]`);
-      this.children = this.sliderule.querySelectorAll(selectors$s.children);
+      this.exit = document.querySelectorAll(this.exitSelector);
+      this.pane = document.querySelector(`[${selectors$u.sliderulePane}]`);
+      this.children = this.sliderule.querySelectorAll(selectors$u.children);
+      this.drawerContent = document.querySelector(selectors$u.drawerContent);
+      this.cachedButton = null;
+      this.accessibility = a11y;
 
       this.trigger.setAttribute('aria-haspopup', true);
       this.trigger.setAttribute('aria-expanded', false);
       this.trigger.setAttribute('aria-controls', this.key);
+      this.closeSliderule = this.closeSliderule.bind(this);
 
       this.clickEvents();
-      this.staggerChildAnimations();
+      this.keyboardEvents();
 
-      document.addEventListener('theme:sliderule:close', this.closeSliderule.bind(this));
+      document.addEventListener('theme:sliderule:close', this.closeSliderule);
     }
 
     clickEvents() {
-      this.trigger.addEventListener(
-        'click',
-        function () {
-          this.showSliderule();
-        }.bind(this)
-      );
-      this.exit.addEventListener(
-        'click',
-        function () {
+      this.trigger.addEventListener('click', () => {
+        this.cachedButton = this.trigger;
+        this.showSliderule();
+      });
+      this.exit.forEach((element) => {
+        element.addEventListener('click', () => {
           this.hideSliderule();
-        }.bind(this)
-      );
+        });
+      });
     }
 
     keyboardEvents() {
-      this.trigger.addEventListener(
-        'keyup',
-        function (evt) {
-          if (evt.which !== window.theme.keyboardKeys.SPACE) {
-            return;
-          }
-          this.showSliderule();
-        }.bind(this)
-      );
-      this.sliderule.addEventListener(
-        'keyup',
-        function (evt) {
-          if (evt.which !== window.theme.keyboardKeys.ESCAPE) {
-            return;
-          }
-          this.hideSliderule();
-          this.buttons[0].focus();
-        }.bind(this)
-      );
-    }
+      this.sliderule.addEventListener('keyup', (evt) => {
+        evt.stopPropagation();
+        if (evt.code !== window.theme.keyboardKeys.ESCAPE) {
+          return;
+        }
 
-    staggerChildAnimations() {
-      this.children.forEach((child, index) => {
-        child.style.transitionDelay = `${index * 50 + 10}ms`;
+        this.hideSliderule();
       });
     }
 
-    hideSliderule() {
-      this.pane.style.setProperty('--sliderule-height', 'auto');
-      this.sliderule.classList.remove(classes$e.isVisible);
-      this.children.forEach((el) => {
-        el.classList.remove(classes$e.isVisible);
-      });
+    trapFocusSliderule(showSliderule = true) {
+      const trapFocusButton = showSliderule ? this.sliderule.querySelector(this.exitSelector) : this.cachedButton;
+
+      this.accessibility.removeTrapFocus();
+
+      if (trapFocusButton && this.drawerContent) {
+        this.accessibility.trapFocus(this.drawerContent, {
+          elementToFocus: document.body.classList.contains(classes$p.focused) ? trapFocusButton : null,
+        });
+      }
+    }
+
+    hideSliderule(close = false) {
       const newPosition = parseInt(this.pane.dataset.sliderulePane, 10) - 1;
-      this.pane.setAttribute(selectors$s.sliderulePane, newPosition);
+      this.pane.setAttribute(selectors$u.sliderulePane, newPosition);
+      this.pane.classList.add(classes$p.isHiding);
+      this.sliderule.classList.add(classes$p.isHiding);
+      const hiddenSelector = close ? `[${selectors$u.dataAnimates}].${classes$p.isHidden}` : `[${selectors$u.dataAnimates}="${newPosition}"]`;
+      const hiddenItems = this.pane.querySelectorAll(hiddenSelector);
+      if (hiddenItems.length) {
+        hiddenItems.forEach((element) => {
+          element.classList.remove(classes$p.isHidden);
+        });
+      }
+
+      const children = close ? this.pane.querySelectorAll(`.${classes$p.isVisible}, .${classes$p.isHiding}`) : this.children;
+      children.forEach((element, index) => {
+        const lastElement = children.length - 1 == index;
+        element.classList.remove(classes$p.isVisible);
+        if (close) {
+          element.classList.remove(classes$p.isHiding);
+          this.pane.classList.remove(classes$p.isHiding);
+        }
+        const removeHidingClass = () => {
+          if (parseInt(this.pane.getAttribute(selectors$u.sliderulePane)) === newPosition) {
+            this.sliderule.classList.remove(classes$p.isVisible);
+          }
+          this.sliderule.classList.remove(classes$p.isHiding);
+          this.pane.classList.remove(classes$p.isHiding);
+
+          if (lastElement) {
+            this.accessibility.removeTrapFocus();
+            if (!close) {
+              this.trapFocusSliderule(false);
+            }
+          }
+
+          element.removeEventListener('animationend', removeHidingClass);
+        };
+
+        if (window.theme.settings.enableAnimations) {
+          element.addEventListener('animationend', removeHidingClass);
+        } else {
+          removeHidingClass();
+        }
+      });
     }
 
     showSliderule() {
-      this.pane.style.setProperty('--sliderule-height', 'auto');
-      this.sliderule.classList.add(classes$e.isVisible);
-      this.children.forEach((el) => {
-        el.classList.add(classes$e.isVisible);
-      });
-      const newPosition = parseInt(this.pane.dataset.sliderulePane, 10) + 1;
-      this.pane.setAttribute(selectors$s.sliderulePane, newPosition);
+      let lastScrollableFrame = null;
+      const parent = this.sliderule.closest(`.${classes$p.isVisible}`);
+      let lastScrollableElement = this.pane;
 
-      const newHeight = parseInt(this.trigger.nextElementSibling.offsetHeight);
-      this.pane.style.setProperty('--sliderule-height', `${newHeight}px`);
+      if (parent) {
+        lastScrollableElement = parent;
+      }
+
+      lastScrollableElement.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth',
+      });
+
+      lastScrollableElement.classList.add(classes$p.scrolling);
+
+      const lastScrollableIsScrolling = () => {
+        if (lastScrollableElement.scrollTop <= 0) {
+          lastScrollableElement.classList.remove(classes$p.scrolling);
+          if (lastScrollableFrame) {
+            cancelAnimationFrame(lastScrollableFrame);
+          }
+        } else {
+          lastScrollableFrame = requestAnimationFrame(lastScrollableIsScrolling);
+        }
+      };
+
+      lastScrollableFrame = requestAnimationFrame(lastScrollableIsScrolling);
+
+      this.sliderule.classList.add(classes$p.isVisible);
+      const oldPosition = parseInt(this.pane.dataset.sliderulePane, 10);
+      const newPosition = oldPosition + 1;
+      this.pane.setAttribute(selectors$u.sliderulePane, newPosition);
+
+      const hiddenItems = this.pane.querySelectorAll(`[${selectors$u.dataAnimates}="${oldPosition}"]`);
+      if (hiddenItems.length) {
+        hiddenItems.forEach((element, index) => {
+          const lastElement = hiddenItems.length - 1 == index;
+          element.classList.add(classes$p.isHiding);
+          const removeHidingClass = () => {
+            element.classList.remove(classes$p.isHiding);
+            if (parseInt(this.pane.getAttribute(selectors$u.sliderulePane)) !== oldPosition) {
+              element.classList.add(classes$p.isHidden);
+            }
+
+            if (lastElement) {
+              this.trapFocusSliderule();
+            }
+            element.removeEventListener('animationend', removeHidingClass);
+          };
+
+          if (window.theme.settings.enableAnimations) {
+            element.addEventListener('animationend', removeHidingClass);
+          } else {
+            removeHidingClass();
+          }
+        });
+      }
     }
 
     closeSliderule() {
-      if (this.pane && this.pane.hasAttribute(selectors$s.sliderulePane) && parseInt(this.pane.getAttribute(selectors$s.sliderulePane)) > 0) {
-        this.hideSliderule();
-        if (parseInt(this.pane.getAttribute(selectors$s.sliderulePane)) > 0) {
-          this.pane.setAttribute(selectors$s.sliderulePane, 0);
+      if (this.pane && this.pane.hasAttribute(selectors$u.sliderulePane) && parseInt(this.pane.getAttribute(selectors$u.sliderulePane)) > 0) {
+        this.hideSliderule(true);
+        if (parseInt(this.pane.getAttribute(selectors$u.sliderulePane)) > 0) {
+          this.pane.setAttribute(selectors$u.sliderulePane, 0);
         }
       }
+    }
+
+    onUnload() {
+      document.removeEventListener('theme:sliderule:close', this.closeSliderule);
     }
   }
 
   const headerMobileSliderule = {
     onLoad() {
-      sections$e[this.id] = [];
-      const els = this.container.querySelectorAll(selectors$s.slideruleWrappper);
+      sections$g[this.id] = [];
+      const els = this.container.querySelectorAll(selectors$u.slideruleWrappper);
       els.forEach((el) => {
-        sections$e[this.id].push(new HeaderMobileSliderule(el));
+        sections$g[this.id].push(new HeaderMobileSliderule(el));
+      });
+    },
+    onUnload() {
+      sections$g[this.id].forEach((el) => {
+        if (typeof el.onUnload === 'function') {
+          el.onUnload();
+        }
       });
     },
   };
 
   const selectors$t = {
     wrapper: '[data-header-wrapper]',
-    html: 'html',
     style: 'data-header-style',
     widthContentWrapper: '[data-takes-space-wrapper]',
     widthContent: '[data-child-takes-space]',
@@ -8785,10 +8379,14 @@
     showMobileClass: 'js__show__mobile',
     backfill: '[data-header-backfill]',
     transparent: 'data-header-transparent',
-    overrideBorder: 'header-override-border',
     firstSectionHasImage: '.main-content > .shopify-section:first-child [data-overlay-header]',
     preventTransparentHeader: '.main-content > .shopify-section:first-child [data-prevent-transparent-header]',
     deadLink: '.navlink[href="#"]',
+    cartToggleButton: '[data-cart-toggle]',
+  };
+
+  const classes$o = {
+    hasTransparentHeader: 'has-transparent-header',
   };
 
   let sections$f = {};
@@ -8796,15 +8394,15 @@
   class Header {
     constructor(el) {
       this.wrapper = el;
-      this.html = document.querySelector(selectors$t.html);
       this.style = this.wrapper.dataset.style;
       this.desktop = this.wrapper.querySelector(selectors$t.desktop);
       this.isTransparentHeader = this.wrapper.getAttribute(selectors$t.transparent) !== 'false';
       this.overlayedImages = document.querySelectorAll(selectors$t.firstSectionHasImage);
       this.deadLinks = document.querySelectorAll(selectors$t.deadLink);
+      this.resizeObserver = null;
       this.headerUpdateEvent = debounce(() => this.checkForImage(), 500);
-      this.resizeEventWidth = () => this.checkWidth();
       this.resizeEventOverlay = () => this.subtractAnnouncementHeight();
+      this.checkWidth = this.checkWidth.bind(this);
 
       this.killDeadLinks();
       if (this.style !== 'drawer' && this.desktop) {
@@ -8813,6 +8411,8 @@
       }
       this.checkForImage();
       this.listenSectionEvents();
+      this.cartToggleEvent();
+      this.screenOrientation = getScreenOrientation();
     }
 
     checkForImage() {
@@ -8825,16 +8425,13 @@
         this.listenOverlay();
         this.wrapper.setAttribute(selectors$t.transparent, true);
         document.querySelector(selectors$t.backfill).style.display = 'none';
-        theme.transparentHeader = true;
+        theme.settings.transparentHeader = true;
+        document.body.classList.add(classes$o.hasTransparentHeader);
       } else {
         this.wrapper.setAttribute(selectors$t.transparent, false);
         document.querySelector(selectors$t.backfill).style.display = 'block';
-        theme.transparentHeader = false;
-      }
-
-      if (this.overlayedImages.length && !preventTransparentHeader && !this.isTransparentHeader) {
-        // Have image but not transparent, remove border bottom
-        this.wrapper.classList.add(selectors$t.overrideBorder);
+        theme.settings.transparentHeader = false;
+        document.body.classList.remove(classes$o.hasTransparentHeader);
       }
 
       this.subtractAnnouncementHeight();
@@ -8846,8 +8443,12 @@
     }
 
     listenWidth() {
-      document.addEventListener('theme:resize', this.resizeEventWidth);
-      this.checkWidth();
+      if ('ResizeObserver' in window) {
+        this.resizeObserver = new ResizeObserver(this.checkWidth);
+        this.resizeObserver.observe(this.wrapper);
+      } else {
+        document.addEventListener('theme:resize', this.checkWidth);
+      }
     }
 
     listenSectionEvents() {
@@ -8865,9 +8466,19 @@
     }
 
     subtractAnnouncementHeight() {
-      const {windowHeight, announcementHeight, headerHeight} = readHeights();
+      const currentScreenOrientation = getScreenOrientation();
+      const {announcementHeight, headerHeight} = readHeights();
+      let {windowHeight} = readHeights();
+
+      // Use the initial window height on mobile devices except if screen oriantation changes
+      if (this.screenOrientation === currentScreenOrientation && isMobile()) {
+        windowHeight = window.initialWindowHeight;
+      } else {
+        window.initialWindowHeight = windowHeight;
+      }
+
       this.overlayedImages.forEach((el) => {
-        if (theme.transparentHeader) {
+        if (theme.settings.transparentHeader) {
           el.style.setProperty('--full-screen', `${windowHeight - announcementHeight}px`);
         } else {
           // headerHeight includes announcement bar height
@@ -8875,6 +8486,11 @@
         }
         el.classList.add('has-overlay');
       });
+
+      // Update screenOrientation state
+      if (this.screenOrientation !== currentScreenOrientation) {
+        this.screenOrientation = currentScreenOrientation;
+      }
     }
 
     checkWidth() {
@@ -8911,8 +8527,25 @@
       return minWidth + spaced;
     }
 
+    cartToggleEvent() {
+      const cartToggleButtons = this.wrapper.querySelectorAll(selectors$t.cartToggleButton);
+      if (cartToggleButtons.length) {
+        cartToggleButtons.forEach((button) => {
+          button.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            document.dispatchEvent(new CustomEvent('theme:cart:toggle', {bubbles: true}));
+          });
+        });
+      }
+    }
+
     unload() {
-      document.removeEventListener('theme:resize', this.resizeEventWidth);
+      if ('ResizeObserver' in window) {
+        this.resizeObserver?.unobserve(this.wrapper);
+      } else {
+        document.removeEventListener('theme:resize', this.checkWidth);
+      }
       document.removeEventListener('theme:resize', this.resizeEventOverlay);
       document.removeEventListener('shopify:section:load', this.headerUpdateEvent);
       document.removeEventListener('shopify:section:unload', this.headerUpdateEvent);
@@ -8956,42 +8589,146 @@
     },
   };
 
-  register('header', [header, drawer, popoutSection, headerMobileSliderule, stickyHeader, hoverDisclosure, headerTotals, searchPopdown]);
+  register('header', [header, drawer, popoutSection, headerMobileSliderule, stickyHeader, hoverDisclosure, headerTotals]);
 
-  const selectors$u = {
-    slider: '[data-slider]',
+  const selectors$s = {
+    scrollElement: '[data-block-scroll]',
+    flickityEnabled: 'flickity-enabled',
+  };
+
+  const sections$e = {};
+
+  class BlockScroll {
+    constructor(el) {
+      this.container = el.container;
+    }
+
+    onBlockSelect(evt) {
+      const scrollElement = this.container.querySelector(selectors$s.scrollElement);
+      if (scrollElement && !scrollElement.classList.contains(selectors$s.flickityEnabled)) {
+        const currentElement = evt.srcElement;
+        if (currentElement) {
+          scrollElement.scrollTo({
+            top: 0,
+            left: currentElement.offsetLeft,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }
+  }
+
+  const blockScroll = {
+    onLoad() {
+      sections$e[this.id] = new BlockScroll(this);
+    },
+    onBlockSelect(e) {
+      sections$e[this.id].onBlockSelect(e);
+    },
+  };
+
+  const selectors$r = {
+    slider: '[data-slider-mobile]',
     slide: '[data-slide]',
     thumb: '[data-slider-thumb]',
+    sliderContainer: '[data-slider-container]',
+    popupContainer: '[data-popup-container]',
+    popupClose: '[data-popup-close]',
+    headerSticky: '[data-header-sticky]',
+    headerHeight: '[data-header-height]',
   };
 
-  const classes$f = {
-    classIsSelected: 'is-selected',
+  const classes$n = {
+    isAnimating: 'is-animating',
+    isSelected: 'is-selected',
+    isOpen: 'is-open',
   };
 
-  const sections$g = {};
+  const attributes$d = {
+    thumbValue: 'data-slider-thumb',
+  };
+
+  const sections$d = {};
 
   class Look {
     constructor(section) {
       this.container = section.container;
-      this.slider = this.container.querySelector(selectors$u.slider);
-      this.slides = this.container.querySelectorAll(selectors$u.slide);
-      this.thumbs = this.container.querySelectorAll(selectors$u.thumb);
+      this.slider = this.container.querySelector(selectors$r.slider);
+      this.slides = this.container.querySelectorAll(selectors$r.slide);
+      this.thumbs = this.container.querySelectorAll(selectors$r.thumb);
+      this.popupContainer = this.container.querySelector(selectors$r.popupContainer);
+      this.popupClose = this.container.querySelectorAll(selectors$r.popupClose);
+      this.popupCloseByEvent = this.popupCloseByEvent.bind(this);
 
+      this.init();
+    }
+
+    init() {
       if (this.slider && this.slides.length && this.thumbs.length) {
-        this.resizeEvent = () => this.checkPosition();
+        this.popupContainer.addEventListener('transitionend', (e) => {
+          if (e.target != this.popupContainer) return;
 
-        this.slider.addEventListener('scroll', this.resizeEvent);
-        document.addEventListener('theme:resize', this.resizeEvent);
+          this.popupContainer.classList.remove(classes$n.isAnimating);
+          if (e.target.classList.contains(classes$n.isOpen)) {
+            this.popupOpenCallback();
+          } else {
+            this.popupCloseCallback();
+          }
+        });
+
+        this.popupContainer.addEventListener('transitionstart', (e) => {
+          if (e.target != this.popupContainer) return;
+
+          this.popupContainer.classList.add(classes$n.isAnimating);
+        });
+
+        this.popupClose.forEach((button) => {
+          button.addEventListener('click', () => {
+            this.popupContainer.classList.remove(classes$n.isOpen);
+            this.scrollUnlock();
+          });
+        });
 
         this.thumbs.forEach((thumb, i) => {
-          thumb.addEventListener('click', () => {
-            const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-            if (windowWidth < theme.sizes.small) {
+          thumb.addEventListener('click', (e) => {
+            e.preventDefault();
+            const idx = thumb.hasAttribute(attributes$d.thumbValue) && thumb.getAttribute(attributes$d.thumbValue) !== '' ? parseInt(thumb.getAttribute(attributes$d.thumbValue)) : i;
+            const slide = this.slides[idx];
+            if (isMobile()) {
               const parentPadding = parseInt(window.getComputedStyle(this.slider).paddingLeft);
-              const thumbLeft = this.slides[i].offsetLeft;
+              const slideLeft = slide.offsetLeft;
               this.slider.scrollTo({
                 top: 0,
-                left: thumbLeft - parentPadding,
+                left: slideLeft - parentPadding,
+                behavior: 'auto',
+              });
+              this.scrollLock();
+              this.popupContainer.classList.add(classes$n.isAnimating, classes$n.isOpen);
+            } else {
+              const headerHeight =
+                document.querySelector(selectors$r.headerSticky) && document.querySelector(selectors$r.headerHeight) ? document.querySelector(selectors$r.headerHeight).getBoundingClientRect().height : 0;
+              const slideTop = slide.getBoundingClientRect().top;
+              const slideHeightHalf = slide.offsetHeight / 2;
+              const windowHeight = window.innerHeight;
+              const windowHeightHalf = windowHeight / 2;
+              const sliderContainer = this.container.querySelector(selectors$r.sliderContainer);
+              let scrollTarget = slideTop + slideHeightHalf - windowHeightHalf + window.scrollY;
+
+              if (sliderContainer) {
+                const sliderContainerTop = sliderContainer.getBoundingClientRect().top + window.scrollY;
+                const sliderContainerHeight = sliderContainer.offsetHeight;
+                const sliderContainerBottom = sliderContainerTop + sliderContainerHeight;
+
+                if (scrollTarget < sliderContainerTop) {
+                  scrollTarget = sliderContainerTop - headerHeight;
+                } else if (scrollTarget + windowHeight > sliderContainerBottom) {
+                  scrollTarget = sliderContainerBottom - windowHeight;
+                }
+              }
+
+              window.scrollTo({
+                top: scrollTarget,
+                left: 0,
                 behavior: 'smooth',
               });
             }
@@ -9000,91 +8737,70 @@
       }
     }
 
-    checkPosition() {
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      if (windowWidth < theme.sizes.small) {
-        const sliderWidth = this.slider.offsetWidth;
-        const sliderPositionLeft = this.slider.scrollLeft;
-        const sliderPositionRight = sliderPositionLeft + sliderWidth;
-
-        this.slides.forEach((slide, i) => {
-          const slideWidth = slide.offsetWidth;
-          const slidePositionLeft = slide.offsetLeft;
-          const slidePositionRight = slidePositionLeft + slideWidth;
-          let nextSlideCheck = false;
-          const nextSlide = this.slides[i + 1];
-
-          if (nextSlide) {
-            const nextSlidePositionWidth = nextSlide.offsetWidth;
-            const nextSlidePositionLeft = nextSlide.offsetLeft;
-            const nextSlidePositionRight = nextSlidePositionLeft + nextSlidePositionWidth;
-
-            if (sliderPositionRight >= nextSlidePositionRight) {
-              nextSlideCheck = true;
-            }
-          }
-
-          this.thumbs[i].classList.toggle(classes$f.classIsSelected, sliderPositionRight >= slidePositionRight && !nextSlideCheck);
-        });
-      }
+    popupCloseByEvent() {
+      this.popupContainer.classList.remove(classes$n.isOpen);
     }
 
-    onUnload() {
-      if (this.slider && this.slides.length && this.thumbs.length) {
-        document.removeEventListener('theme:resize', this.resizeEvent);
-        this.slider.removeEventListener('scroll', this.resizeEvent);
-      }
+    popupOpenCallback() {
+      document.addEventListener('theme:quick-add:open', this.popupCloseByEvent, {once: true});
+      document.addEventListener('theme:product:added', this.popupCloseByEvent, {once: true});
+    }
+
+    popupCloseCallback() {
+      document.removeEventListener('theme:quick-add:open', this.popupCloseByEvent, {once: true});
+      document.removeEventListener('theme:product:added', this.popupCloseByEvent, {once: true});
+    }
+
+    scrollLock() {
+      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
+    }
+
+    scrollUnlock() {
+      document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
     }
   }
 
   const lookSection = {
     onLoad() {
-      sections$g[this.id] = new Look(this);
-    },
-    onUnload(e) {
-      sections$g[this.id].onUnload(e);
+      sections$d[this.id] = new Look(this);
     },
   };
 
-  register('look', [lookSection, slider, quickAddProduct, swatchGridSection]);
+  register('look', [lookSection, swatchGridSection, siblings, blockScroll]);
 
-  const selectors$v = {
+  const selectors$q = {
     body: 'body',
     dataRelatedSectionElem: '[data-related-section]',
     dataTabsHolder: '[data-tabs-holder]',
     dataTab: 'data-tab',
     dataTabIndex: 'data-tab-index',
-    dataTabStartIndex: 'data-start-index',
+    dataAos: '[data-aos]',
     blockId: 'data-block-id',
-    tabsLi: 'ul.tabs > li',
+    tabsLi: '[data-tab]',
     tabLink: '.tab-link',
     tabLinkRecent: '.tab-link__recent',
     tabContent: '.tab-content',
     scrollbarHolder: '[data-scrollbar]',
-    scrollbarArrowPrev: '[data-scrollbar-arrow-prev]',
-    scrollbarArrowNext: '[data-scrollbar-arrow-next]',
-    productModal: '[data-product-modal]',
-    dataLockScrollbar: 'data-lock-scroll',
   };
 
-  const classes$g = {
-    classCurrent: 'current',
-    classHide: 'hide',
-    classAlt: 'alt',
-    classAosAnimate: 'aos-animate',
-    classAosNoTransition: 'aos-no-transition',
+  const classes$m = {
+    current: 'current',
+    hidden: 'hidden',
+    aosAnimate: 'aos-animate',
+    aosNoTransition: 'aos-no-transition',
+    focused: 'is-focused',
   };
 
-  const sections$h = {};
+  const sections$c = {};
 
   class GlobalTabs {
     constructor(holder) {
       this.container = holder;
-      this.body = document.querySelector(selectors$v.body);
+      this.body = document.querySelector(selectors$q.body);
       this.accessibility = window.accessibility;
 
       if (this.container) {
-        this.scrollbarHolder = this.container.querySelectorAll(selectors$v.scrollbarHolder);
+        this.scrollbarHolder = this.container.querySelectorAll(selectors$q.scrollbarHolder);
 
         this.init();
 
@@ -9094,43 +8810,23 @@
     }
 
     init() {
-      const ctx = this.container;
-      const tabsNavList = ctx.querySelectorAll(selectors$v.tabsLi);
-      const firstTabLink = ctx.querySelector(`${selectors$v.tabLink}-${ctx.hasAttribute(selectors$v.dataTabStartIndex) ? ctx.getAttribute(selectors$v.dataTabStartIndex) : 0}`);
-      const firstTabContent = ctx.querySelector(`${selectors$v.tabContent}-${ctx.hasAttribute(selectors$v.dataTabStartIndex) ? ctx.getAttribute(selectors$v.dataTabStartIndex) : 0}`);
+      const tabsNavList = this.container.querySelectorAll(selectors$q.tabsLi);
 
-      if (firstTabContent) {
-        firstTabContent.classList.add(classes$g.classCurrent);
-      }
-
-      if (firstTabLink) {
-        firstTabLink.classList.add(classes$g.classCurrent);
-      }
-
-      this.checkVisibleTabLinks();
-      this.container.addEventListener('tabs:checkRecentTab', () => this.checkRecentTab());
-      this.container.addEventListener('tabs:hideRelatedTab', () => this.hideRelatedTab());
+      this.container.addEventListener('theme:tab:check', () => this.checkRecentTab());
+      this.container.addEventListener('theme:tab:hide', () => this.hideRelatedTab());
 
       if (tabsNavList.length) {
         tabsNavList.forEach((element) => {
-          const tabId = parseInt(element.getAttribute(selectors$v.dataTab));
-          const tab = ctx.querySelector(`${selectors$v.tabContent}-${tabId}`);
+          const tabId = parseInt(element.getAttribute(selectors$q.dataTab));
+          const tab = this.container.querySelector(`${selectors$q.tabContent}-${tabId}`);
 
           element.addEventListener('click', () => {
             this.tabChange(element, tab);
           });
 
           element.addEventListener('keyup', (event) => {
-            if ((event.which === window.theme.keyboardKeys.SPACE || event.which === window.theme.keyboardKeys.ENTER) && this.body.classList.contains('is-focused')) {
+            if ((event.code === window.theme.keyboardKeys.SPACE || event.code === window.theme.keyboardKeys.ENTER) && this.body.classList.contains(classes$m.focused)) {
               this.tabChange(element, tab);
-
-              if (tab.querySelector('a, input')) {
-                this.accessibility.lastFocused = element;
-
-                this.accessibility.a11y.trapFocus(tab, {
-                  elementToFocus: tab.querySelector('a:first-child, input:first-child'),
-                });
-              }
             }
           });
         });
@@ -9138,38 +8834,53 @@
     }
 
     tabChange(element, tab) {
-      this.container.querySelector(`${selectors$v.tabsLi}.${classes$g.classCurrent}`).classList.remove(classes$g.classCurrent);
-      const lastCurrentTab = this.container.querySelector(`${selectors$v.tabContent}.${classes$g.classCurrent}`);
-      lastCurrentTab.classList.remove(classes$g.classCurrent);
-
-      element.classList.add(classes$g.classCurrent);
-      tab.classList.add(classes$g.classCurrent);
-
-      if (element.classList.contains(classes$g.classHide)) {
-        tab.classList.add(classes$g.classHide);
+      if (element.classList.contains(classes$m.current)) {
+        return;
       }
 
-      this.checkVisibleTabLinks();
+      const currentTab = this.container.querySelector(`${selectors$q.tabsLi}.${classes$m.current}`);
+      const currentTabContent = this.container.querySelector(`${selectors$q.tabContent}.${classes$m.current}`);
+
+      currentTab?.classList.remove(classes$m.current);
+      currentTabContent?.classList.remove(classes$m.current);
+
+      element.classList.add(classes$m.current);
+      tab.classList.add(classes$m.current);
+
+      if (element.classList.contains(classes$m.hidden)) {
+        tab.classList.add(classes$m.hidden);
+      }
 
       this.accessibility.a11y.removeTrapFocus();
+
+      this.container.dispatchEvent(new CustomEvent('theme:tab:change', {bubbles: true}));
+
+      element.dispatchEvent(
+        new CustomEvent('theme:form:sticky', {
+          bubbles: true,
+          detail: {
+            element: 'tab',
+          },
+        })
+      );
 
       this.animateItems(tab);
     }
 
     animateItems(tab, animated = true) {
-      const animatedItems = tab.querySelectorAll(`[data-aos]`);
+      const animatedItems = tab.querySelectorAll(selectors$q.dataAos);
 
       if (animatedItems.length) {
         animatedItems.forEach((animatedItem) => {
-          animatedItem.classList.remove(classes$g.classAosAnimate);
+          animatedItem.classList.remove(classes$m.aosAnimate);
 
           if (animated) {
-            animatedItem.classList.add(classes$g.classAosNoTransition);
+            animatedItem.classList.add(classes$m.aosNoTransition);
 
-            setTimeout(() => {
-              animatedItem.classList.remove(classes$g.classAosNoTransition);
-              animatedItem.classList.add(classes$g.classAosAnimate);
-            }, 100);
+            requestAnimationFrame(() => {
+              animatedItem.classList.remove(classes$m.aosNoTransition);
+              animatedItem.classList.add(classes$m.aosAnimate);
+            });
           }
         });
       }
@@ -9183,56 +8894,42 @@
       }
     }
 
-    checkVisibleTabLinks() {
-      const tabsNavList = this.container.querySelectorAll(selectors$v.tabsLi);
-      const tabsNavListHided = this.container.querySelectorAll(`${selectors$v.tabLink}.${classes$g.classHide}`);
-      const difference = tabsNavList.length - tabsNavListHided.length;
-
-      if (difference < 2) {
-        this.container.classList.add(classes$g.classAlt);
-      } else {
-        this.container.classList.remove(classes$g.classAlt);
-      }
-    }
-
     checkRecentTab() {
-      const tabLink = this.container.querySelector(selectors$v.tabLinkRecent);
+      const tabLink = this.container.querySelector(selectors$q.tabLinkRecent);
 
       if (tabLink) {
-        tabLink.classList.remove(classes$g.classHide);
-        const tabLinkIdx = parseInt(tabLink.getAttribute(selectors$v.dataTab));
-        const tabContent = this.container.querySelector(`${selectors$v.tabContent}[${selectors$v.dataTabIndex}="${tabLinkIdx}"]`);
+        tabLink.classList.remove(classes$m.hidden);
+        const tabLinkIdx = parseInt(tabLink.getAttribute(selectors$q.dataTab));
+        const tabContent = this.container.querySelector(`${selectors$q.tabContent}[${selectors$q.dataTabIndex}="${tabLinkIdx}"]`);
 
         if (tabContent) {
-          tabContent.classList.remove(classes$g.classHide);
+          tabContent.classList.remove(classes$m.hidden);
 
           this.animateItems(tabContent, false);
         }
-
-        this.checkVisibleTabLinks();
 
         this.initNativeScrollbar();
       }
     }
 
     hideRelatedTab() {
-      const relatedSection = this.container.querySelector(selectors$v.dataRelatedSectionElem);
+      const relatedSection = this.container.querySelector(selectors$q.dataRelatedSectionElem);
       if (!relatedSection) {
         return;
       }
 
-      const parentTabContent = relatedSection.closest(`${selectors$v.tabContent}.${classes$g.classCurrent}`);
+      const parentTabContent = relatedSection.closest(`${selectors$q.tabContent}.${classes$m.current}`);
       if (!parentTabContent) {
         return;
       }
-      const parentTabContentIdx = parseInt(parentTabContent.getAttribute(selectors$v.dataTabIndex));
-      const tabsNavList = this.container.querySelectorAll(selectors$v.tabsLi);
+      const parentTabContentIdx = parseInt(parentTabContent.getAttribute(selectors$q.dataTabIndex));
+      const tabsNavList = this.container.querySelectorAll(selectors$q.tabsLi);
 
       if (tabsNavList.length > parentTabContentIdx) {
         const nextTabsNavLink = tabsNavList[parentTabContentIdx].nextSibling;
 
         if (nextTabsNavLink) {
-          tabsNavList[parentTabContentIdx].classList.add(classes$g.classHide);
+          tabsNavList[parentTabContentIdx].classList.add(classes$m.hidden);
           nextTabsNavLink.dispatchEvent(new Event('click'));
           this.initNativeScrollbar();
         }
@@ -9240,7 +8937,7 @@
     }
 
     onBlockSelect(evt) {
-      const element = this.container.querySelector(`${selectors$v.tabLink}[${selectors$v.blockId}="${evt.detail.blockId}"]`);
+      const element = this.container.querySelector(`${selectors$q.tabLink}[${selectors$q.blockId}="${evt.detail.blockId}"]`);
       if (element) {
         element.dispatchEvent(new Event('click'));
 
@@ -9255,15 +8952,15 @@
 
   const tabs = {
     onLoad() {
-      sections$h[this.id] = [];
-      const tabHolders = this.container.querySelectorAll(selectors$v.dataTabsHolder);
+      sections$c[this.id] = [];
+      const tabHolders = this.container.querySelectorAll(selectors$q.dataTabsHolder);
 
       tabHolders.forEach((holder) => {
-        sections$h[this.id].push(new GlobalTabs(holder));
+        sections$c[this.id].push(new GlobalTabs(holder));
       });
     },
     onBlockSelect(e) {
-      sections$h[this.id].forEach((el) => {
+      sections$c[this.id].forEach((el) => {
         if (typeof el.onBlockSelect === 'function') {
           el.onBlockSelect(e);
         }
@@ -9271,348 +8968,7 @@
     },
   };
 
-  register('product-grid', [slider, quickAddProduct, swatchGridSection, tabs]);
-
-  const fadeOut = (el, callback = null) => {
-    el.style.opacity = 1;
-
-    (function fade() {
-      if ((el.style.opacity -= 0.1) < 0) {
-        el.style.display = 'none';
-      } else {
-        requestAnimationFrame(fade);
-      }
-
-      if (parseFloat(el.style.opacity) === 0 && typeof callback === 'function') {
-        callback();
-      }
-    })();
-  };
-
-  const selectors$w = {
-    productSlideshow: '[data-product-slideshow]',
-    productThumbs: '[data-product-thumbs]',
-    sliderThumb: '[data-thumb-item]',
-    dataTallLayout: 'data-tall-layout',
-    mediaType: 'data-type',
-    dataMediaId: 'data-media-id',
-    dataThumb: 'data-thumb',
-    dataThumbIndex: 'data-thumb-index',
-    deferredMediaButton: '[data-deferred-media-button]',
-    ariaLabel: 'aria-label',
-    dataThumbnail: '[data-thumbnail]',
-    productSlideThumb: '.js-product-slide-thumb',
-    classSelected: 'is-active',
-    classMediaHidden: 'media--hidden',
-    sliderEnabled: 'flickity-enabled',
-    focusEnabled: 'is-focused',
-    thumbsSlider: '[data-thumbs-slider]',
-  };
-
-  const classes$h = {
-    classDrag: 'is-dragging',
-  };
-
-  const thumbIcons = {
-    model:
-      '<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-media-model" viewBox="0 0 26 26"><path class="icon-media-model-outline" d="M.5 25v.5h25V.5H.5z" fill="none"/><path class="icon-media-model-element" d="M19.13 8.28L14 5.32a2 2 0 0 0-2 0l-5.12 3a2 2 0 0 0-1 1.76V16a2 2 0 0 0 1 1.76l5.12 3a2 2 0 0 0 2 0l5.12-3a2 2 0 0 0 1-1.76v-6a2 2 0 0 0-.99-1.72zm-6.4 11.1l-5.12-3a.53.53 0 0 1-.26-.38v-6a.53.53 0 0 1 .27-.46l5.12-3a.53.53 0 0 1 .53 0l5.12 3-4.72 2.68a1.33 1.33 0 0 0-.67 1.2v6a.53.53 0 0 1-.26 0z" opacity=".6" style="isolation:isolate"/></svg>',
-    video:
-      '<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-media-video" viewBox="0 0 26 26"><path fill-rule="evenodd" clip-rule="evenodd" d="M1 25h24V1H1v24z"/><path class="icon-media-video-outline" d="M.5 25v.5h25V.5H.5V25z"/><path class="icon-media-video-element" fill-rule="evenodd" clip-rule="evenodd" d="M9.718 6.72a1 1 0 0 0-1.518.855v10.736a1 1 0 0 0 1.562.827l8.35-5.677a1 1 0 0 0-.044-1.682l-8.35-5.06z" opacity=".6"/></svg>',
-  };
-
-  class InitSlider {
-    constructor(section) {
-      this.container = section.container;
-      this.tallLayout = this.container.getAttribute(selectors$w.dataTallLayout) === 'true';
-      this.slideshow = this.container.querySelector(selectors$w.productSlideshow);
-      this.thumbs = this.container.querySelector(selectors$w.productThumbs);
-      this.mobileSliderEnable = this.container.getAttribute(selectors$w.mobileSliderEnable) === 'true';
-
-      this.flkty = null;
-
-      this.init();
-    }
-
-    init() {
-      if (this.tallLayout) {
-        this.initSliderMobile();
-
-        document.addEventListener('theme:resize', () => {
-          this.initSliderMobile();
-        });
-      } else {
-        this.createSlider();
-      }
-    }
-
-    initSliderMobile() {
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      const isMobile = windowWidth < theme.sizes.small;
-      if (isMobile) {
-        this.createSlider();
-      } else {
-        this.destroySlider();
-      }
-    }
-
-    destroySlider() {
-      const isSliderInitialized = this.slideshow.classList.contains(selectors$w.sliderEnabled);
-
-      if (isSliderInitialized) {
-        this.flkty.destroy();
-      }
-
-      if (this.thumbs) {
-        this.thumbs.innerHTML = '';
-      }
-    }
-
-    createSlider() {
-      if (!this.slideshow) {
-        return;
-      }
-
-      const instance = this;
-      const firstSlide = this.slideshow.querySelectorAll(`[${selectors$w.mediaType}]`)[0];
-
-      let flickityOptions = {
-        autoPlay: false,
-        prevNextButtons: false,
-        contain: true,
-        pageDots: false,
-        adaptiveHeight: true,
-        wrapAround: true,
-        fade: true,
-        on: {
-          ready: function () {
-            instance.sliderThumbs(this);
-          },
-        },
-      };
-
-      this.flkty = new FlickityFade(this.slideshow, flickityOptions);
-      this.flkty.resize();
-
-      if (firstSlide) {
-        const firstType = firstSlide.getAttribute(selectors$w.mediaType);
-
-        if (firstType === 'model' || firstType === 'video' || firstType === 'external_video') {
-          this.flkty.options.draggable = false;
-          this.flkty.updateDraggable();
-        }
-      }
-
-      this.flkty.on('change', function (index) {
-        let lastSLideIdx = index;
-
-        if (instance.thumbs) {
-          const selectedElem = instance.thumbs.querySelector(`.${selectors$w.classSelected}`);
-          const currentSlide = instance.thumbs.querySelector(`${selectors$w.sliderThumb} [${selectors$w.dataThumbIndex}="${index}"]`);
-
-          if (selectedElem) {
-            lastSLideIdx = Array.from(selectedElem.parentElement.children).indexOf(selectedElem);
-            selectedElem.classList.remove(selectors$w.classSelected);
-          }
-
-          if (currentSlide) {
-            currentSlide.parentElement.classList.add(selectors$w.classSelected);
-          }
-
-          instance.scrollToThumb();
-        }
-
-        const currentMedia = this.cells[lastSLideIdx].element;
-        const newMedia = this.selectedElement;
-
-        currentMedia.dispatchEvent(new CustomEvent('mediaHidden'));
-        newMedia.classList.remove(selectors$w.classMediaHidden);
-      });
-
-      this.flkty.on('settle', function () {
-        const currentMedia = this.selectedElement;
-        const otherMedia = Array.prototype.filter.call(currentMedia.parentNode.children, function (child) {
-          return child !== currentMedia;
-        });
-        const mediaType = currentMedia.getAttribute(selectors$w.mediaType);
-        const isFocusEnabled = document.body.classList.contains(selectors$w.focusEnabled);
-
-        if (mediaType === 'model' || mediaType === 'video' || mediaType === 'external_video') {
-          // fisrt boolean sets value, second option false to prevent refresh
-          instance.flkty.options.draggable = false;
-          instance.flkty.updateDraggable();
-        } else {
-          instance.flkty.options.draggable = true;
-          instance.flkty.updateDraggable();
-        }
-
-        if (isFocusEnabled) currentMedia.dispatchEvent(new Event('focus'));
-
-        if (otherMedia.length) {
-          otherMedia.forEach((element) => {
-            element.classList.add(selectors$w.classMediaHidden);
-          });
-        }
-
-        currentMedia.dispatchEvent(new CustomEvent('mediaVisible'));
-
-        // Force media loading if slide becomes visible
-        const deferredMedia = currentMedia.querySelector('deferred-media');
-        if (deferredMedia && deferredMedia.getAttribute('loaded') !== true) {
-          currentMedia.querySelector(selectors$w.deferredMediaButton).dispatchEvent(new Event('click', {bubbles: false}));
-        }
-      });
-
-      this.flkty.on('dragStart', (event, pointer) => {
-        event.target.classList.add(classes$h.classDrag);
-      });
-
-      this.flkty.on('dragEnd', (event, pointer) => {
-        const draggedElem = this.flkty.element.querySelector(`.${classes$h.classDrag}`);
-        if (draggedElem) {
-          draggedElem.classList.remove(classes$h.classDrag);
-        }
-      });
-
-      this.container.addEventListener('click', (e) => {
-        const target = e.target;
-
-        if (target.matches(selectors$w.productSlideThumb) || target.closest(selectors$w.productSlideThumb)) {
-          e.preventDefault();
-
-          let slideIdx = 0;
-          let selector;
-          if (target.matches(selectors$w.productSlideThumb)) {
-            selector = target;
-          } else {
-            selector = target.closest(selectors$w.productSlideThumb);
-          }
-
-          slideIdx = parseInt(selector.getAttribute(selectors$w.dataThumbIndex));
-
-          this.flkty.select(slideIdx);
-        }
-      });
-    }
-
-    scrollToThumb() {
-      const thumbs = this.container.querySelector(selectors$w.thumbsSlider);
-
-      if (thumbs) {
-        const thumb = thumbs.querySelector(`.${selectors$w.classSelected}`);
-        if (!thumb) return;
-        const thumbsScrollTop = thumbs.scrollTop;
-        const thumbsScrollLeft = thumbs.scrollLeft;
-        const thumbsWidth = thumbs.offsetWidth;
-        const thumbsHeight = thumbs.offsetHeight;
-        const thumbsPositionBottom = thumbsScrollTop + thumbsHeight;
-        const thumbsPositionRight = thumbsScrollLeft + thumbsWidth;
-        const thumbPosTop = thumb.offsetTop;
-        const thumbPosLeft = thumb.offsetLeft;
-        const thumbWidth = thumb.offsetWidth;
-        const thumbHeight = thumb.offsetHeight;
-        const thumbRightPos = thumbPosLeft + thumbWidth;
-        const thumbBottomPos = thumbPosTop + thumbHeight;
-        const topCheck = thumbsScrollTop > thumbPosTop;
-        const bottomCheck = thumbBottomPos > thumbsPositionBottom;
-        const leftCheck = thumbsScrollLeft > thumbPosLeft;
-        const rightCheck = thumbRightPos > thumbsPositionRight;
-        const verticalCheck = bottomCheck || topCheck;
-        const horizontalCheck = rightCheck || leftCheck;
-
-        if (verticalCheck || horizontalCheck) {
-          const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-          const isMobile = windowWidth < theme.sizes.small;
-          let scrollTopPosition = thumbPosTop - thumbsHeight + thumbHeight;
-          let scrollLeftPosition = thumbPosLeft - thumbsWidth + thumbWidth;
-
-          if (topCheck) {
-            scrollTopPosition = thumbPosTop;
-          }
-
-          if (rightCheck && isMobile) {
-            scrollLeftPosition += parseInt(window.getComputedStyle(thumbs).paddingRight);
-          }
-
-          if (leftCheck) {
-            scrollLeftPosition = thumbPosLeft;
-
-            if (isMobile) {
-              scrollLeftPosition -= parseInt(window.getComputedStyle(thumbs).paddingLeft);
-            }
-          }
-
-          thumbs.scrollTo({
-            top: scrollTopPosition,
-            left: scrollLeftPosition,
-            behavior: 'smooth',
-          });
-        }
-      }
-    }
-
-    sliderThumbs(thisEl) {
-      const slides = thisEl.slides;
-
-      if (this.thumbs && slides.length) {
-        let slidesHtml = '';
-        slides.forEach((element, i) => {
-          const slide = element.cells[0].element;
-          const type = slide.getAttribute(selectors$w.mediaType);
-          const mediaId = slide.getAttribute(selectors$w.dataMediaId);
-          const thumb = slide.getAttribute(selectors$w.dataThumb);
-          let thumbAlt = '';
-          const thumbIcon = thumbIcons[type] ? thumbIcons[type] : '';
-          let selected = '';
-
-          if (slide.querySelector(`[${selectors$w.ariaLabel}]`)) {
-            thumbAlt = slide.querySelector(`[${selectors$w.ariaLabel}]`).getAttribute(selectors$w.ariaLabel);
-          }
-
-          if (thumbAlt === '' && slide.hasAttribute(selectors$w.ariaLabel)) {
-            thumbAlt = slide.getAttribute(selectors$w.ariaLabel);
-          }
-
-          slide.setAttribute('tabindex', '-1');
-
-          if (slide.classList.contains(selectors$w.classSelected) || i === 0) {
-            selected = selectors$w.classSelected;
-          }
-
-          slidesHtml += `<div class="thumb ${selected}" data-thumb-item><a href="${thumb}" class="thumb__link thumb__link--${type} js-product-slide-thumb" data-thumb-index="${i}" data-thumbnail data-media-id="${mediaId}"><img class="thumb__link__image lazyload" alt="${thumbAlt}" data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048, 2450, 2700, 3000, 3350, 3750, 4100]" data-sizes="auto" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="${thumb}">${thumbIcon}</a></div>`;
-        });
-
-        if (slidesHtml !== '') {
-          slidesHtml = `<div class="thumbs-holder" data-thumbs-slider>${slidesHtml}</div>`;
-          this.thumbs.innerHTML = slidesHtml;
-        }
-      }
-
-      const productThumbImages = this.container.querySelectorAll(selectors$w.dataThumbnail);
-      if (productThumbImages.length) {
-        productThumbImages.forEach((element) => {
-          element.addEventListener('click', function (e) {
-            e.preventDefault();
-          });
-
-          element.addEventListener('keyup', function (e) {
-            // On keypress Enter move the focus to the first focusable element in the related slide
-            if (e.keyCode === window.theme.keyboardKeys.ENTER) {
-              const mediaId = this.getAttribute(selectors$w.dataMediaId);
-              const mediaElem = thisEl.element
-                .querySelector(`[${selectors$w.dataMediaId}="${mediaId}"]`)
-                .querySelectorAll('model-viewer, video, iframe, button, [href], input, [tabindex]:not([tabindex="-1"])')[0];
-              if (mediaElem) {
-                mediaElem.dispatchEvent(new Event('focus'));
-                mediaElem.dispatchEvent(new Event('select'));
-              }
-            }
-          });
-        });
-      }
-    }
-  }
-
-  const selectors$x = {
+  const selectors$p = {
     dataEnableSound: 'data-enable-sound',
     dataEnableBackground: 'data-enable-background',
     dataEnableAutoplay: 'data-enable-autoplay',
@@ -9622,22 +8978,22 @@
     videoIframe: '[data-video-id]',
   };
 
-  const classes$i = {
+  const classes$l = {
     loaded: 'loaded',
   };
 
   class LoadVideoVimeo {
     constructor(container) {
       this.container = container;
-      this.player = this.container.querySelector(selectors$x.videoIframe);
+      this.player = this.container.querySelector(selectors$p.videoIframe);
 
       if (this.player) {
-        this.videoID = this.player.getAttribute(selectors$x.dataVideoId);
-        this.videoType = this.player.getAttribute(selectors$x.dataVideoType);
-        this.enableBackground = this.player.getAttribute(selectors$x.dataEnableBackground) === 'true';
-        this.disableSound = this.player.getAttribute(selectors$x.dataEnableSound) === 'false';
-        this.enableAutoplay = this.player.getAttribute(selectors$x.dataEnableAutoplay) !== 'false';
-        this.enableLoop = this.player.getAttribute(selectors$x.dataEnableLoop) !== 'false';
+        this.videoID = this.player.getAttribute(selectors$p.dataVideoId);
+        this.videoType = this.player.getAttribute(selectors$p.dataVideoType);
+        this.enableBackground = this.player.getAttribute(selectors$p.dataEnableBackground) === 'true';
+        this.disableSound = this.player.getAttribute(selectors$p.dataEnableSound) === 'false';
+        this.enableAutoplay = this.player.getAttribute(selectors$p.dataEnableAutoplay) !== 'false';
+        this.enableLoop = this.player.getAttribute(selectors$p.dataEnableLoop) !== 'false';
 
         if (this.videoType == 'vimeo') {
           this.init();
@@ -9673,20 +9029,19 @@
           state.innerHTML = data.html;
 
           setTimeout(function () {
-            state.parentElement.classList.add(classes$i.loaded);
+            state.parentElement.classList.add(classes$l.loaded);
           }, 1000);
         })
-        .catch(function () {
-          console.log('error');
+        .catch(function (error) {
+          console.log(error);
         });
     }
   }
 
-  const selectors$y = {
+  const selectors$o = {
     dataSectionId: 'data-section-id',
     dataEnableSound: 'data-enable-sound',
     dataHideOptions: 'data-hide-options',
-    dataCheckPlayerVisibility: 'data-check-player-visibility',
     dataVideoId: 'data-video-id',
     dataVideoType: 'data-video-type',
     videoIframe: '[data-video-id]',
@@ -9694,7 +9049,7 @@
     youtubeWrapper: '[data-youtube-wrapper]',
   };
 
-  const classes$j = {
+  const classes$k = {
     loaded: 'loaded',
   };
 
@@ -9703,16 +9058,15 @@
   class LoadVideoYT {
     constructor(container) {
       this.container = container;
-      this.player = this.container.querySelector(selectors$y.videoIframe);
+      this.player = this.container.querySelector(selectors$o.videoIframe);
 
       if (this.player) {
         this.videoOptionsVars = {};
-        this.videoID = this.player.getAttribute(selectors$y.dataVideoId);
-        this.videoType = this.player.getAttribute(selectors$y.dataVideoType);
+        this.videoID = this.player.getAttribute(selectors$o.dataVideoId);
+        this.videoType = this.player.getAttribute(selectors$o.dataVideoType);
         if (this.videoType == 'youtube') {
-          this.checkPlayerVisibilityFlag = this.player.getAttribute(selectors$y.dataCheckPlayerVisibility) === 'true';
-          this.playerID = this.player.querySelector(selectors$y.youtubeWrapper) ? this.player.querySelector(selectors$y.youtubeWrapper).id : this.player.id;
-          if (this.player.hasAttribute(selectors$y.dataHideOptions)) {
+          this.playerID = this.player.querySelector(selectors$o.youtubeWrapper) ? this.player.querySelector(selectors$o.youtubeWrapper).id : this.player.id;
+          if (this.player.hasAttribute(selectors$o.dataHideOptions)) {
             this.videoOptionsVars = {
               cc_load_policy: 0,
               iv_load_policy: 3,
@@ -9730,12 +9084,16 @@
 
           this.init();
 
-          this.container.addEventListener('touchstart', function (e) {
-            if (e.target.matches(selectors$y.videoWrapper) || e.target.closest(selectors$y.videoWrapper)) {
-              const playerID = e.target.querySelector(selectors$y.videoIframe).id;
-              players[playerID].playVideo();
-            }
-          });
+          this.container.addEventListener(
+            'touchstart',
+            function (e) {
+              if (e.target.matches(selectors$o.videoWrapper) || e.target.closest(selectors$o.videoWrapper)) {
+                const playerID = e.target.querySelector(selectors$o.videoIframe).id;
+                players[playerID].playVideo();
+              }
+            },
+            {passive: true}
+          );
         }
       }
     }
@@ -9758,7 +9116,7 @@
           onReady: (event) => {
             const eventIframe = event.target.getIframe();
             const id = eventIframe.id;
-            const enableSound = document.querySelector(`#${id}`).getAttribute(selectors$y.dataEnableSound) === 'true';
+            const enableSound = document.querySelector(`#${id}`).getAttribute(selectors$o.dataEnableSound) === 'true';
 
             eventIframe.setAttribute('tabindex', '-1');
 
@@ -9768,17 +9126,6 @@
               event.target.mute();
             }
             event.target.playVideo();
-
-            if (this.checkPlayerVisibilityFlag) {
-              this.checkPlayerVisibility(id);
-
-              window.addEventListener(
-                'scroll',
-                throttle(() => {
-                  this.checkPlayerVisibility(id);
-                }, 150)
-              );
-            }
           },
           onStateChange: (event) => {
             // Loop video if state is ended
@@ -9787,7 +9134,7 @@
             }
             if (event.data == 1) {
               // video is playing
-              event.target.getIframe().parentElement.classList.add(classes$j.loaded);
+              event.target.getIframe().parentElement.classList.add(classes$k.loaded);
             }
           },
         },
@@ -9803,68 +9150,51 @@
       window.isYoutubeAPILoaded = true;
     }
 
-    checkPlayerVisibility(id) {
-      let playerID;
-      if (typeof id === 'string') {
-        playerID = id;
-      } else if (id.data != undefined) {
-        playerID = id.data.id;
-      } else {
-        return;
-      }
-
-      const playerElement = document.getElementById(playerID + '-container');
-      if (!playerElement) return;
-      const player = players[playerID];
-      const box = playerElement.getBoundingClientRect();
-      let isVisible = visibilityHelper.isElementPartiallyVisible(playerElement) || visibilityHelper.isElementTotallyVisible(playerElement);
-
-      // Fix the issue when element height is bigger than the viewport height
-      if (box.top < 0 && playerElement.clientHeight + box.top >= 0) {
-        isVisible = true;
-      }
-
-      if (isVisible && player && typeof player.playVideo === 'function') {
-        player.playVideo();
-      } else if (!isVisible && player && typeof player.pauseVideo === 'function') {
-        player.pauseVideo();
-      }
-    }
-
     onUnload() {
-      const playerID = 'youtube-' + this.container.getAttribute(selectors$y.dataSectionId);
+      const playerID = 'youtube-' + this.container.getAttribute(selectors$o.dataSectionId);
       if (!players[playerID]) return;
       players[playerID].destroy();
     }
   }
 
-  const selectors$z = {
+  const selectors$n = {
     popupContainer: '.pswp',
     popupCloseBtn: '.pswp__custom-close',
     popupIframe: 'iframe, video',
     popupCustomIframe: '.pswp__custom-iframe',
     popupThumbs: '.pswp__thumbs',
+    popupButtons: '.pswp__button, .pswp__caption-close',
+  };
+
+  const classes$j = {
+    current: 'is-current',
+    customLoader: 'pswp--custom-loader',
+    customOpen: 'pswp--custom-opening',
+    loader: 'pswp__loader',
+    popupCloseButton: 'pswp__button--close',
+    isFocused: 'is-focused',
+  };
+
+  const attributes$c = {
     dataOptionClasses: 'data-pswp-option-classes',
     dataVideoType: 'data-video-type',
+    ariaCurrent: 'aria-current',
   };
 
-  const classes$k = {
-    classCurrent: 'is-current',
-    classCustomLoader: 'pswp--custom-loader',
-    classCustomOpen: 'pswp--custom-opening',
-    classLoader: 'pswp__loader',
-  };
-
-  const loaderHTML = `<div class="${classes$k.classLoader}"><div class="loader pswp__loader-line"><div class="loader-indeterminate"></div></div></div>`;
+  const loaderHTML = `<div class="${classes$j.loader}"><div class="loader pswp__loader-line"><div class="loader-indeterminate"></div></div></div>`;
 
   class LoadPhotoswipe {
     constructor(items, options = '') {
       this.items = items;
-      this.pswpElement = document.querySelectorAll(selectors$z.popupContainer)[0];
+      this.pswpElement = document.querySelectorAll(selectors$n.popupContainer)[0];
       this.popup = null;
       this.popupThumbs = null;
-      this.popupThumbsContainer = this.pswpElement.querySelector(selectors$z.popupThumbs);
-      this.closeBtn = this.pswpElement.querySelector(selectors$z.popupCloseBtn);
+      this.isVideo = false;
+      this.popupThumbsContainer = this.pswpElement.querySelector(selectors$n.popupThumbs);
+      this.closeBtn = this.pswpElement.querySelector(selectors$n.popupCloseBtn);
+      this.keyupCloseEvent = (e) => this.keyupClose(e);
+      this.a11y = a11y;
+
       const defaultOptions = {
         history: false,
         focus: false,
@@ -9876,7 +9206,7 @@
     }
 
     init() {
-      this.pswpElement.classList.add(classes$k.classCustomOpen);
+      this.pswpElement.classList.add(classes$j.customOpen);
 
       this.initLoader();
 
@@ -9886,14 +9216,14 @@
     }
 
     initLoader() {
-      if (this.pswpElement.classList.contains(classes$k.classCustomLoader) && this.options !== '' && this.options.mainClass) {
-        this.pswpElement.setAttribute(selectors$z.dataOptionClasses, this.options.mainClass);
+      if (this.pswpElement.classList.contains(classes$j.customLoader) && this.options !== '' && this.options.mainClass) {
+        this.pswpElement.setAttribute(attributes$c.dataOptionClasses, this.options.mainClass);
         let loaderElem = document.createElement('div');
         loaderElem.innerHTML = loaderHTML;
         loaderElem = loaderElem.firstChild;
         this.pswpElement.appendChild(loaderElem);
       } else {
-        this.pswpElement.setAttribute(selectors$z.dataOptionClasses, '');
+        this.pswpElement.setAttribute(attributes$c.dataOptionClasses, '');
       }
     }
 
@@ -9901,11 +9231,11 @@
       const PhotoSwipe = window.themePhotoswipe.PhotoSwipe.default;
       const PhotoSwipeUI = window.themePhotoswipe.PhotoSwipeUI.default;
 
-      if (this.pswpElement.classList.contains(classes$k.classCustomLoader)) {
-        this.pswpElement.classList.remove(classes$k.classCustomLoader);
+      if (this.pswpElement.classList.contains(classes$j.customLoader)) {
+        this.pswpElement.classList.remove(classes$j.customLoader);
       }
 
-      this.pswpElement.classList.remove(classes$k.classCustomOpen);
+      this.pswpElement.classList.remove(classes$j.customOpen);
 
       this.popup = new PhotoSwipe(this.pswpElement, PhotoSwipeUI, this.items, this.options);
       this.popup.init();
@@ -9914,17 +9244,33 @@
 
       this.thumbsActions();
 
+      if (this.isVideo) {
+        this.hideUnusedButtons();
+      }
+
+      setTimeout(() => {
+        this.a11y.trapFocus(this.pswpElement, {
+          elementToFocus: this.closeBtn,
+        });
+      }, 200);
+
       this.popup.listen('close', () => this.onClose());
 
-      if (this.closeBtn) {
-        this.closeBtn.addEventListener('click', () => this.popup.close());
+      if (this.options && this.options.closeElClasses && this.options.closeElClasses.length) {
+        this.options.closeElClasses.forEach((closeClass) => {
+          const closeElement = this.pswpElement.querySelector(`.pswp__${closeClass}`);
+          if (closeElement) {
+            closeElement.addEventListener('keyup', this.keyupCloseEvent);
+          }
+        });
       }
     }
 
     initVideo() {
-      const videoContainer = this.pswpElement.querySelector(selectors$z.popupCustomIframe);
+      const videoContainer = this.pswpElement.querySelector(selectors$n.popupCustomIframe);
       if (videoContainer) {
-        const videoType = videoContainer.getAttribute(selectors$z.dataVideoType);
+        const videoType = videoContainer.getAttribute(attributes$c.dataVideoType);
+        this.isVideo = true;
 
         if (videoType == 'youtube') {
           new LoadVideoYT(videoContainer.parentElement);
@@ -9940,12 +9286,15 @@
         this.popupThumbsContainer.addEventListener('mousewheel', (e) => this.stopDisabledScroll(e));
         this.popupThumbsContainer.addEventListener('DOMMouseScroll', (e) => this.stopDisabledScroll(e));
 
-        this.popupThumbs = this.pswpElement.querySelectorAll(`${selectors$z.popupThumbs} > *`);
+        this.popupThumbs = this.pswpElement.querySelectorAll(`${selectors$n.popupThumbs} > *`);
         this.popupThumbs.forEach((element, i) => {
           element.addEventListener('click', (e) => {
             e.preventDefault();
-            element.parentElement.querySelector(`.${classes$k.classCurrent}`).classList.remove(classes$k.classCurrent);
-            element.classList.add(classes$k.classCurrent);
+            const lastCurrentElement = element.parentElement.querySelector(`.${classes$j.current}`);
+            lastCurrentElement.classList.remove(classes$j.current);
+            lastCurrentElement.setAttribute(attributes$c.ariaCurrent, false);
+            element.classList.add(classes$j.current);
+            element.setAttribute(attributes$c.ariaCurrent, true);
             this.popup.goTo(i);
           });
         });
@@ -9955,12 +9304,29 @@
       }
     }
 
+    hideUnusedButtons() {
+      const buttons = this.pswpElement.querySelectorAll(selectors$n.popupButtons);
+      if (buttons.length) {
+        buttons.forEach((element) => {
+          if (!element.classList.contains(classes$j.popupCloseButton)) {
+            element.style.display = 'none';
+          }
+        });
+      }
+    }
+
     stopDisabledScroll(e) {
       e.stopPropagation();
     }
 
+    keyupClose(e) {
+      if (e.code === window.theme.keyboardKeys.ENTER) {
+        this.popup.close();
+      }
+    }
+
     onClose() {
-      const popupIframe = this.pswpElement.querySelector(selectors$z.popupIframe);
+      const popupIframe = this.pswpElement.querySelector(selectors$n.popupIframe);
       if (popupIframe) {
         popupIframe.parentNode.removeChild(popupIframe);
       }
@@ -9969,22 +9335,41 @@
         while (this.popupThumbsContainer.firstChild) this.popupThumbsContainer.removeChild(this.popupThumbsContainer.firstChild);
       }
 
-      this.pswpElement.setAttribute(selectors$z.dataOptionClasses, '');
-      const loaderElem = this.pswpElement.querySelector(`.${classes$k.classLoader}`);
+      this.pswpElement.setAttribute(attributes$c.dataOptionClasses, '');
+      const loaderElem = this.pswpElement.querySelector(`.${classes$j.loader}`);
       if (loaderElem) {
         this.pswpElement.removeChild(loaderElem);
+      }
+
+      if (this.options && this.options.closeElClasses && this.options.closeElClasses.length) {
+        this.options.closeElClasses.forEach((closeClass) => {
+          const closeElement = this.pswpElement.querySelector(`.pswp__${closeClass}`);
+          if (closeElement) {
+            closeElement.removeEventListener('keyup', this.keyupCloseEvent);
+          }
+        });
+      }
+
+      this.a11y.removeTrapFocus();
+
+      if (window.accessibility.lastElement && document.body.classList.contains(classes$j.isFocused)) {
+        requestAnimationFrame(() => {
+          window.accessibility.lastElement.focus();
+        });
       }
     }
 
     setCurrentThumb() {
-      const lastCurrentThumb = this.pswpElement.querySelector(`${selectors$z.popupThumbs} > .${classes$k.classCurrent}`);
+      const lastCurrentThumb = this.pswpElement.querySelector(`${selectors$n.popupThumbs} > .${classes$j.current}`);
       if (lastCurrentThumb) {
-        lastCurrentThumb.classList.remove(classes$k.classCurrent);
+        lastCurrentThumb.classList.remove(classes$j.current);
+        lastCurrentThumb.setAttribute(attributes$c.ariaCurrent, false);
       }
 
       if (!this.popupThumbs) return;
       const currentThumb = this.popupThumbs[this.popup.getCurrentIndex()];
-      currentThumb.classList.add(classes$k.classCurrent);
+      currentThumb.classList.add(classes$j.current);
+      currentThumb.setAttribute(attributes$c.ariaCurrent, true);
       this.scrollThumbs(currentThumb);
     }
 
@@ -10007,19 +9392,20 @@
     }
   }
 
-  const selectors$A = {
+  const selectors$m = {
     zoomWrapper: '[data-zoom-wrapper]',
     dataImageSrc: 'data-image-src',
     dataImageWidth: 'data-image-width',
     dataImageHeight: 'data-image-height',
+    dataImageAlt: 'data-image-alt',
     dataImageZoomEnable: 'data-image-zoom-enable',
     thumbs: '.pswp__thumbs',
     caption: '[data-zoom-caption]',
   };
 
-  const classes$l = {
+  const classes$i = {
     variantSoldOut: 'variant--soldout',
-    variantUnavailable: 'variant--unavailabe',
+    variantUnavailable: 'variant--unavailable',
     popupThumb: 'pswp__thumb',
     popupClass: 'pswp-zoom-gallery',
     popupClassNoThumbs: 'pswp-zoom-gallery--single',
@@ -10030,10 +9416,10 @@
   class Zoom {
     constructor(section) {
       this.container = section.container;
-      this.zoomWrappers = this.container.querySelectorAll(selectors$A.zoomWrapper);
-      this.thumbsContainer = document.querySelector(selectors$A.thumbs);
-      this.zoomCaptionElem = this.container.querySelector(selectors$A.caption);
-      this.zoomEnable = this.container.getAttribute(selectors$A.dataImageZoomEnable) === 'true';
+      this.zoomWrappers = this.container.querySelectorAll(selectors$m.zoomWrapper);
+      this.thumbsContainer = document.querySelector(selectors$m.thumbs);
+      this.zoomCaptionElem = this.container.querySelector(selectors$m.caption);
+      this.zoomEnable = this.container.getAttribute(selectors$m.dataImageZoomEnable) === 'true';
 
       if (this.zoomEnable) {
         this.init();
@@ -10041,22 +9427,24 @@
     }
 
     init() {
-      const self = this;
-
       if (this.zoomWrappers.length) {
         this.zoomWrappers.forEach((element, i) => {
-          element.addEventListener('click', function (e) {
+          element.addEventListener('click', (e) => {
             e.preventDefault();
 
-            self.createZoom(i);
+            this.createZoom(i);
+
+            window.accessibility.lastElement = element;
           });
 
-          element.addEventListener('keyup', function (e) {
+          element.addEventListener('keyup', (e) => {
             // On keypress Enter move the focus to the first focusable element in the related slide
-            if (e.keyCode === window.theme.keyboardKeys.ENTER) {
+            if (e.code === window.theme.keyboardKeys.ENTER) {
               e.preventDefault();
 
-              self.createZoom(i);
+              this.createZoom(i);
+
+              window.accessibility.lastElement = element;
             }
           });
         });
@@ -10064,35 +9452,30 @@
     }
 
     createZoom(indexImage) {
-      const self = this;
       let items = [];
       let counter = 0;
       let thumbs = '';
       this.zoomWrappers.forEach((elementImage) => {
-        const imgSrc = elementImage.getAttribute(selectors$A.dataImageSrc);
-        const imgWidth = parseInt(elementImage.getAttribute(selectors$A.dataImageWidth));
-        const imgHeight = parseInt(elementImage.getAttribute(selectors$A.dataImageHeight));
+        const imgSrc = elementImage.getAttribute(selectors$m.dataImageSrc);
+        const imgAlt = elementImage.hasAttribute(selectors$m.dataImageAlt) ? elementImage.getAttribute(selectors$m.dataImageAlt) : '';
+
+        counter += 1;
 
         items.push({
           src: imgSrc,
-          w: imgWidth,
-          h: imgHeight,
+          w: parseInt(elementImage.getAttribute(selectors$m.dataImageWidth)),
+          h: parseInt(elementImage.getAttribute(selectors$m.dataImageHeight)),
           msrc: imgSrc,
         });
 
-        thumbs += `<a href="#" class="${classes$l.popupThumb}" style="background-image: url('${imgSrc}')"></a>`;
+        thumbs += `<a href="#" class="${classes$i.popupThumb}" style="background-image: url('${imgSrc}')" aria-label="${imgAlt}" aria-current="false"></a>`;
 
-        counter += 1;
-        if (self.zoomWrappers.length === counter) {
-          let popupClass = `${classes$l.popupClass}`;
-          if (counter === 1) {
-            popupClass = `${classes$l.popupClass} ${classes$l.popupClassNoThumbs}`;
-          }
+        if (this.zoomWrappers.length === counter) {
           const options = {
             history: false,
             focus: false,
             index: indexImage,
-            mainClass: popupClass,
+            mainClass: counter === 1 ? `${classes$i.popupClass} ${classes$i.popupClassNoThumbs}` : `${classes$i.popupClass}`,
             showHideOpacity: true,
             howAnimationDuration: 150,
             hideAnimationDuration: 250,
@@ -10108,11 +9491,11 @@
             spacing: 0,
             allowPanToNext: true,
             pinchToClose: false,
-            addCaptionHTMLFn: function (item, captionEl, isFake) {
-              self.zoomCaption(item, captionEl, isFake);
+            addCaptionHTMLFn: (item, captionEl, isFake) => {
+              this.zoomCaption(item, captionEl, isFake);
             },
-            getThumbBoundsFn: function getThumbBoundsFn() {
-              const imageLocation = self.zoomWrappers[indexImage];
+            getThumbBoundsFn: () => {
+              const imageLocation = this.zoomWrappers[indexImage];
               const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
               const rect = imageLocation.getBoundingClientRect();
               return {x: rect.left, y: rect.top + pageYScroll, w: rect.width};
@@ -10121,8 +9504,8 @@
 
           new LoadPhotoswipe(items, options);
 
-          if (self.thumbsContainer && thumbs !== '') {
-            self.thumbsContainer.innerHTML = thumbs;
+          if (this.thumbsContainer && thumbs !== '') {
+            this.thumbsContainer.innerHTML = thumbs;
           }
         }
       });
@@ -10134,20 +9517,20 @@
       if (this.zoomCaptionElem) {
         captionHtml = this.zoomCaptionElem.innerHTML;
 
-        if (this.zoomCaptionElem.closest(`.${classes$l.variantSoldOut}`)) {
-          targetContainer.classList.add(classes$l.variantSoldOut);
+        if (this.zoomCaptionElem.closest(`.${classes$i.variantSoldOut}`)) {
+          targetContainer.classList.add(classes$i.variantSoldOut);
         } else {
-          targetContainer.classList.remove(classes$l.variantSoldOut);
+          targetContainer.classList.remove(classes$i.variantSoldOut);
         }
 
-        if (this.zoomCaptionElem.closest(`.${classes$l.variantUnavailable}`)) {
-          targetContainer.classList.add(classes$l.variantUnavailable);
+        if (this.zoomCaptionElem.closest(`.${classes$i.variantUnavailable}`)) {
+          targetContainer.classList.add(classes$i.variantUnavailable);
         } else {
-          targetContainer.classList.remove(classes$l.variantUnavailable);
+          targetContainer.classList.remove(classes$i.variantUnavailable);
         }
       }
 
-      captionHtml = captionHtml.replaceAll(classes$l.popupTitle, classes$l.popupTitleNew);
+      captionHtml = captionHtml.replaceAll(classes$i.popupTitle, classes$i.popupTitleNew);
       targetContainer.innerHTML = captionHtml;
       return false;
     }
@@ -10156,18 +9539,20 @@
   const hosts = {
     html5: 'html5',
     youtube: 'youtube',
+    vimeo: 'vimeo',
   };
 
-  const selectors$B = {
+  const selectors$l = {
     deferredMedia: '[data-deferred-media]',
     deferredMediaButton: '[data-deferred-media-button]',
     productMediaWrapper: '[data-product-single-media-wrapper]',
     productMediaSlider: '[data-product-single-media-slider]',
     mediaContainer: '[data-video]',
     mediaId: 'data-media-id',
+    dataTallLayout: 'data-tall-layout',
   };
 
-  const classes$m = {
+  const classes$h = {
     mediaHidden: 'media--hidden',
   };
 
@@ -10177,15 +9562,16 @@
       this.section = section;
       this.container = section.container;
       this.id = section.id;
+      this.tallLayout = this.container.getAttribute(selectors$l.dataTallLayout) === 'true';
       this.players = {};
       this.init();
     }
 
     init() {
-      const mediaContainers = this.container.querySelectorAll(selectors$B.mediaContainer);
+      const mediaContainers = this.container.querySelectorAll(selectors$l.mediaContainer);
 
       mediaContainers.forEach((mediaContainer) => {
-        const deferredMediaButton = mediaContainer.querySelector(selectors$B.deferredMediaButton);
+        const deferredMediaButton = mediaContainer.querySelector(selectors$l.deferredMediaButton);
 
         if (deferredMediaButton) {
           deferredMediaButton.addEventListener('click', this.loadContent.bind(this, mediaContainer));
@@ -10194,7 +9580,7 @@
     }
 
     loadContent(mediaContainer) {
-      if (mediaContainer.querySelector(selectors$B.deferredMedia).getAttribute('loaded')) {
+      if (mediaContainer.querySelector(selectors$l.deferredMedia).getAttribute('loaded')) {
         return;
       }
 
@@ -10203,7 +9589,7 @@
       const mediaId = mediaContainer.dataset.mediaId;
       const element = content.querySelector('video, iframe');
       const host = this.hostFromVideoElement(element);
-      const deferredMedia = mediaContainer.querySelector(selectors$B.deferredMedia);
+      const deferredMedia = mediaContainer.querySelector(selectors$l.deferredMedia);
       deferredMedia.appendChild(element).focus();
       deferredMedia.setAttribute('loaded', true);
 
@@ -10213,9 +9599,7 @@
         container: mediaContainer,
         element: element,
         host: host,
-        ready: () => {
-          this.createPlayer(mediaId);
-        },
+        ready: () => this.createPlayer(mediaId),
       };
 
       const video = this.players[mediaId];
@@ -10223,6 +9607,13 @@
       switch (video.host) {
         case hosts.html5:
           this.loadVideo(video, hosts.html5);
+          break;
+        case hosts.vimeo:
+          if (window.isVimeoAPILoaded) {
+            this.loadVideo(video, hosts.vimeo);
+          } else {
+            loadScript({url: 'https://player.vimeo.com/api/player.js'}).then(() => this.loadVideo(video, hosts.vimeo));
+          }
           break;
         case hosts.youtube:
           if (window.isYoutubeAPILoaded) {
@@ -10242,8 +9633,11 @@
       if (video.tagName === 'IFRAME') {
         if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtube-nocookie\.com|youtu\.?be)\/.+$/.test(video.src)) {
           return hosts.youtube;
+        } else if (video.src.includes('vimeo.com')) {
+          return hosts.vimeo;
         }
       }
+
       return null;
     }
 
@@ -10255,21 +9649,38 @@
 
     createPlayer(mediaId) {
       const video = this.players[mediaId];
-      const enableLooping = video.container.dataset.enableVideoLooping;
 
       switch (video.host) {
         case hosts.html5:
-          video.element.addEventListener('play', () => {
-            this.pauseOtherMedia(mediaId);
-          });
+          // Force video play on iOS
+          video.element.play();
+          video.element.addEventListener('play', () => this.pauseOtherMedia(mediaId));
 
           video.element.play(); // Force video play on iOS
-          video.container.addEventListener('mediaHidden', (event) => this.onHidden(event));
+          video.container.addEventListener('theme:media:hidden', (event) => this.onHidden(event));
           video.container.addEventListener('xrLaunch', (event) => this.onHidden(event));
-          video.container.addEventListener('mediaVisible', (event) => this.onVisible(event));
+          video.container.addEventListener('theme:media:visible', (event) => this.onVisible(event));
+
+          if (this.tallLayout) {
+            this.observeVideo(video, mediaId);
+          }
 
           break;
+        case hosts.vimeo:
+          this.players[mediaId].player = new Vimeo.Player(video.element);
+          this.players[mediaId].player.play(); // Force video play on iOS
 
+          window.isVimeoAPILoaded = true;
+
+          video.container.addEventListener('theme:media:hidden', (event) => this.onHidden(event));
+          video.container.addEventListener('xrLaunch', (event) => this.onHidden(event));
+          video.container.addEventListener('theme:media:visible', (event) => this.onVisible(event));
+
+          if (this.tallLayout) {
+            this.observeVideo(video, mediaId);
+          }
+
+          break;
         case hosts.youtube:
           if (video.host == hosts.youtube && video.player) {
             return;
@@ -10281,72 +9692,86 @@
             this.players[mediaId].player = new YT.Player(video.element, {
               videoId: videoId,
               events: {
-                onReady: (event) => {
-                  event.target.playVideo(); // Force video play on iOS
-                },
-                onStateChange: (event) => {
-                  if (event.data === 0) {
-                    // ended
-                    if (enableLooping) {
-                      event.target.seekTo(0);
-                    }
-                  }
-                  if (event.data === 1) {
-                    // playing
-                    this.pauseOtherMedia(mediaId);
-                  }
-                  if (event.data === 2) ;
-                },
+                onReady: (event) => event.target.playVideo(), // Force video play on iOS
               },
             });
 
             window.isYoutubeAPILoaded = true;
 
-            video.container.addEventListener('mediaHidden', (event) => this.onHidden(event));
+            video.container.addEventListener('theme:media:hidden', (event) => this.onHidden(event));
             video.container.addEventListener('xrLaunch', (event) => this.onHidden(event));
-            video.container.addEventListener('mediaVisible', (event) => this.onVisible(event));
+            video.container.addEventListener('theme:media:visible', (event) => this.onVisible(event));
+
+            if (this.tallLayout) {
+              this.observeVideo(video, mediaId);
+            }
           });
 
           break;
       }
     }
 
+    observeVideo(video, mediaId) {
+      let observer = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach((entry) => {
+            const outsideViewport = entry.intersectionRatio != 1;
+
+            if (outsideViewport) {
+              this.pauseVideo(video);
+            } else {
+              this.playVideo(video);
+              this.pauseOtherMedia(mediaId);
+            }
+          });
+        },
+        {threshold: 1}
+      );
+      observer.observe(video.element);
+    }
+
+    playVideo(video) {
+      if (video.player && video.player.playVideo) {
+        video.player.playVideo();
+      } else if (video.element && video.element.play) {
+        video.element.play();
+      } else if (video.player && video.player.play) {
+        video.player.play();
+      }
+    }
+
+    pauseVideo(video) {
+      if (video.player && video.player.pauseVideo) {
+        video.player.pauseVideo();
+      } else if (video.element && video.element.pause) {
+        video.element.pause();
+      } else if (video.player && video.player.pause) {
+        video.player.pause();
+      }
+    }
+
     onHidden(event) {
       if (typeof event.target.dataset.mediaId !== 'undefined') {
-        const mediaId = event.target.dataset.mediaId;
-        const videoPlayer = this.players[mediaId];
-
-        if (videoPlayer.player && videoPlayer.player.pauseVideo) {
-          videoPlayer.player.pauseVideo();
-        } else if (videoPlayer.element && videoPlayer.element.pause) {
-          videoPlayer.element.pause();
-        }
+        this.pauseVideo(this.players[event.target.dataset.mediaId]);
       }
     }
 
     onVisible(event) {
       if (typeof event.target.dataset.mediaId !== 'undefined') {
-        const mediaId = event.target.dataset.mediaId;
-        const videoPlayer = this.players[mediaId];
-
-        if (videoPlayer.player && videoPlayer.player.playVideo) {
-          videoPlayer.player.playVideo();
-        } else if (videoPlayer.element && videoPlayer.element.play) {
-          videoPlayer.element.play();
-        }
+        this.playVideo(this.players[event.target.dataset.mediaId]);
       }
     }
 
     pauseOtherMedia(mediaId) {
-      const mediaIdString = `[${selectors$B.mediaId}="${mediaId}"]`;
-      const currentMedia = document.querySelector(`${selectors$B.productMediaWrapper}${mediaIdString}`);
-      const otherMedia = document.querySelectorAll(`${selectors$B.productMediaWrapper}:not(${mediaIdString})`);
-      currentMedia.classList.remove(classes$m.mediaHidden);
+      const mediaIdString = `[${selectors$l.mediaId}="${mediaId}"]`;
+      const otherMedia = document.querySelectorAll(`${selectors$l.productMediaWrapper}:not(${mediaIdString})`);
+
+      document.querySelector(`${selectors$l.productMediaWrapper}${mediaIdString}`).classList.remove(classes$h.mediaHidden);
 
       if (otherMedia.length) {
         otherMedia.forEach((element) => {
-          element.dispatchEvent(new CustomEvent('mediaHidden'));
-          element.classList.add(classes$m.mediaHidden);
+          element.dispatchEvent(new CustomEvent('theme:media:hidden'));
+          element.classList.add(classes$h.mediaHidden);
         });
       }
     }
@@ -10354,11 +9779,14 @@
 
   theme.mediaInstances = {};
 
-  const selectors$C = {
+  const selectors$k = {
     videoPlayer: '[data-video]',
     modelViewer: '[data-model]',
     sliderEnabled: 'flickity-enabled',
-    classMediaHidden: 'media--hidden',
+  };
+
+  const classes$g = {
+    mediaHidden: 'media--hidden',
   };
 
   class Media {
@@ -10374,11 +9802,10 @@
 
       new Video(this.section);
       new Zoom(this.section);
-      new InitSlider(this.section);
     }
 
     detect3d() {
-      const modelViewerElements = this.container.querySelectorAll(selectors$C.modelViewer);
+      const modelViewerElements = this.container.querySelectorAll(selectors$k.modelViewer);
       if (modelViewerElements.length) {
         modelViewerElements.forEach((element) => {
           theme.ProductModel.init(element, this.id);
@@ -10387,74 +9814,935 @@
     }
 
     launch3d() {
-      const instance = this;
-
-      document.addEventListener('shopify_xr_launch', function () {
-        const currentMedia = instance.container.querySelector(`${instance.selectors.modelViewer}:not(.${selectors$C.classMediaHidden})`);
+      document.addEventListener('shopify_xr_launch', () => {
+        const currentMedia = this.container.querySelector(`${selectors$k.modelViewer}:not(.${classes$g.mediaHidden})`);
         currentMedia.dispatchEvent(new CustomEvent('xrLaunch'));
       });
     }
   }
 
-  const selectors$D = {
-    pickupContainer: '[data-store-availability-container]',
+  const selectors$j = {
+    ariaLabel: 'aria-label',
+    dataMediaId: 'data-media-id',
+    dataTallLayout: 'data-tall-layout',
+    dataThumb: 'data-thumb',
+    dataThumbIndex: 'data-thumb-index',
+    deferredMediaButton: '[data-deferred-media-button]',
+    focusedElement: 'model-viewer, video, iframe, button, [href], input, [tabindex]',
+    isActive: '.is-active',
+    mediaType: 'data-type',
+    mobileSliderDisabled: 'data-slideshow-disabled-mobile',
+    productSlideshow: '[data-product-slideshow]',
+    productThumbs: '[data-product-thumbs]',
+    thumb: '[data-thumb-item]',
+    thumbLink: '[data-thumb-link]',
+    thumbSlider: '[data-thumbs-slider]',
+    quickAddModal: '[data-quick-add-modal]',
+    zoomElement: '[data-zoom-wrapper]',
+  };
+
+  const classes$f = {
+    active: 'is-active',
+    focused: 'is-focused',
+    dragging: 'is-dragging',
+    selected: 'is-selected',
+    sliderEnabled: 'flickity-enabled',
+    mediaHidden: 'media--hidden',
+  };
+
+  const attributes$b = {
+    ariaCurrent: 'aria-current',
+    sliderOptions: 'data-options',
+  };
+
+  let sections$b = {};
+
+  class InitSlider {
+    constructor(section, modalHolder = null) {
+      this.container = modalHolder || section.container;
+      this.tallLayout = this.container.getAttribute(selectors$j.dataTallLayout) === 'true';
+      this.slideshow = this.container.querySelector(selectors$j.productSlideshow);
+      this.thumbSlider = this.container.querySelector(selectors$j.thumbSlider);
+      this.thumbLinks = this.container.querySelectorAll(selectors$j.thumbLink);
+      this.mobileSliderDisabled = this.container.getAttribute(selectors$j.mobileSliderDisabled) === 'true';
+      this.initSliderMobileEvent = () => this.initSliderMobile();
+      this.initSliderDesktopEvent = () => this.initSliderDesktop();
+
+      if (this.slideshow && this.slideshow.hasAttribute(attributes$b.sliderOptions)) {
+        this.customOptions = JSON.parse(decodeURIComponent(this.slideshow.getAttribute(attributes$b.sliderOptions)));
+      }
+
+      this.flkty = null;
+
+      this.init();
+    }
+
+    init() {
+      if (!this.slideshow) return;
+
+      if (this.tallLayout) {
+        if (!this.mobileSliderDisabled) {
+          this.initSliderMobile();
+
+          document.addEventListener('theme:resize:width', this.initSliderMobileEvent);
+        }
+      } else if (this.mobileSliderDisabled) {
+        this.initSliderDesktop();
+
+        document.addEventListener('theme:resize:width', this.initSliderDesktopEvent);
+      } else {
+        this.createSlider();
+      }
+    }
+
+    initSliderMobile() {
+      if (isMobile()) {
+        this.createSlider();
+      } else {
+        this.destroySlider();
+      }
+    }
+
+    initSliderDesktop() {
+      if (isMobile()) {
+        this.destroySlider();
+      } else {
+        this.createSlider();
+      }
+    }
+
+    destroySlider() {
+      const isSliderInitialized = this.slideshow.classList.contains(classes$f.sliderEnabled);
+
+      if (isSliderInitialized) {
+        this.flkty.destroy();
+      }
+    }
+
+    createSlider() {
+      if (!this.slideshow || (this.mobileSliderDisabled && isMobile())) {
+        return;
+      }
+
+      const sliderOptions = {
+        autoPlay: false,
+        pageDots: false,
+        wrapAround: true,
+        ...this.customOptions,
+      };
+
+      const instance = this;
+      const firstSlide = this.slideshow.querySelectorAll(`[${selectors$j.mediaType}]`)[0];
+      let options = {
+        ...sliderOptions,
+        on: {
+          ready: function () {
+            const slides = this.element;
+            slides.addEventListener('keyup', (e) => {
+              if (e.code === window.theme.keyboardKeys.ENTER) {
+                const zoomElement = slides.querySelector(`.${classes$f.selected} ${selectors$j.zoomElement}`);
+                if (zoomElement) {
+                  zoomElement.dispatchEvent(new Event('click', {bubbles: false}));
+                  window.accessibility.lastElement = slides;
+                }
+              }
+            });
+
+            instance.sliderThumbs(this);
+
+            instance.accessibilityActions(this);
+          },
+        },
+      };
+
+      this.flkty = new FlickityFade(this.slideshow, options);
+      this.flkty.resize();
+
+      if (firstSlide) {
+        const firstType = firstSlide.getAttribute(selectors$j.mediaType);
+
+        if (firstType === 'model' || firstType === 'video' || firstType === 'external_video') {
+          this.flkty.options.draggable = false;
+          this.flkty.updateDraggable();
+        }
+      }
+
+      this.flkty.on('change', function (index) {
+        let lastSLideIdx = index;
+
+        if (instance.thumbSlider) {
+          const selectedElem = instance.thumbSlider.querySelector(selectors$j.isActive);
+          const currentSlide = instance.thumbSlider.querySelector(`${selectors$j.thumb} [${selectors$j.dataThumbIndex}="${index}"]`);
+
+          if (selectedElem) {
+            const selectedElemThumb = selectedElem.querySelector(`[${selectors$j.dataThumbIndex}]`);
+            lastSLideIdx = Array.from(selectedElem.parentElement.children).indexOf(selectedElem);
+            selectedElem.classList.remove(classes$f.active);
+
+            if (selectedElemThumb) {
+              selectedElemThumb.setAttribute(attributes$b.ariaCurrent, false);
+            }
+          }
+
+          if (currentSlide) {
+            currentSlide.parentElement.classList.add(classes$f.active);
+            currentSlide.setAttribute(attributes$b.ariaCurrent, true);
+          }
+
+          instance.scrollToThumb();
+        }
+
+        const currentMedia = this.cells[lastSLideIdx].element;
+        const newMedia = this.selectedElement;
+
+        currentMedia.dispatchEvent(new CustomEvent('theme:media:hidden'));
+        newMedia.classList.remove(classes$f.mediaHidden);
+      });
+
+      this.flkty.on('settle', function () {
+        const currentMedia = this.selectedElement;
+        const otherMedia = Array.prototype.filter.call(currentMedia.parentNode.children, function (child) {
+          return child !== currentMedia;
+        });
+        const mediaType = currentMedia.getAttribute(selectors$j.mediaType);
+        const isFocusEnabled = document.body.classList.contains(classes$f.focused);
+
+        if (mediaType === 'model' || mediaType === 'video' || mediaType === 'external_video') {
+          // fisrt boolean sets value, second option false to prevent refresh
+          instance.flkty.options.draggable = false;
+          instance.flkty.updateDraggable();
+        } else {
+          instance.flkty.options.draggable = true;
+          instance.flkty.updateDraggable();
+        }
+
+        if (isFocusEnabled) currentMedia.dispatchEvent(new Event('focus'));
+
+        if (otherMedia.length) {
+          otherMedia.forEach((element) => {
+            element.classList.add(classes$f.mediaHidden);
+          });
+        }
+
+        currentMedia.dispatchEvent(new CustomEvent('theme:media:visible'));
+
+        // Force media loading if slide becomes visible
+        const deferredMedia = currentMedia.querySelector('deferred-media');
+        if (deferredMedia && deferredMedia.getAttribute('loaded') !== true) {
+          currentMedia.querySelector(selectors$j.deferredMediaButton).dispatchEvent(new Event('click', {bubbles: false}));
+        }
+
+        instance.accessibilityActions(this);
+      });
+
+      this.flkty.on('dragStart', (event, pointer) => {
+        event.target.classList.add(classes$f.dragging);
+      });
+
+      this.flkty.on('dragEnd', (event, pointer) => {
+        const draggedElem = this.flkty.element.querySelector(`.${classes$f.dragging}`);
+        if (draggedElem) {
+          draggedElem.classList.remove(classes$f.dragging);
+        }
+      });
+    }
+
+    accessibilityActions(slider) {
+      const slides = slider.slides;
+
+      if (slides.length) {
+        slides.forEach((element) => {
+          const slide = element.cells[0].element;
+          const focusedElements = slide.querySelectorAll(selectors$j.focusedElement);
+
+          if (slide.classList.contains(classes$f.selected)) {
+            slide.setAttribute('tabindex', '0');
+          } else {
+            slide.setAttribute('tabindex', '-1');
+          }
+
+          if (focusedElements.length) {
+            focusedElements.forEach((focusedElement) => {
+              if (slide.classList.contains(classes$f.selected)) {
+                focusedElement.setAttribute('tabindex', '0');
+              } else {
+                focusedElement.setAttribute('tabindex', '-1');
+              }
+            });
+          }
+        });
+      }
+    }
+
+    scrollToThumb() {
+      const thumbs = this.thumbSlider;
+
+      if (thumbs) {
+        const thumb = thumbs.querySelector(selectors$j.isActive);
+        if (!thumb) return;
+        const thumbsScrollTop = thumbs.scrollTop;
+        const thumbsScrollLeft = thumbs.scrollLeft;
+        const thumbsWidth = thumbs.offsetWidth;
+        const thumbsHeight = thumbs.offsetHeight;
+        const thumbsPositionBottom = thumbsScrollTop + thumbsHeight;
+        const thumbsPositionRight = thumbsScrollLeft + thumbsWidth;
+        const thumbPosTop = thumb.offsetTop;
+        const thumbPosLeft = thumb.offsetLeft;
+        const thumbWidth = thumb.offsetWidth;
+        const thumbHeight = thumb.offsetHeight;
+        const thumbRightPos = thumbPosLeft + thumbWidth;
+        const thumbBottomPos = thumbPosTop + thumbHeight;
+        const topCheck = thumbsScrollTop > thumbPosTop;
+        const bottomCheck = thumbBottomPos > thumbsPositionBottom;
+        const leftCheck = thumbsScrollLeft > thumbPosLeft;
+        const rightCheck = thumbRightPos > thumbsPositionRight;
+        const verticalCheck = bottomCheck || topCheck;
+        const horizontalCheck = rightCheck || leftCheck;
+        const isMobileView = isMobile();
+
+        if (verticalCheck || horizontalCheck) {
+          let scrollTopPosition = thumbPosTop - thumbsHeight + thumbHeight;
+          let scrollLeftPosition = thumbPosLeft - thumbsWidth + thumbWidth;
+
+          if (topCheck) {
+            scrollTopPosition = thumbPosTop;
+          }
+
+          if (rightCheck && isMobileView) {
+            scrollLeftPosition += parseInt(window.getComputedStyle(thumbs).paddingRight);
+          }
+
+          if (leftCheck) {
+            scrollLeftPosition = thumbPosLeft;
+
+            if (isMobileView) {
+              scrollLeftPosition -= parseInt(window.getComputedStyle(thumbs).paddingLeft);
+            }
+          }
+
+          thumbs.scrollTo({
+            top: scrollTopPosition,
+            left: scrollLeftPosition,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }
+
+    sliderThumbs(slider) {
+      if (this.thumbLinks.length) {
+        this.thumbLinks.forEach((item) => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const slideIdx = item.hasAttribute(selectors$j.dataThumbIndex) ? parseInt(item.getAttribute(selectors$j.dataThumbIndex)) : 0;
+
+            this.flkty.select(slideIdx);
+          });
+
+          item.addEventListener('keyup', (e) => {
+            // On keypress Enter move the focus to the first focusable element in the related slide
+            if (e.code === window.theme.keyboardKeys.ENTER) {
+              const mediaId = item.getAttribute(selectors$j.dataMediaId);
+              const mediaElem = slider.element
+                .querySelector(`[${selectors$j.dataMediaId}="${mediaId}"]`)
+                .querySelectorAll('model-viewer, video, iframe, button, [href], input, [tabindex]:not([tabindex="-1"])')[0];
+              if (mediaElem) {
+                mediaElem.dispatchEvent(new Event('focus'));
+                mediaElem.dispatchEvent(new Event('select'));
+              }
+            }
+          });
+        });
+      }
+    }
+
+    onUnload() {
+      if (this.tallLayout) {
+        if (!this.mobileSliderDisabled) {
+          document.removeEventListener('theme:resize:width', this.initSliderMobileEvent);
+        }
+      } else if (this.mobileSliderDisabled) {
+        document.removeEventListener('theme:resize:width', this.initSliderDesktopEvent);
+      }
+    }
+  }
+
+  const initSlider = {
+    onLoad() {
+      sections$b[this.id] = new InitSlider(this);
+    },
+    onUnload(e) {
+      sections$b[this.id].onUnload(e);
+    },
+  };
+
+  const classes$e = {
+    added: 'is-added',
+    animated: 'is-animated',
+    disabled: 'is-disabled',
+    error: 'has-error',
+    loading: 'is-loading',
+    open: 'is-open',
+    overlayText: 'product-item--overlay-text',
+    visible: 'is-visible',
+    siblingLinkCurrent: 'sibling__link--current',
+    focused: 'is-focused',
+  };
+
+  const settings = {
+    errorDelay: 3000,
+  };
+
+  const selectors$i = {
+    animation: '[data-animation]',
+    apiContent: '[data-api-content]',
+    buttonQuickAdd: '[data-quick-add-btn]',
+    buttonAddToCart: '[data-add-to-cart]',
+    cartDrawer: '[data-cart-drawer]',
+    cartLineItems: '[data-line-items]',
+    dialog: 'dialog',
+    focusable: 'button, [href], select, textarea, [tabindex]:not([tabindex="-1"])',
+    media: '[data-media-slide]',
+    messageError: '[data-message-error]',
+    modalButton: '[data-quick-add-modal-handle]',
+    modalContainer: '[data-product-upsell-container]',
+    modalContent: '[data-product-upsell-ajax]',
+    modalClose: '[data-quick-add-modal-close]',
+    productGridItem: 'data-product-grid-item',
+    productInformationHolder: '[data-product-information]',
+    popoutWrapper: '[data-popout]',
+    quickAddHolder: '[data-quick-add-holder]',
+    quickAddModal: '[data-quick-add-modal]',
+    quickAddModalTemplate: '[data-quick-add-modal-template]',
+    swatch: '[data-swatch]',
+  };
+
+  const attributes$a = {
+    closing: 'closing',
+    productId: 'data-product-id',
+    modalHandle: 'data-quick-add-modal-handle',
+    siblingSwapper: 'data-sibling-swapper',
+    quickAddHolder: 'data-quick-add-holder',
+  };
+
+  class QuickAddProduct extends HTMLElement {
+    constructor() {
+      super();
+
+      this.container = this;
+      this.quickAddHolder = this.container.querySelector(selectors$i.quickAddHolder);
+
+      if (this.quickAddHolder) {
+        this.modal = null;
+        this.currentModal = null;
+        this.productId = this.quickAddHolder.getAttribute(attributes$a.quickAddHolder);
+        this.modalButton = this.quickAddHolder.querySelector(selectors$i.modalButton);
+        this.handle = this.modalButton?.getAttribute(attributes$a.modalHandle);
+        this.cartDrawer = document.querySelector(selectors$i.cartDrawer);
+        this.buttonQuickAdd = this.quickAddHolder.querySelector(selectors$i.buttonQuickAdd);
+        this.buttonATC = this.quickAddHolder.querySelector(selectors$i.buttonAddToCart);
+        this.button = this.modalButton || this.buttonATC;
+        this.modalClose = this.modalClose.bind(this);
+        this.modalCloseOnProductAdded = this.modalCloseOnProductAdded.bind(this);
+        this.isAnimating = false;
+
+        this.modalButtonClickEvent = this.modalButtonClickEvent.bind(this);
+        this.quickAddLoadingToggle = this.quickAddLoadingToggle.bind(this);
+      }
+    }
+
+    connectedCallback() {
+      /**
+       * Modal button works for multiple variants products
+       */
+      if (this.modalButton) {
+        this.modalButton.addEventListener('click', this.modalButtonClickEvent);
+      }
+
+      /**
+       * Quick add button works for single variant products
+       */
+
+      if (this.buttonATC) {
+        this.buttonATC.addEventListener('click', (e) => {
+          e.preventDefault();
+
+          document.dispatchEvent(
+            new CustomEvent('theme:cart:add', {
+              detail: {
+                button: this.buttonATC,
+              },
+            })
+          );
+        });
+      }
+
+      if (this.quickAddHolder) {
+        this.quickAddHolder.addEventListener('animationend', this.quickAddLoadingToggle);
+        this.errorHandler();
+      }
+    }
+
+    modalButtonClickEvent(e) {
+      e.preventDefault();
+
+      const isSiblingSwapper = this.modalButton.hasAttribute(attributes$a.siblingSwapper);
+      const isSiblingLinkCurrent = this.modalButton.classList.contains(classes$e.siblingLinkCurrent);
+
+      if (isSiblingLinkCurrent) return;
+
+      this.modalButton.classList.add(classes$e.loading);
+      this.modalButton.disabled = true;
+
+      // Siblings product modal swapper
+      if (isSiblingSwapper && !isSiblingLinkCurrent) {
+        this.currentModal = e.target.closest(selectors$i.quickAddModal);
+        this.currentModal.classList.add(classes$e.loading);
+      }
+
+      this.renderModal();
+    }
+
+    modalCreate(response) {
+      const cachedModal = document.querySelector(`${selectors$i.quickAddModal}[${attributes$a.productId}="${this.productId}"]`);
+
+      if (cachedModal) {
+        this.modal = cachedModal;
+        this.modalOpen();
+      } else {
+        const modalTemplate = this.quickAddHolder.querySelector(selectors$i.quickAddModalTemplate);
+        if (!modalTemplate) return;
+
+        const htmlObject = document.createElement('div');
+        htmlObject.innerHTML = modalTemplate.innerHTML;
+
+        // Add dialog to the body
+        document.body.appendChild(htmlObject.querySelector(selectors$i.quickAddModal));
+        modalTemplate.remove();
+
+        this.modal = document.querySelector(`${selectors$i.quickAddModal}[${attributes$a.productId}="${this.productId}"]`);
+        this.modal.querySelector(selectors$i.modalContent).innerHTML = new DOMParser().parseFromString(response, 'text/html').querySelector(selectors$i.apiContent).innerHTML;
+
+        this.modalCreatedCallback();
+      }
+    }
+
+    modalOpen() {
+      this.modal.showModal();
+      this.modal.setAttribute('open', true);
+      this.modal.removeAttribute('inert');
+
+      if (this.currentModal) {
+        this.currentModal.dispatchEvent(new CustomEvent('theme:modal:close', {bubbles: false}));
+      }
+
+      const focusTarget = this.modal.querySelector('[autofocus]') || this.modal.querySelector(selectors$i.focusable);
+      focusTarget.focus();
+
+      const mediaObject = {
+        container: this.modal,
+        id: this.productId,
+      };
+
+      theme.mediaInstances[this.id] = new Media(mediaObject);
+      theme.mediaInstances[this.id].init();
+
+      this.quickAddHolder.classList.add(classes$e.disabled);
+
+      if (this.modalButton) {
+        this.modalButton.classList.remove(classes$e.loading);
+        this.modalButton.disabled = false;
+      }
+
+      // Animate items
+      requestAnimationFrame(() => {
+        this.modal.querySelectorAll(selectors$i.animation).forEach((item) => {
+          item.classList.add(classes$e.animated);
+        });
+      });
+
+      document.dispatchEvent(new CustomEvent('theme:quick-add:open', {bubbles: true}));
+      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
+      document.addEventListener('theme:product:added', this.modalCloseOnProductAdded, {once: true});
+    }
+
+    modalClose() {
+      if (this.isAnimating) {
+        return;
+      }
+
+      if (!this.modal.hasAttribute(attributes$a.closing)) {
+        this.modal.setAttribute(attributes$a.closing, '');
+        this.isAnimating = true;
+        return;
+      }
+
+      this.modal.close();
+      this.modal.removeAttribute(attributes$a.closing);
+      this.modal.setAttribute('inert', '');
+      this.modal.classList.remove(classes$e.loading);
+
+      const allMedia = this.modal.querySelectorAll(selectors$i.media);
+
+      allMedia.forEach((media) => {
+        media.dispatchEvent(new CustomEvent('pause'));
+      });
+
+      if (this.modalButton) {
+        this.modalButton.disabled = false;
+      }
+
+      if (this.quickAddHolder && this.quickAddHolder.classList.contains(classes$e.disabled)) {
+        this.quickAddHolder.classList.remove(classes$e.disabled);
+      }
+
+      this.resetAnimatedItems();
+
+      const hasOpenDrawer = this.cartDrawer && this.cartDrawer.classList.contains(classes$e.open);
+      const hasOpenModal = document.querySelector('dialog[open]');
+
+      // Unlock scroll if no other drawers & modals are open
+      if (!hasOpenDrawer && !hasOpenModal) {
+        document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
+      }
+
+      document.removeEventListener('theme:product:added', this.modalCloseOnProductAdded);
+    }
+
+    modalEvents() {
+      // Close button click event
+      this.modal.querySelector(selectors$i.modalClose)?.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.modalClose();
+      });
+
+      // Close dialog on click outside content
+      this.modal.addEventListener('click', (event) => {
+        if (event.target.nodeName === 'DIALOG' && event.type === 'click') {
+          this.modalClose();
+        }
+      });
+
+      // Close dialog on click ESC key pressed
+      this.modal.addEventListener('keydown', (event) => {
+        if (event.code == theme.keyboardKeys.ESCAPE) {
+          event.preventDefault();
+          this.modalClose();
+        }
+      });
+
+      this.modal.addEventListener('theme:modal:close', () => {
+        this.modalClose();
+      });
+
+      // Close dialog after animation completes
+      this.modal.addEventListener('animationend', (event) => {
+        if (event.target !== this.modal) return;
+        this.isAnimating = false;
+
+        if (this.modal.hasAttribute(attributes$a.closing)) {
+          this.modalClose();
+
+          // Return focus to quick add button
+          if (document.body.classList.contains(classes$e.focused) && this.buttonQuickAdd) {
+            this.buttonQuickAdd.addEventListener(
+              'transitionend',
+              () => {
+                this.buttonQuickAdd.focus();
+                this.buttonQuickAdd.classList.remove(classes$e.visible);
+              },
+              {once: true}
+            );
+            this.buttonQuickAdd.classList.add(classes$e.visible);
+          }
+        }
+      });
+    }
+
+    modalCloseOnProductAdded() {
+      this.resetQuickAddButtons();
+      if (this.modal && this.modal.hasAttribute('open')) {
+        this.modalClose();
+      }
+    }
+
+    quickAddLoadingToggle(e) {
+      if (e.target != this.quickAddHolder) return;
+
+      this.quickAddHolder.classList.remove(classes$e.disabled);
+    }
+
+    /**
+     * Handle error cart response
+     */
+    errorHandler() {
+      this.quickAddHolder.addEventListener('theme:cart:error', (event) => {
+        const holder = event.detail.holder;
+        const parentProduct = holder.closest(`[${selectors$i.productGridItem}]`);
+        if (!parentProduct) return;
+
+        const errorMessageHolder = holder.querySelector(selectors$i.messageError);
+        const hasOverlayText = parentProduct.classList.contains(classes$e.overlayText);
+        const productInfo = parentProduct.querySelector(selectors$i.productInformationHolder);
+        const button = holder.querySelector(selectors$i.buttonAddToCart);
+
+        if (button) {
+          button.classList.remove(classes$e.added, classes$e.loading);
+          holder.classList.add(classes$e.error);
+        }
+
+        if (errorMessageHolder) {
+          errorMessageHolder.innerText = event.detail.description;
+        }
+
+        if (hasOverlayText) {
+          productInfo.classList.add(classes$e.hidden);
+        }
+
+        setTimeout(() => {
+          this.resetQuickAddButtons();
+
+          if (hasOverlayText) {
+            productInfo.classList.remove(classes$e.hidden);
+          }
+        }, settings.errorDelay);
+      });
+    }
+
+    /**
+     * Reset buttons to default states
+     */
+    resetQuickAddButtons() {
+      if (this.quickAddHolder) {
+        this.quickAddHolder.classList.remove(classes$e.visible, classes$e.error);
+      }
+
+      if (this.buttonQuickAdd) {
+        this.buttonQuickAdd.classList.remove(classes$e.added);
+        this.buttonQuickAdd.disabled = false;
+      }
+    }
+
+    renderModal() {
+      if (this.modal) {
+        this.modalOpen();
+      } else {
+        window
+          .fetch(`${window.theme.routes.root}products/${this.handle}?section_id=api-product-upsell`)
+          .then(this.upsellErrorsHandler)
+          .then((response) => {
+            return response.text();
+          })
+          .then((response) => {
+            this.modalCreate(response);
+          });
+      }
+    }
+
+    modalCreatedCallback() {
+      this.modalEvents();
+      this.modalOpen();
+
+      new InitSlider(null, this.modal);
+
+      const swatchElements = this.modal.querySelectorAll(selectors$i.swatch);
+      if (swatchElements.length) {
+        swatchElements.forEach((el) => {
+          new Swatch(el);
+        });
+      }
+
+      const wrappers = this.modal.querySelectorAll(selectors$i.popoutWrapper);
+      if (wrappers.length) {
+        wrappers.forEach((wrapper) => {
+          new Popout(wrapper);
+        });
+      }
+
+      wrapElements(this.modal);
+    }
+
+    upsellErrorsHandler(response) {
+      if (!response.ok) {
+        return response.json().then(function (json) {
+          const e = new FetchError({
+            status: response.statusText,
+            headers: response.headers,
+            json: json,
+          });
+          throw e;
+        });
+      }
+      return response;
+    }
+
+    resetAnimatedItems() {
+      this.modal?.querySelectorAll(selectors$i.animation).forEach((item) => {
+        item.classList.remove(classes$e.animated);
+      });
+    }
+  }
+
+  register('product-grid', [slider, swatchGridSection, tabs, siblings]);
+
+  if (!customElements.get('quick-add-product')) {
+    customElements.define('quick-add-product', QuickAddProduct);
+  }
+
+  const tokensReducer = (acc, token) => {
+    const {el, elStyle, elHeight, rowsLimit, rowsWrapped, options} = acc;
+    let oldBuffer = acc.buffer;
+    let newBuffer = oldBuffer;
+
+    if (rowsWrapped === rowsLimit + 1) {
+      return {...acc};
+    }
+    const textBeforeWrap = oldBuffer;
+    let newRowsWrapped = rowsWrapped;
+    let newHeight = elHeight;
+    el.innerHTML = newBuffer = oldBuffer.length ? `${oldBuffer}${options.delimiter}${token}${options.replaceStr}` : `${token}${options.replaceStr}`;
+
+    if (parseFloat(elStyle.height) > parseFloat(elHeight)) {
+      newRowsWrapped++;
+      newHeight = elStyle.height;
+
+      if (newRowsWrapped === rowsLimit + 1) {
+        el.innerHTML = newBuffer = textBeforeWrap[textBeforeWrap.length - 1] === '.' && options.replaceStr === '...' ? `${textBeforeWrap}..` : `${textBeforeWrap}${options.replaceStr}`;
+
+        return {...acc, elHeight: newHeight, rowsWrapped: newRowsWrapped};
+      }
+    }
+
+    el.innerHTML = newBuffer = textBeforeWrap.length ? `${textBeforeWrap}${options.delimiter}${token}` : `${token}`;
+
+    return {...acc, buffer: newBuffer, elHeight: newHeight, rowsWrapped: newRowsWrapped};
+  };
+
+  const ellipsis = (selector = '', rows = 1, options = {}) => {
+    const defaultOptions = {
+      replaceStr: '...',
+      debounceDelay: 250,
+      delimiter: ' ',
+    };
+
+    const opts = {...defaultOptions, ...options};
+
+    const elements =
+      selector &&
+      (selector instanceof NodeList
+        ? selector
+        : selector.nodeType === 1 // if node type is Node.ELEMENT_NODE
+        ? [selector] // wrap it in (NodeList) if it is a single node
+        : document.querySelectorAll(selector));
+
+    for (let i = 0; i < elements.length; i++) {
+      const el = elements[i];
+      const elementHtml = el.innerHTML;
+      const commentRegex = /<!--[\s\S]*?-->/g;
+      const htmlWithoutComments = elementHtml.replace(commentRegex, '');
+      const splittedText = htmlWithoutComments.split(opts.delimiter);
+
+      el.innerHTML = '';
+      const elStyle = window.getComputedStyle(el);
+
+      splittedText.reduce(tokensReducer, {
+        el,
+        buffer: el.innerHTML,
+        elStyle,
+        elHeight: 0,
+        rowsLimit: rows,
+        rowsWrapped: 0,
+        options: opts,
+      });
+    }
+  };
+
+  const fadeOut = (el, callback = null) => {
+    el.style.opacity = 1;
+
+    (function fade() {
+      if ((el.style.opacity -= 0.1) < 0) {
+        el.style.display = 'none';
+      } else {
+        requestAnimationFrame(fade);
+      }
+
+      if (parseFloat(el.style.opacity) === 0 && typeof callback === 'function') {
+        callback();
+      }
+    })();
+  };
+
+  const selectors$h = {
+    pickupContainer: 'data-store-availability-container',
     shopifySection: '.shopify-section',
     drawer: '[data-pickup-drawer]',
-    drawerBody: '[data-pickup-drawer-body]',
     drawerOpen: '[data-pickup-drawer-open]',
     drawerClose: '[data-pickup-drawer-close]',
-    body: 'body',
   };
 
-  const classes$n = {
+  const classes$d = {
     isOpen: 'is-open',
+    isHidden: 'hidden',
+    isFocused: 'is-focused',
   };
 
-  let sections$i = {};
+  const attributes$9 = {
+    drawerUnderlay: 'data-drawer-underlay',
+  };
+
+  let sections$a = {};
 
   class PickupAvailability {
     constructor(section) {
       this.container = section.container;
       this.drawer = null;
-      this.drawerBody = null;
       this.buttonDrawerOpen = null;
       this.buttonDrawerClose = null;
-      this.body = document.querySelector(selectors$D.body);
       this.a11y = a11y;
 
       this.container.addEventListener('theme:variant:change', (event) => this.fetchPickupAvailability(event));
-
-      this.closeEvent();
     }
 
     fetchPickupAvailability(event) {
-      const container = this.container.querySelector(selectors$D.pickupContainer);
-      const variant = event.detail.variant;
+      const container = this.container.querySelector(`[${selectors$h.pickupContainer}]`);
+      if (!container) return;
+      if ((event && !event.detail.variant) || (event && event.detail.variant && !event.detail.variant.available)) {
+        container.classList.add(classes$d.isHidden);
+        return;
+      }
+      const variantID = event && event.detail.variant ? event.detail.variant.id : container.getAttribute(selectors$h.pickupContainer);
+      this.drawer = document.querySelector(selectors$h.drawer);
 
       // Remove cloned instances of pickup drawer
       if (this.drawer) {
-        this.body.removeChild(this.drawer);
+        document.body.removeChild(this.drawer);
       }
 
-      if (container && variant) {
-        fetch(`${window.theme.routes.root}variants/${variant.id}/?section_id=api-pickup-availability`)
+      if (variantID) {
+        fetch(`${window.theme.routes.root}variants/${variantID}/?section_id=api-pickup-availability`)
+          .then(this.handleErrors)
           .then((response) => response.text())
           .then((text) => {
-            const pickupAvailabilityHTML = new DOMParser().parseFromString(text, 'text/html').querySelector(selectors$D.shopifySection).innerHTML;
+            const pickupAvailabilityHTML = new DOMParser().parseFromString(text, 'text/html').querySelector(selectors$h.shopifySection).innerHTML;
             container.innerHTML = pickupAvailabilityHTML;
 
-            this.drawer = this.container.querySelector(selectors$D.drawer);
+            this.drawer = this.container.querySelector(selectors$h.drawer);
+            if (!this.drawer) {
+              container.classList.add(classes$d.isHidden);
+              return;
+            }
             // Clone Pickup drawer and append it to the end of <body>
             this.clone = this.drawer.cloneNode(true);
-            this.body.appendChild(this.clone);
+            document.body.appendChild(this.clone);
 
             // Delete the original instance of pickup drawer
+            container.classList.remove(classes$d.isHidden);
             container.removeChild(this.drawer);
 
-            this.drawer = this.body.querySelector(selectors$D.drawer);
-            this.drawerBody = this.body.querySelector(selectors$D.drawerBody);
-            this.buttonDrawerOpen = this.body.querySelector(selectors$D.drawerOpen);
-            this.buttonDrawerClose = this.body.querySelectorAll(selectors$D.drawerClose);
+            this.drawer = document.querySelector(selectors$h.drawer);
+            this.buttonDrawerOpen = document.querySelector(selectors$h.drawerOpen);
+            this.buttonDrawerClose = document.querySelectorAll(selectors$h.drawerClose);
 
             if (this.buttonDrawerOpen) {
               this.buttonDrawerOpen.addEventListener('click', () => {
@@ -10471,7 +10759,7 @@
             }
 
             this.drawer.addEventListener('keyup', (evt) => {
-              if (evt.which !== window.theme.keyboardKeys.ESCAPE) {
+              if (evt.code !== window.theme.keyboardKeys.ESCAPE) {
                 return;
               }
               this.closeDrawer();
@@ -10485,13 +10773,14 @@
 
     openDrawer() {
       if (this.drawer) {
-        this.drawer.classList.add(classes$n.isOpen);
-        this.drawer.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true, detail: this.drawerBody}));
+        this.drawer.classList.add(classes$d.isOpen);
+        this.drawer.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
+        this.onBodyClickEvent = this.onBodyClickEvent || this.onBodyClick.bind(this);
+        document.body.addEventListener('click', this.onBodyClickEvent);
 
-        // Focus the close button on pickup drawer close
+        // Focus the close button on pickup drawer open
         setTimeout(() => {
-          const elementToFocus = this.drawer.querySelector(selectors$D.drawerClose);
-          this.a11y.removeTrapFocus();
+          const elementToFocus = this.drawer.querySelector(selectors$h.drawerClose);
           this.a11y.trapFocus(this.drawer, {
             elementToFocus: elementToFocus,
           });
@@ -10501,42 +10790,621 @@
 
     closeDrawer() {
       if (this.drawer) {
-        this.drawer.classList.remove(classes$n.isOpen);
-        this.drawer.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true, detail: this.drawerBody}));
         this.a11y.removeTrapFocus();
+        this.drawer.classList.remove(classes$d.isOpen);
+        document.body.removeEventListener('click', this.onBodyClickEvent);
+        document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
 
         // Focus the last element on pickup drawer close
-        if (window.accessibility.lastElement) {
-          setTimeout(() => {
+        if (window.accessibility.lastElement && document.body.classList.contains(classes$d.isFocused)) {
+          requestAnimationFrame(() => {
             window.accessibility.lastElement.focus();
-          }, 200);
+          });
         }
       }
     }
 
-    /**
-     * Body click event to close pickup drawer
-     *
-     * @return  {Void}
-     */
-    closeEvent() {
-      document.addEventListener('click', (event) => {
-        const clickedElement = event.target;
+    onBodyClick(event) {
+      if (!this.container.contains(event.target) || event.target.hasAttribute(attributes$9.drawerUnderlay)) this.closeDrawer();
+    }
 
-        if (!clickedElement.matches(selectors$D.drawerOpen) && !clickedElement.closest(selectors$D.drawer)) {
-          this.closeDrawer();
-        }
-      });
+    handleErrors(response) {
+      if (!response.ok) {
+        return response.json().then(function (json) {
+          const e = new FetchError({
+            status: response.statusText,
+            headers: response.headers,
+            json: json,
+          });
+          throw e;
+        });
+      }
+      return response;
     }
   }
 
   const pickupAvailability = {
     onLoad() {
-      sections$i[this.id] = new PickupAvailability(this);
+      sections$a[this.id] = new PickupAvailability(this);
     },
   };
 
-  const selectors$E = {
+  const selectors$g = {
+    complementaryProducts: 'complementary-products',
+    quickAddProduct: 'quick-add-product',
+  };
+
+  const classes$c = {
+    loaded: 'is-loaded',
+  };
+
+  const attributes$8 = {
+    url: 'data-url',
+  };
+
+  class ComplementaryProducts extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      const handleIntersection = (entries, observer) => {
+        if (!entries[0].isIntersecting) return;
+        observer.unobserve(this);
+
+        if (this.hasAttribute(attributes$8.url) && this.getAttribute(attributes$8.url) !== '') {
+          fetch(this.getAttribute(attributes$8.url))
+            .then((response) => response.text())
+            .then((text) => {
+              const html = document.createElement('div');
+              html.innerHTML = text;
+              const recommendations = html.querySelector(selectors$g.complementaryProducts);
+
+              if (recommendations && recommendations.innerHTML.trim().length) {
+                this.innerHTML = recommendations.innerHTML;
+              }
+
+              if (html.querySelector(`${selectors$g.complementaryProducts} ${selectors$g.quickAddProduct}`)) {
+                this.classList.add(classes$c.loaded);
+              }
+            })
+            .catch((e) => {
+              console.error(e);
+            });
+        }
+      };
+
+      new IntersectionObserver(handleIntersection.bind(this), {rootMargin: '0px 0px 400px 0px'}).observe(this);
+    }
+  }
+
+  const events$1 = {
+    cartUpdate: 'cart-update',
+    variantChange: 'variant-change',
+    cartError: 'cart-error',
+  };
+
+  class RecipientForm extends HTMLElement {
+    cartUpdateUnsubscriber = undefined;
+    variantChangeUnsubscriber = undefined;
+    cartErrorUnsubscriber = undefined;
+    constructor() {
+      super();
+      this.checkboxInput = this.querySelector(`#Recipient-Checkbox-${this.dataset.sectionIdForm}`);
+      this.checkboxInput.disabled = false;
+      this.hiddenControlField = this.querySelector(`#Recipient-Control-${this.dataset.sectionIdForm}`);
+      this.hiddenControlField.disabled = true;
+      this.emailInput = this.querySelector(`#Recipient-email-${this.dataset.sectionIdForm}`);
+      this.nameInput = this.querySelector(`#Recipient-name-${this.dataset.sectionIdForm}`);
+      this.messageInput = this.querySelector(`#Recipient-message-${this.dataset.sectionIdForm}`);
+      this.errorMessageWrapper = this.querySelector('.product-form__recipient-error-message-wrapper');
+      this.errorMessageList = this.errorMessageWrapper?.querySelector('ul');
+      this.errorMessage = this.errorMessageWrapper?.querySelector('span.error-message');
+      this.defaultErrorHeader = this.errorMessage?.textContent;
+      this.currentProductVariantId = this.dataset.productVariantId;
+      this.addEventListener('change', this.onChange.bind(this));
+    }
+
+    connectedCallback() {
+      this.cartUpdateUnsubscriber = subscribe(events$1.cartUpdate, (event) => {
+        if (event.source === 'product-form' && event.productVariantId && event.productVariantId.toString() === this.currentProductVariantId) {
+          this.resetRecipientForm();
+        }
+      });
+
+      this.variantChangeUnsubscriber = subscribe(events$1.variantChange, (event) => {
+        if (event.data.sectionId === this.dataset.sectionIdForm) {
+          this.currentProductVariantId = event.data.variant.id.toString();
+        }
+      });
+
+      this.cartUpdateUnsubscriber = subscribe(events$1.cartError, (event) => {
+        if (event.source === 'product-form' && event.productVariantId && event.productVariantId.toString() === this.currentProductVariantId) {
+          this.displayErrorMessage(event.message, event.errors);
+        }
+      });
+    }
+
+    disconnectedCallback() {
+      if (this.cartUpdateUnsubscriber) {
+        this.cartUpdateUnsubscriber();
+      }
+
+      if (this.variantChangeUnsubscriber) {
+        this.variantChangeUnsubscriber();
+      }
+
+      if (this.cartErrorUnsubscriber) {
+        this.cartErrorUnsubscriber();
+      }
+    }
+
+    onChange() {
+      if (!this.checkboxInput.checked) {
+        this.clearInputFields();
+        this.clearErrorMessage();
+      }
+
+      this.dispatchEvent(
+        new CustomEvent('theme:form:sticky', {
+          bubbles: true,
+          detail: {
+            element: 'accordion',
+          },
+        })
+      );
+    }
+
+    clearInputFields() {
+      this.emailInput.value = '';
+      this.nameInput.value = '';
+      this.messageInput.value = '';
+    }
+
+    displayErrorMessage(title, body) {
+      this.clearErrorMessage();
+      this.errorMessageWrapper.classList.add('is-visible');
+      if (typeof body === 'object') {
+        this.errorMessage.innerText = this.defaultErrorHeader;
+        return Object.entries(body).forEach(([key, value]) => {
+          const errorMessageId = `RecipientForm-${key}-error-${this.dataset.sectionIdForm}`;
+          const fieldSelector = `#Recipient-${key}-${this.dataset.sectionIdForm}`;
+          const placeholderElement = this.querySelector(`${fieldSelector}`);
+          const label = placeholderElement?.getAttribute('placeholder') || key;
+          const message = `${label} ${value}`;
+          const errorMessageElement = this.querySelector(`#${errorMessageId}`);
+          const errorTextElement = errorMessageElement?.querySelector('.error-message');
+          if (!errorTextElement) return;
+
+          if (this.errorMessageList) {
+            this.errorMessageList.appendChild(this.createErrorListItem(fieldSelector, message));
+          }
+
+          errorTextElement.innerText = `${message}.`;
+          errorMessageElement.classList.remove('hidden');
+
+          const inputElement = this[`${key}Input`];
+          if (!inputElement) return;
+
+          inputElement.setAttribute('aria-invalid', true);
+          inputElement.setAttribute('aria-describedby', errorMessageId);
+        });
+      }
+
+      this.errorMessage.innerText = body;
+    }
+
+    createErrorListItem(target, message) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.setAttribute('href', target);
+      a.innerText = message;
+      li.appendChild(a);
+      li.className = 'error-message';
+      return li;
+    }
+
+    clearErrorMessage() {
+      this.errorMessageWrapper.classList.remove('is-visible');
+
+      if (this.errorMessageList) this.errorMessageList.innerHTML = '';
+
+      this.querySelectorAll('.recipient-fields .form__message').forEach((field) => {
+        field.classList.add('hidden');
+        const textField = field.querySelector('.error-message');
+        if (textField) textField.innerText = '';
+      });
+
+      [this.emailInput, this.messageInput, this.nameInput].forEach((inputElement) => {
+        inputElement.setAttribute('aria-invalid', false);
+        inputElement.removeAttribute('aria-describedby');
+      });
+    }
+
+    resetRecipientForm() {
+      if (this.checkboxInput.checked) {
+        this.checkboxInput.checked = false;
+        this.clearInputFields();
+        this.clearErrorMessage();
+      }
+    }
+  }
+
+  const selectors$f = {
+    slideshow: '[data-product-slideshow]',
+    dataStickyEnabled: 'data-sticky-enabled',
+    productPage: '.product__page',
+    formWrapper: '[data-form-wrapper]',
+    headerSticky: '[data-header-sticky]',
+    headerHeight: '[data-header-height]',
+  };
+
+  const classes$b = {
+    sticky: 'is-sticky',
+  };
+
+  window.theme.variables = {
+    productPageSticky: false,
+  };
+
+  const sections$9 = {};
+
+  class ProductSticky {
+    constructor(section) {
+      this.section = section;
+      this.container = section.container;
+      this.stickyEnabled = this.container.getAttribute(selectors$f.dataStickyEnabled) === 'true';
+      this.formWrapper = this.container.querySelector(selectors$f.formWrapper);
+      this.stickyScrollTop = 0;
+      this.scrollLastPosition = 0;
+      this.stickyDefaultTop = 0;
+      this.currentPoint = 0;
+      this.defaultTopBottomSpacings = 30;
+      this.scrollTop = window.scrollY;
+      this.scrollDirectionDown = true;
+      this.requestAnimationSticky = null;
+      this.stickyFormLoad = true;
+      this.stickyFormLastHeight = null;
+      this.onChangeCounter = 0;
+      this.scrollEvent = (e) => this.scrollEvents(e);
+      this.resizeEvent = (e) => this.resizeEvents(e);
+
+      // The code should execute after truncate text in product.js - 50ms
+      setTimeout(() => {
+        this.init();
+      }, 50);
+    }
+
+    init() {
+      if (this.stickyEnabled) {
+        this.stickyScrollCheck();
+
+        document.addEventListener('theme:resize', this.resizeEvent);
+      }
+
+      this.initSticky();
+    }
+
+    initSticky() {
+      if (theme.variables.productPageSticky) {
+        this.requestAnimationSticky = requestAnimationFrame(() => this.calculateStickyPosition());
+
+        this.formWrapper.addEventListener('theme:form:sticky', (e) => {
+          this.removeAnimationFrame();
+
+          this.requestAnimationSticky = requestAnimationFrame(() => this.calculateStickyPosition(e));
+        });
+
+        document.addEventListener('theme:scroll', this.scrollEvent);
+      }
+    }
+
+    scrollEvents(e) {
+      this.scrollTop = e.detail.position;
+      this.scrollDirectionDown = e.detail.down;
+
+      if (!this.requestAnimationSticky) {
+        this.requestAnimationSticky = requestAnimationFrame(() => this.calculateStickyPosition());
+      }
+    }
+
+    resizeEvents(e) {
+      this.stickyScrollCheck();
+
+      document.removeEventListener('theme:scroll', this.scrollEvent);
+
+      this.initSticky();
+    }
+
+    stickyScrollCheck() {
+      const targetFormWrapper = this.container.querySelector(`${selectors$f.productPage} ${selectors$f.formWrapper}`);
+
+      if (!targetFormWrapper) return;
+
+      if (isDesktop()) {
+        const form = this.container.querySelector(selectors$f.formWrapper);
+        const slideshow = this.container.querySelector(selectors$f.slideshow);
+        if (!form || !slideshow) return;
+        const productCopyHeight = form.offsetHeight;
+        const productImagesHeight = slideshow.offsetHeight;
+
+        // Is the product description and form taller than window space
+        // Is also shorter than the window and images
+        if (productCopyHeight < productImagesHeight) {
+          theme.variables.productPageSticky = true;
+          targetFormWrapper.classList.add(classes$b.sticky);
+        } else {
+          theme.variables.productPageSticky = false;
+          targetFormWrapper.classList.remove(classes$b.sticky);
+        }
+      } else {
+        theme.variables.productPageSticky = false;
+        targetFormWrapper.classList.remove(classes$b.sticky);
+      }
+    }
+
+    calculateStickyPosition(e = null) {
+      const isScrollLocked = document.documentElement.hasAttribute('data-scroll-locked');
+      if (isScrollLocked) {
+        this.removeAnimationFrame();
+        return;
+      }
+
+      const eventExist = Boolean(e && e.detail);
+      const isAccordion = Boolean(eventExist && e.detail.element && e.detail.element === 'accordion');
+      const formWrapperHeight = this.formWrapper.offsetHeight;
+      const heightDifference = window.innerHeight - formWrapperHeight - this.defaultTopBottomSpacings;
+      const scrollDifference = Math.abs(this.scrollTop - this.scrollLastPosition);
+
+      if (this.scrollDirectionDown) {
+        this.stickyScrollTop -= scrollDifference;
+      } else {
+        this.stickyScrollTop += scrollDifference;
+      }
+
+      if (this.stickyFormLoad) {
+        if (document.querySelector(selectors$f.headerSticky) && document.querySelector(selectors$f.headerHeight)) {
+          this.stickyDefaultTop = parseInt(document.querySelector(selectors$f.headerHeight).getBoundingClientRect().height);
+        } else {
+          this.stickyDefaultTop = this.defaultTopBottomSpacings;
+        }
+
+        this.stickyScrollTop = this.stickyDefaultTop;
+      }
+
+      this.stickyScrollTop = Math.min(Math.max(this.stickyScrollTop, heightDifference), this.stickyDefaultTop);
+
+      const differencePoint = this.stickyScrollTop - this.currentPoint;
+      this.currentPoint = this.stickyFormLoad ? this.stickyScrollTop : this.currentPoint + differencePoint * 0.5;
+
+      this.formWrapper.style.setProperty('--sticky-top', `${this.currentPoint}px`);
+
+      this.scrollLastPosition = this.scrollTop;
+      this.stickyFormLoad = false;
+
+      if (
+        (isAccordion && this.onChangeCounter <= 10) ||
+        (isAccordion && this.stickyFormLastHeight !== formWrapperHeight) ||
+        (this.stickyScrollTop !== this.currentPoint && this.requestAnimationSticky)
+      ) {
+        if (isAccordion) {
+          this.onChangeCounter += 1;
+        }
+
+        if (isAccordion && this.stickyFormLastHeight !== formWrapperHeight) {
+          this.onChangeCounter = 11;
+        }
+
+        this.requestAnimationSticky = requestAnimationFrame(() => this.calculateStickyPosition(e));
+      } else if (this.requestAnimationSticky) {
+        this.removeAnimationFrame();
+      }
+
+      this.stickyFormLastHeight = formWrapperHeight;
+    }
+
+    removeAnimationFrame() {
+      if (this.requestAnimationSticky) {
+        cancelAnimationFrame(this.requestAnimationSticky);
+        this.requestAnimationSticky = null;
+        this.onChangeCounter = 0;
+      }
+    }
+
+    onUnload() {
+      if (this.stickyEnabled) {
+        document.removeEventListener('theme:resize', this.resizeEvent);
+      }
+
+      if (theme.variables.productPageSticky) {
+        document.removeEventListener('theme:scroll', this.scrollEvent);
+      }
+    }
+  }
+
+  const productStickySection = {
+    onLoad() {
+      sections$9[this.id] = new ProductSticky(this);
+    },
+    onUnload() {
+      sections$9[this.id].onUnload();
+    },
+  };
+
+  const selectors$e = {
+    section: 'data-section-type',
+    shareButton: '[data-share-button]',
+    shareMessage: '[data-share-message]',
+  };
+
+  const classes$a = {
+    visible: 'is-visible',
+  };
+
+  class ShareButton extends HTMLElement {
+    constructor() {
+      super();
+
+      this.container = this.closest(`[${selectors$e.section}]`);
+      this.shareButton = this.querySelector(selectors$e.shareButton);
+      this.shareMessage = this.querySelector(selectors$e.shareMessage);
+      this.urlToShare = this.shareButton.dataset.shareUrl ? this.shareButton.dataset.shareUrl : document.location.href;
+
+      this.init();
+      this.updateShareLink();
+    }
+
+    init() {
+      if (navigator.share) {
+        this.shareButton.addEventListener('click', () => {
+          navigator.share({url: this.urlToShare, title: document.title});
+        });
+      } else {
+        this.shareButton.addEventListener('click', this.copyToClipboard.bind(this));
+      }
+    }
+
+    updateShareLink() {
+      if (this.container.getAttribute(selectors$e.section) == 'product') {
+        this.container.addEventListener('theme:variant:change', (event) => {
+          if (event.detail.variant) {
+            this.urlToShare = `${this.urlToShare.split('?')[0]}?variant=${event.detail.variant.id}`;
+          }
+        });
+      }
+    }
+
+    copyToClipboard() {
+      navigator.clipboard.writeText(this.urlToShare).then(() => {
+        this.shareMessage.classList.add(classes$a.visible);
+
+        const removeVisibleClass = () => {
+          this.shareMessage.classList.remove(classes$a.visible);
+          this.shareMessage.removeEventListener('animationend', removeVisibleClass);
+        };
+
+        this.shareMessage.addEventListener('animationend', removeVisibleClass);
+      });
+    }
+  }
+
+  const selectors$d = {
+    optionPosition: 'data-option-position',
+    optionInput: '[name^="options"], [data-popout-option]',
+    optionInputCurrent: '[name^="options"]:checked, [name^="options"][type="hidden"]',
+    selectOptionValue: 'data-value',
+    popout: '[data-popout]',
+  };
+
+  const classes$9 = {
+    soldOut: 'sold-out',
+    unavailable: 'unavailable',
+    sale: 'sale',
+  };
+
+  /**
+   * Variant Sellout Precrime Click Preview
+   * I think of this like the precrime machine in Minority report.  It gives a preview
+   * of every possible click action, given the current form state.  The logic is:
+   *
+   * for each clickable name=options[] variant selection element
+   * find the value of the form if the element were clicked
+   * lookup the variant with those value in the product json
+   * clear the classes, add .unavailable if it's not found,
+   * and add .sold-out if it is out of stock
+   *
+   * Caveat: we rely on the option position so we don't need
+   * to keep a complex map of keys and values.
+   */
+
+  class SelloutVariants {
+    constructor(section, productJSON) {
+      this.container = section;
+      this.productJSON = productJSON;
+      this.optionElements = this.container.querySelectorAll(selectors$d.optionInput);
+
+      if (this.productJSON && this.optionElements.length) {
+        this.init();
+      }
+    }
+
+    init() {
+      this.update();
+    }
+
+    update() {
+      this.getCurrentState();
+
+      this.optionElements.forEach((el) => {
+        const parent = el.closest(`[${selectors$d.optionPosition}]`);
+        if (!parent) return;
+        const val = el.value || el.getAttribute(selectors$d.selectOptionValue);
+        const positionString = parent.getAttribute(selectors$d.optionPosition);
+        // subtract one because option.position in liquid does not count form zero, but JS arrays do
+        const position = parseInt(positionString, 10) - 1;
+        const selectPopout = el.closest(selectors$d.popout);
+
+        let newVals = [...this.selections];
+        newVals[position] = val;
+
+        const found = this.productJSON.variants.find((element) => {
+          // only return true if every option matches our hypothetical selection
+          let perfectMatch = true;
+          for (let index = 0; index < newVals.length; index++) {
+            if (element.options[index] !== newVals[index]) {
+              perfectMatch = false;
+            }
+          }
+          return perfectMatch;
+        });
+
+        el.classList.remove(classes$9.soldOut, classes$9.unavailable);
+        el.parentNode.classList.remove(classes$9.sale);
+
+        if (selectPopout) {
+          selectPopout.classList.remove(classes$9.soldOut, classes$9.unavailable, classes$9.sale);
+        }
+
+        if (typeof found === 'undefined') {
+          el.classList.add(classes$9.unavailable);
+
+          if (selectPopout) {
+            selectPopout.classList.add(classes$9.unavailable);
+          }
+        } else if (found && found.available === false) {
+          el.classList.add(classes$9.soldOut);
+
+          if (selectPopout) {
+            selectPopout.classList.add(classes$9.soldOut);
+          }
+        }
+
+        if (found && found.compare_at_price > found.price && theme.settings.variantOnSale) {
+          el.parentNode.classList.add(classes$9.sale);
+        }
+      });
+    }
+
+    getCurrentState() {
+      this.selections = [];
+
+      const options = this.container.querySelectorAll(selectors$d.optionInputCurrent);
+      if (options.length) {
+        options.forEach((element) => {
+          const elemValue = element.value;
+          if (elemValue && elemValue !== '') {
+            this.selections.push(elemValue);
+          }
+        });
+      }
+    }
+  }
+
+  const events = {
+    variantChange: 'variant-change',
+  };
+
+  const selectors$c = {
     product: '[data-product]',
     productForm: '[data-product-form]',
     addToCart: '[data-add-to-cart]',
@@ -10553,65 +11421,128 @@
     unitPrice: '[data-product-unit-price]',
     unitBase: '[data-product-base]',
     unitWrapper: '[data-product-unit]',
-    preOrderTag: '_preorder',
+    isPreOrder: '[data-product-preorder]',
     sliderEnabled: 'flickity-enabled',
     productSlide: '.product__slide',
-    dataTallLayout: 'data-tall-layout',
-    dataEnableHistoryState: 'data-enable-history-state',
     subPrices: '[data-subscription-watch-price]',
     subSelectors: '[data-subscription-selectors]',
-    subOffWrap: '[data-price-off]',
     subsToggle: '[data-toggles-group]',
     subsChild: 'data-group-toggle',
-    subOffAmount: '[data-price-off-amount]',
     subDescription: '[data-plan-description]',
-    dataImageId: 'data-image-id',
-    idInput: '[name="id"]',
+    section: '[data-section-type]',
+    quickAddModal: '[data-quick-add-modal]',
+    priceOffWrap: '[data-price-off]',
+    priceOffType: '[data-price-off-type]',
+    priceOffAmount: '[data-price-off-amount]',
+    remainingCount: '[data-remaining-count]',
+    remainingMax: '[data-remaining-max]',
+    remainingWrapper: '[data-remaining-wrapper]',
+    remainingJSON: '[data-product-remaining-json]',
+    optionValue: '[data-option-value]',
+    optionPosition: '[data-option-position]',
+    installment: '[data-product-form-installment]',
+    inputId: 'input[name="id"]',
   };
 
-  const classes$o = {
-    hide: 'hide',
+  const classes$8 = {
+    hidden: 'hidden',
     variantSoldOut: 'variant--soldout',
-    variantUnavailable: 'variant--unavailabe',
+    variantUnavailable: 'variant--unavailable',
     productPriceSale: 'product__price--sale',
+    remainingLow: 'count-is-low',
+    remainingIn: 'count-is-in',
+    remainingOut: 'count-is-out',
+    remainingUnavailable: 'count-is-unavailable',
   };
 
-  class ProductAddForm {
-    constructor(section) {
-      this.section = section;
-      this.container = section.container;
-      this.tallLayout = this.container.getAttribute(selectors$E.dataTallLayout) === 'true';
-      this.product = this.container.querySelector(selectors$E.product);
-      this.productForm = this.container.querySelector(selectors$E.productForm);
+  const attributes$7 = {
+    dataTallLayout: 'data-tall-layout',
+    remainingMaxAttr: 'data-remaining-max',
+    dataEnableHistoryState: 'data-enable-history-state',
+    optionPosition: 'data-option-position',
+    dataImageId: 'data-image-id',
+  };
 
-      // Stop parsing if we don't have the product
-      if (!this.product || !this.productForm) {
-        return;
+  class ProductForm extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      this.cartAddEvents();
+
+      this.container = this.closest(selectors$c.section) || this.closest(selectors$c.quickAddModal);
+      if (!this.container) return;
+
+      this.sectionId = this.container.dataset.sectionId;
+      this.tallLayout = this.container.getAttribute(attributes$7.dataTallLayout) === 'true';
+      this.product = this.container.querySelector(selectors$c.product);
+      this.productForm = this.container.querySelector(selectors$c.productForm);
+      this.installmentForm = this.container.querySelector(selectors$c.installment);
+      this.sellout = null;
+
+      this.priceOffWrap = this.container.querySelector(selectors$c.priceOffWrap);
+      this.priceOffAmount = this.container.querySelector(selectors$c.priceOffAmount);
+      this.priceOffType = this.container.querySelector(selectors$c.priceOffType);
+      this.planDescription = this.container.querySelector(selectors$c.subDescription);
+
+      this.remainingWrapper = this.container.querySelector(selectors$c.remainingWrapper);
+
+      if (this.remainingWrapper) {
+        const remainingMaxWrap = this.container.querySelector(selectors$c.remainingMax);
+        if (remainingMaxWrap) {
+          this.remainingMaxInt = parseInt(remainingMaxWrap.getAttribute(attributes$7.remainingMaxAttr), 10);
+          this.remainingCount = this.container.querySelector(selectors$c.remainingCount);
+          this.remainingJSONWrapper = this.container.querySelector(selectors$c.remainingJSON);
+          this.remainingJSON = null;
+
+          if (this.remainingJSONWrapper && this.remainingJSONWrapper.innerHTML !== '') {
+            this.remainingJSON = JSON.parse(this.remainingJSONWrapper.innerHTML);
+          } else {
+            console.warn('Missing product quantity JSON');
+          }
+        }
       }
 
-      this.enableHistoryState = this.container.getAttribute(selectors$E.dataEnableHistoryState) === 'true';
-      this.hasUnitPricing = this.container.querySelector(selectors$E.unitWrapper);
-      this.subSelectors = this.container.querySelector(selectors$E.subSelectors);
-      this.subPrices = this.container.querySelector(selectors$E.subPrices);
+      this.enableHistoryState = this.container.getAttribute(attributes$7.dataEnableHistoryState) === 'true';
+      this.hasUnitPricing = this.container.querySelector(selectors$c.unitWrapper);
+      this.subSelectors = this.container.querySelector(selectors$c.subSelectors);
+      this.subPrices = this.container.querySelector(selectors$c.subPrices);
+      this.isPreOrder = this.container.querySelector(selectors$c.isPreOrder);
 
       const counter = new QuantityCounter(this.container);
       counter.init();
 
-      this.init();
-    }
-
-    init() {
       let productJSON = null;
-      const productElemJSON = this.container.querySelector(selectors$E.productJson);
+      const productElemJSON = this.container.querySelector(selectors$c.productJson);
       if (productElemJSON) {
         productJSON = productElemJSON.innerHTML;
       }
       if (productJSON) {
         this.productJSON = JSON.parse(productJSON);
         this.linkForm();
+        this.sellout = new SelloutVariants(this.container, this.productJSON);
       } else {
         console.error('Missing product JSON');
       }
+    }
+
+    cartAddEvents() {
+      this.buttonATC = this.querySelector(selectors$c.addToCart);
+      if (!this.buttonATC) return;
+
+      this.buttonATC.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        document.dispatchEvent(
+          new CustomEvent('theme:cart:add', {
+            detail: {
+              button: this.buttonATC,
+            },
+            bubbles: false,
+          })
+        );
+      });
     }
 
     destroy() {
@@ -10619,7 +11550,7 @@
     }
 
     linkForm() {
-      this.productForm = new ProductForm(this.productForm, this.productJSON, {
+      this.productForm = new ProductFormReader(this.container, this.productJSON, {
         onOptionChange: this.onOptionChange.bind(this),
         onPlanChange: this.onPlanChange.bind(this),
       });
@@ -10642,8 +11573,12 @@
       this.productState = this.setProductState(formState);
       this.updateAddToCartState(formState);
       this.updateProductPrices(formState);
+      this.updateSaleText(formState);
       this.updateSubscriptionText(formState);
+      this.updateRemaining(formState);
+      this.updateLegend(formState);
       this.fireHookEvent(formState);
+      this.sellout?.update(formState);
       if (this.enableHistoryState) {
         this.updateHistoryState(formState);
       }
@@ -10652,18 +11587,24 @@
     updateAddToCartState(formState) {
       const variant = formState.variant;
       let addText = theme.strings.addToCart;
-      const priceWrapper = this.container.querySelectorAll(selectors$E.priceWrapper);
-      const addToCart = this.container.querySelectorAll(selectors$E.addToCart);
-      const addToCartText = this.container.querySelectorAll(selectors$E.addToCartText);
-      const formWrapper = this.container.querySelectorAll(selectors$E.formWrapper);
+      const priceWrapper = this.container.querySelectorAll(selectors$c.priceWrapper);
+      const addToCart = this.container.querySelectorAll(selectors$c.addToCart);
+      const addToCartText = this.container.querySelectorAll(selectors$c.addToCartText);
+      const formWrapper = this.container.querySelectorAll(selectors$c.formWrapper);
 
-      if (this.productJSON.tags.includes(selectors$E.preOrderTag)) {
+      if (this.installmentForm && variant) {
+        const installmentInput = this.installmentForm.querySelector(selectors$c.inputId);
+        installmentInput.value = variant.id;
+        installmentInput.dispatchEvent(new Event('change', {bubbles: true}));
+      }
+
+      if (this.isPreOrder) {
         addText = theme.strings.preOrder;
       }
 
       if (priceWrapper.length && variant) {
         priceWrapper.forEach((element) => {
-          element.classList.remove(classes$o.hide);
+          element.classList.remove(classes$8.hidden);
         });
       }
 
@@ -10685,8 +11626,18 @@
         addToCartText.forEach((element) => {
           if (variant) {
             if (variant.available) {
+              if(element.attributes['data-product-with-price']){
+                const discountFloat = Math.floor(variant.price / 100).toFixed(2);
+                element.innerHTML=`<span class="text-box">${addText}</span><span class="text-box-price">$${discountFloat}</span>`
+              }
+              else
               element.innerHTML = addText;
             } else {
+              if(element.attributes['data-product-with-price']){
+                const discountFloat = Math.floor(variant.price / 100).toFixed(2);
+                element.innerHTML=`<span class="text-box">${theme.strings.soldOut}</span><span class="text-box-price">$${discountFloat}</span>`
+              }
+              else
               element.innerHTML = theme.strings.soldOut;
             }
           } else {
@@ -10699,18 +11650,25 @@
         formWrapper.forEach((element) => {
           if (variant) {
             if (variant.available) {
-              element.classList.remove(classes$o.variantSoldOut, classes$o.variantUnavailable);
+              element.classList.remove(classes$8.variantSoldOut, classes$8.variantUnavailable);
             } else {
-              element.classList.add(classes$o.variantSoldOut);
-              element.classList.remove(classes$o.variantUnavailable);
+              element.classList.add(classes$8.variantSoldOut);
+              element.classList.remove(classes$8.variantUnavailable);
             }
-            const formSelect = element.querySelector(selectors$E.originalSelectorId);
+
+            const formSelect = element.querySelector(selectors$c.originalSelectorId);
             if (formSelect) {
               formSelect.value = variant.id;
             }
+
+            const inputId = element.querySelector(`${selectors$c.inputId}[form]`);
+            if (inputId) {
+              inputId.value = variant.id;
+              inputId.dispatchEvent(new Event('change'));
+            }
           } else {
-            element.classList.add(classes$o.variantUnavailable);
-            element.classList.remove(classes$o.variantSoldOut);
+            element.classList.add(classes$8.variantUnavailable);
+            element.classList.remove(classes$8.variantSoldOut);
           }
         });
       }
@@ -10735,6 +11693,33 @@
       }
     }
 
+    updateRemaining(formState) {
+      const variant = formState.variant;
+
+      this.remainingWrapper?.classList.remove(classes$8.remainingIn, classes$8.remainingOut, classes$8.remainingUnavailable, classes$8.remainingLow);
+
+      if (variant && this.remainingWrapper && this.remainingJSON) {
+        const remaining = this.remainingJSON[variant.id];
+
+        if (remaining === 'out' || remaining < 1) {
+          this.remainingWrapper.classList.add(classes$8.remainingOut);
+        }
+
+        if (remaining === 'in' || remaining >= this.remainingMaxInt) {
+          this.remainingWrapper.classList.add(classes$8.remainingIn);
+        }
+        if (remaining === 'low' || (remaining > 0 && remaining < this.remainingMaxInt)) {
+          this.remainingWrapper.classList.add(classes$8.remainingLow);
+
+          if (this.remainingCount) {
+            this.remainingCount.innerHTML = remaining;
+          }
+        }
+      } else if (!variant && this.remainingWrapper) {
+        this.remainingWrapper.classList.add(classes$8.remainingUnavailable);
+      }
+    }
+
     getBaseUnit(variant) {
       return variant.unit_price_measurement.reference_value === 1
         ? variant.unit_price_measurement.reference_unit
@@ -10742,24 +11727,24 @@
     }
 
     subsToggleListeners() {
-      const toggles = this.container.querySelectorAll(selectors$E.subsToggle);
+      const toggles = this.container.querySelectorAll(selectors$c.subsToggle);
 
       toggles.forEach((toggle) => {
         toggle.addEventListener(
           'change',
           function (e) {
             const val = e.target.value.toString();
-            const selected = this.container.querySelector(`[${selectors$E.subsChild}="${val}"]`);
-            const groups = this.container.querySelectorAll(`[${selectors$E.subsChild}]`);
+            const selected = this.container.querySelector(`[${selectors$c.subsChild}="${val}"]`);
+            const groups = this.container.querySelectorAll(`[${selectors$c.subsChild}]`);
             if (selected) {
-              selected.classList.remove(classes$o.hide);
+              selected.classList.remove(classes$8.hidden);
               const first = selected.querySelector(`[name="selling_plan"]`);
               first.checked = true;
               first.dispatchEvent(new Event('change'));
             }
             groups.forEach((group) => {
               if (group !== selected) {
-                group.classList.add(classes$o.hide);
+                group.classList.add(classes$8.hidden);
                 const plans = group.querySelectorAll(`[name="selling_plan"]`);
                 plans.forEach((plan) => {
                   plan.checked = false;
@@ -10772,41 +11757,64 @@
       });
     }
 
-    updateSubscriptionText(formState) {
-      const plan = formState.plan;
-      const subOffWrap = this.container.querySelector(selectors$E.subOffWrap);
-      const subOffAmount = this.container.querySelector(selectors$E.subOffAmount);
-      const planDecription = this.container.querySelector(selectors$E.subDescription);
-
+    updateSaleText(formState) {
       if (this.productState.planSale) {
-        const adjustment = plan.detail.price_adjustments[0];
+        this.updateSaleTextSubscription(formState);
+      } else if (this.productState.onSale) {
+        this.updateSaleTextStandard(formState);
+      } else if (this.priceOffWrap) {
+        this.priceOffWrap.classList.add(classes$8.hidden);
+      }
+    }
+
+    updateSaleTextStandard(formState) {
+      if (this.priceOffType) {
+        this.priceOffType.innerHTML = window.theme.strings.sale || 'sale';
+      }
+      if (this.priceOffAmount && this.priceOffWrap) {
+        const variant = formState.variant;
+        const discountFloat = (variant.compare_at_price - variant.price) / 100;
+        const discountInt = Math.floor(discountFloat);
+        this.priceOffAmount.innerHTML = `$${discountInt}`;
+        this.priceOffWrap.classList.remove(classes$8.hidden);
+      }
+    }
+
+    updateSubscriptionText(formState) {
+      if (formState.plan && this.planDescription) {
+        this.planDescription.innerHTML = formState.plan.detail.description;
+        this.planDescription.classList.remove(classes$8.hidden);
+      } else if (this.planDescription) {
+        this.planDescription.classList.add(classes$8.hidden);
+      }
+    }
+
+    updateSaleTextSubscription(formState) {
+      if (this.priceOffType) {
+        this.priceOffType.innerHTML = window.theme.strings.subscription || 'subscripton';
+      }
+
+      if (this.priceOffAmount && this.priceOffWrap) {
+        const adjustment = formState.plan.detail.price_adjustments[0];
         const discount = adjustment.value;
         if (adjustment && adjustment.value_type === 'percentage') {
-          subOffAmount.innerHTML = `${discount}%`;
+          this.priceOffAmount.innerHTML = `${discount}%`;
         } else {
-          subOffAmount.innerHTML = themeCurrency.formatMoney(discount, theme.moneyFormat);
+          this.priceOffAmount.innerHTML = themeCurrency.formatMoney(discount, theme.moneyFormat);
         }
-        subOffWrap.classList.remove(classes$o.hide);
-      } else if (subOffWrap) {
-        subOffWrap.classList.add(classes$o.hide);
-      }
-      if (plan) {
-        planDecription.innerHTML = plan.detail.description;
-        planDecription.classList.remove(classes$o.hide);
-      } else if (planDecription) {
-        planDecription.classList.add(classes$o.hide);
+        this.priceOffWrap.classList.remove(classes$8.hidden);
       }
     }
 
     updateProductPrices(formState) {
       const variant = formState.variant;
       const plan = formState.plan;
-      const priceWrappers = this.container.querySelectorAll(selectors$E.priceWrapper);
+      const priceWrappers = this.container.querySelectorAll(selectors$c.priceWrapper);
 
       priceWrappers.forEach((wrap) => {
-        const comparePriceEl = wrap.querySelector(selectors$E.comparePrice);
-        const productPriceEl = wrap.querySelector(selectors$E.productPrice);
-        const comparePriceText = wrap.querySelector(selectors$E.comparePriceText);
+        const comparePriceEl = wrap.querySelector(selectors$c.comparePrice);
+        const productPriceEl = wrap.querySelector(selectors$c.productPrice);
+        const comparePriceText = wrap.querySelector(selectors$c.comparePriceText);
 
         let comparePrice = '';
         let price = '';
@@ -10827,13 +11835,13 @@
 
         if (comparePriceEl) {
           if (this.productState.onSale || this.productState.planSale) {
-            comparePriceEl.classList.remove(classes$o.hide);
-            comparePriceText.classList.remove(classes$o.hide);
-            productPriceEl.classList.add(classes$o.productPriceSale);
+            comparePriceEl.classList.remove(classes$8.hidden);
+            comparePriceText.classList.remove(classes$8.hidden);
+            productPriceEl.classList.add(classes$8.productPriceSale);
           } else {
-            comparePriceEl.classList.add(classes$o.hide);
-            comparePriceText.classList.add(classes$o.hide);
-            productPriceEl.classList.remove(classes$o.productPriceSale);
+            comparePriceEl.classList.add(classes$8.hidden);
+            comparePriceText.classList.add(classes$8.hidden);
+            productPriceEl.classList.remove(classes$8.productPriceSale);
           }
           comparePriceEl.innerHTML = themeCurrency.formatMoney(comparePrice, theme.moneyFormat);
         }
@@ -10861,11 +11869,11 @@
       if (unitPrice) {
         const base = this.getBaseUnit(variant);
         const formattedPrice = themeCurrency.formatMoney(unitPrice, theme.moneyFormat);
-        this.container.querySelector(selectors$E.unitPrice).innerHTML = formattedPrice;
-        this.container.querySelector(selectors$E.unitBase).innerHTML = base;
-        showElement(this.container.querySelector(selectors$E.unitWrapper));
+        this.container.querySelector(selectors$c.unitPrice).innerHTML = formattedPrice;
+        this.container.querySelector(selectors$c.unitBase).innerHTML = base;
+        showElement(this.container.querySelector(selectors$c.unitWrapper));
       } else {
-        hideElement(this.container.querySelector(selectors$E.unitWrapper));
+        hideElement(this.container.querySelector(selectors$c.unitWrapper));
       }
     }
 
@@ -10879,6 +11887,13 @@
           bubbles: true,
         })
       );
+
+      publish(events.variantChange, {
+        data: {
+          sectionId: this.sectionId,
+          variant,
+        },
+      });
     }
 
     /**
@@ -10892,7 +11907,7 @@
      *  productState.requiresPlan - all the product variants requires a selling plan
      *  productState.hasPlan - there is a valid selling plan
      *  productState.planSale - plan has a discount to show next to price
-     *  productState.planPerDelivery - plan price does not equal per_delivery_price - a prepaid subscribtion
+     *  productState.planPerDelivery - plan price does not equal per_delivery_price - a prepaid subscription
      */
     setProductState(dataset) {
       const variant = dataset.variant;
@@ -10947,257 +11962,195 @@
       if (variant) {
         // Update variant image, if one is set
         if (variant.featured_media) {
-          const newImg = this.container.querySelector(`${selectors$E.productImage}[${selectors$E.dataImageId}="${variant.featured_media.id}"]`);
-          const newImageParent = newImg.closest(selectors$E.productSlide);
+          const newImg = this.container.querySelector(`[${attributes$7.dataImageId}="${variant.featured_media.id}"]`);
+          const newImageParent = newImg?.closest(selectors$c.productSlide);
           // If we have a mobile breakpoint or the tall layout is disabled,
           // just switch the slideshow.
+
           if (newImageParent) {
             const newImagePos = Array.from(newImageParent.parentElement.children).indexOf(newImageParent);
-            const slider = this.container.querySelector(selectors$E.productSlideshow);
+            const slider = this.container.querySelector(selectors$c.productSlideshow);
+            const isDesktopView = isDesktop();
 
-            if (slider && slider.classList.contains(selectors$E.sliderEnabled)) {
+            if (slider && slider.classList.contains(selectors$c.sliderEnabled)) {
               FlickityFade.data(slider).select(newImagePos);
+            } else if (slider && !isDesktopView) {
+              slider.scrollTo({
+                top: 0,
+                left: newImageParent.offsetLeft,
+                behavior: 'smooth',
+              });
             }
 
-            if (!theme.variables.bpSmall && this.tallLayout) {
+            if (isDesktopView && this.tallLayout) {
               // We know its a tall layout, if it's sticky
               // scroll to the images
               // Scroll to/reorder image unless it's the first photo on load
-              const targetScroll = newImg.getBoundingClientRect().top + window.scrollY;
+              const newImgTop = newImg.getBoundingClientRect().top;
 
-              if (newImagePos === 0 && targetScroll > window.pageYOffset) return;
+              if (newImagePos === 0 && newImgTop + window.scrollY > window.pageYOffset) return;
 
               // Scroll to variant image
               document.dispatchEvent(
-                new CustomEvent('tooltip:close', {
+                new CustomEvent('theme:tooltip:close', {
                   bubbles: false,
                   detail: {
                     hideTransition: false,
                   },
                 })
               );
-              window.scrollTo({
-                top: targetScroll,
-                left: 0,
-                behavior: 'smooth',
-              });
+
+              scrollTo(newImgTop);
             }
           }
         }
       }
     }
-  }
 
-  const productFormSection = {
-    onLoad() {
-      this.section = new ProductAddForm(this);
-    },
-  };
-
-  const selectors$F = {
-    elements: {
-      accordionHolder: '[data-accordion-holder]',
-      accordion: '[data-accordion]',
-      accordionToggle: '[data-accordion-toggle]',
-      accordionBody: '[data-accordion-body]',
-      accordionExpandValue: 'data-accordion-expand',
-      accordionBlockValue: 'data-block-id',
-    },
-    classes: {
-      open: 'is-open',
-    },
-  };
-
-  const sections$j = {};
-
-  class GlobalAccordions {
-    constructor(el) {
-      this.container = el.container;
-      this.accordion = this.container.querySelector(selectors$F.elements.accordion);
-      this.accordionToggles = this.container.querySelectorAll(selectors$F.elements.accordionToggle);
-      this.accordionTogglesLength = this.accordionToggles.length;
-      this.accordionBody = this.container.querySelector(selectors$F.elements.accordionBody);
-
-      if (this.accordionTogglesLength && this.accordionBody) {
-        this.accordionEvents();
-      }
-    }
-
-    accordionEvents() {
-      this.accordionToggles.forEach((element) => {
-        element.addEventListener(
-          'click',
-          throttle((event) => {
-            event.preventDefault();
-            const targetAccordionBody = element.parentElement.querySelector(selectors$F.elements.accordionBody);
-            if (targetAccordionBody) {
-              this.onAccordionToggle(element, targetAccordionBody);
+    updateLegend(formState) {
+      const variant = formState.variant;
+      if (variant) {
+        const optionValues = this.container.querySelectorAll(selectors$c.optionValue);
+        if (optionValues.length) {
+          optionValues.forEach((optionValue) => {
+            const selectorWrapper = optionValue.closest(selectors$c.optionPosition);
+            if (selectorWrapper) {
+              const optionPosition = selectorWrapper.getAttribute(attributes$7.optionPosition);
+              const optionIndex = parseInt(optionPosition, 10) - 1;
+              const selectedOptionValue = variant.options[optionIndex];
+              optionValue.innerHTML = selectedOptionValue;
             }
-          }, 800)
-        );
-      });
-
-      if (this.accordion.getAttribute(selectors$F.elements.accordionExpandValue) === 'true') {
-        this.accordionToggles[0].classList.add(selectors$F.classes.open);
-
-        showElement(this.accordionToggles[0].parentElement.querySelector(selectors$F.elements.accordionBody));
-      }
-    }
-
-    closeOtherAccordions(element, slide = true) {
-      let otherElements = [...this.accordionToggles];
-      const holder = this.container.closest(selectors$F.elements.accordionHolder);
-      if (holder) {
-        otherElements = [...holder.querySelectorAll(selectors$F.elements.accordionToggle)];
-      }
-
-      otherElements.filter((otherElement) => {
-        const otherElementAccordionBody = otherElement.parentElement.querySelector(selectors$F.elements.accordionBody);
-        if (otherElement !== element && otherElement.classList.contains(selectors$F.classes.open) && otherElementAccordionBody) {
-          this.onAccordionClose(otherElement, otherElementAccordionBody, slide);
-        }
-      });
-    }
-
-    onAccordionOpen(element, body, slide = true) {
-      element.classList.add(selectors$F.classes.open);
-      slideDown(body);
-
-      this.closeOtherAccordions(element, slide);
-    }
-
-    onAccordionClose(element, body, slide = true) {
-      element.classList.remove(selectors$F.classes.open);
-      if (slide) {
-        slideUp(body);
-      } else {
-        hideElement(body);
-      }
-    }
-
-    onAccordionToggle(element, body) {
-      element.classList.toggle(selectors$F.classes.open);
-      slideToggle(body);
-
-      this.closeOtherAccordions(element);
-    }
-
-    onBlockToggle(evt, blockSelect = true) {
-      const targetAccordionToggle = this.container.querySelector(`${selectors$F.elements.accordionToggle}[${selectors$F.elements.accordionBlockValue}="${evt.detail.blockId}"]`);
-      if (!targetAccordionToggle) return;
-      const targetAccordionBody = targetAccordionToggle.parentElement.querySelector(selectors$F.elements.accordionBody);
-      if (!targetAccordionBody) return;
-      if (blockSelect) {
-        this.onAccordionOpen(targetAccordionToggle, targetAccordionBody, false);
-      } else {
-        this.onAccordionClose(targetAccordionToggle, targetAccordionBody);
-      }
-    }
-
-    onSelectToggle(sectionSelect = true) {
-      if (this.accordionBody && this.accordionTogglesLength && this.accordionTogglesLength < 2) {
-        if (sectionSelect) {
-          this.onAccordionOpen(this.accordionToggles[0], this.accordionBody, false);
-        } else {
-          this.onAccordionClose(this.accordionToggles[0], this.accordionBody);
+          });
         }
       }
-    }
-
-    onSelect() {
-      this.onSelectToggle(true);
-    }
-
-    onDeselect() {
-      this.onSelectToggle(false);
-    }
-
-    onBlockSelect(evt) {
-      this.onBlockToggle(evt, true);
-    }
-
-    onBlockDeselect(evt) {
-      this.onBlockToggle(evt, false);
     }
   }
 
-  const accordions = {
-    onLoad() {
-      sections$j[this.id] = new GlobalAccordions(this);
-    },
-    onSelect() {
-      sections$j[this.id].onSelect();
-    },
-    onDeselect() {
-      sections$j[this.id].onDeselect();
-    },
-    onBlockSelect(e) {
-      sections$j[this.id].onBlockSelect(e);
-    },
-    onBlockDeselect(e) {
-      sections$j[this.id].onBlockDeselect(e);
-    },
+  const selectors$b = {
+    dialog: 'dialog',
+    focusable: 'button, [href], select, textarea, [tabindex]:not([tabindex="-1"])',
+    buttonModalOpen: '[data-modal-open]',
+    buttonModalClose: '[data-modal-close]',
   };
 
-  window.theme.variables = {
-    productPageSticky: false,
-    bpSmall: false,
+  const attributes$6 = {
+    closing: 'closing',
   };
 
-  const selectors$G = {
+  class ProductModal extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      this.modal = this.querySelector(selectors$b.dialog);
+      this.buttonModalOpen = this.querySelector(selectors$b.buttonModalOpen);
+      this.buttonModalClose = this.querySelector(selectors$b.buttonModalClose);
+      this.focusTarget = this.modal.querySelector('[autofocus]') || this.modal.querySelector(selectors$b.focusable);
+      this.isAnimating = false;
+
+      this.modalEvents();
+    }
+
+    modalOpen() {
+      this.modal.showModal();
+      this.modal.setAttribute('open', true);
+      this.modal.removeAttribute('inert');
+
+      this.focusTarget?.focus();
+
+      document.dispatchEvent(new CustomEvent('theme:modal:open', {bubbles: true}));
+    }
+
+    modalClose() {
+      if (this.isAnimating) {
+        return;
+      }
+
+      if (!this.modal.hasAttribute(attributes$6.closing)) {
+        this.modal.setAttribute(attributes$6.closing, '');
+        this.isAnimating = true;
+        return;
+      }
+
+      this.modal.close();
+      this.modal.removeAttribute(attributes$6.closing);
+      this.modal.setAttribute('inert', '');
+    }
+
+    modalEvents() {
+      // Open modal on button click event
+      this.buttonModalOpen.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.modalOpen();
+      });
+
+      // Close button click event
+      this.buttonModalClose.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.modalClose();
+      });
+
+      // Close dialog on click outside content
+      this.modal.addEventListener('click', (event) => {
+        if (event.target.nodeName === 'DIALOG' && event.type === 'click') {
+          this.modalClose();
+        }
+      });
+
+      // Close dialog on click ESC key pressed
+      this.modal.addEventListener('keydown', (event) => {
+        if (event.code == theme.keyboardKeys.ESCAPE) {
+          event.preventDefault();
+          this.modalClose();
+        }
+      });
+
+      this.modal.addEventListener('theme:modal:close', () => {
+        this.modalClose();
+      });
+
+      // Close dialog after animation completes
+      this.modal.addEventListener('animationend', (event) => {
+        if (event.target !== this.modal) return;
+        this.isAnimating = false;
+
+        if (this.modal.hasAttribute(attributes$6.closing)) {
+          this.modalClose();
+        }
+      });
+    }
+  }
+
+  const selectors$a = {
     addToCart: '[data-add-to-cart]',
     priceWrapper: '[data-price-wrapper]',
-    slideshow: '[data-product-slideshow]',
     productImage: '[data-product-image]',
     productJson: '[data-product-json]',
     form: '[data-product-form]',
-    thumbs: '[data-product-thumbs]',
     dataSectionId: 'data-section-id',
-    dataTallLayout: 'data-tall-layout',
-    dataStickyEnabled: 'data-sticky-enabled',
     dataCartBar: 'data-cart-bar',
-    dataProductShare: '[data-product-share]',
-    dataProductShareValue: 'data-product-share',
-    dataProductShareTitleValue: 'data-product-share-title',
-    productPage: '.product__page',
-    formWrapper: '.form__wrapper',
     cartBar: '#cart-bar',
-    productSubmitAdd: '.product__submit__add',
     cartBarAdd: 'data-add-to-cart-bar',
     cartBarScroll: 'data-cart-bar-scroll',
-    templateProduct: '#template-product',
-    siteFooterWrapper: '.site-footer-wrapper',
+    productSubmitAdd: '.product__submit__add',
     toggleTruncateHolder: '[data-truncated-holder]',
     toggleTruncateButton: '[data-truncated-button]',
     toggleTruncateContent: '[data-truncated-content]',
     toggleTruncateContentAttr: 'data-truncated-content',
-    headerSticky: '[data-header-sticky="sticky"]',
-    upsellButton: '[data-upsell-btn]',
-    upsellButtonText: '[data-upsell-btn-text]',
-    scrollToElement: '[data-scroll-to]',
-    scrollToElementValue: 'data-scroll-to',
-    accordionHolder: '[data-accordion-holder]',
-    accordionToggle: '[data-accordion-toggle]',
-    headerHeight: '[data-header-height]',
-    dataModalButton: 'data-product-popup',
-    modalScrollContainer: '[data-tabs-holder]',
     formWrapper: '[data-form-wrapper]',
-    tooltip: '[data-tooltip]',
-    tooltipStopMousenterValue: 'data-tooltip-stop-mouseenter',
+    slider: '[data-slider]',
+    sliderIndex: 'data-slider-index',
   };
 
-  const classes$p = {
-    classExpanded: 'is-expanded',
-    classSticky: 'is-sticky',
-    classStickyHeader: 'with-sticky-header',
-    classVisible: 'is-visible',
-    classLoading: 'is-loading',
-    classSiteFooterPush: 'site-footer--push',
-    open: 'is-open',
-    hasPopup: 'has-popup',
+  const classes$7 = {
+    expanded: 'is-expanded',
+    visible: 'is-visible',
+    loading: 'is-loading',
+    added: 'is-added',
   };
 
-  const sections$k = {};
+  const sections$8 = {};
 
   /**
    * Product section constructor.
@@ -11207,66 +12160,59 @@
     constructor(section) {
       this.section = section;
       this.container = section.container;
-      this.id = this.container.getAttribute(selectors$G.dataSectionId);
-      this.tallLayout = this.container.getAttribute(selectors$G.dataTallLayout) === 'true';
-      this.stickyEnabled = this.container.getAttribute(selectors$G.dataStickyEnabled) === 'true';
-      this.headerSticky = document.querySelector(selectors$G.headerSticky) !== null;
-      this.thumbs = this.container.querySelector(selectors$G.thumbs);
-      this.shareButton = this.container.querySelector(selectors$G.dataProductShare);
-      this.upsellButton = this.container.querySelector(selectors$G.upsellButton);
-      this.scrollToButton = this.container.querySelector(selectors$G.scrollToElement);
-      this.truncateElementHolder = this.container.querySelector(selectors$G.toggleTruncateHolder);
-      this.truncateElement = this.container.querySelector(selectors$G.toggleTruncateContent);
-      this.modalButton = this.container.querySelectorAll(`[${selectors$G.dataModalButton}]`);
-      this.formWrapper = this.container.querySelector(selectors$G.formWrapper);
-      this.resizeEventTruncate = () => this.truncateText();
-      this.resizeEventSticky = () => this.stickyScrollCheck();
-      this.resizeEventUpsell = () => this.calcUpsellButtonDemensions();
-      this.scrollEvent = () => this.scrollTop();
+      this.id = this.container.getAttribute(selectors$a.dataSectionId);
+      this.sliders = this.container.querySelectorAll(selectors$a.slider);
+      this.slider = [];
+      this.truncateElementHolder = this.container.querySelector(selectors$a.toggleTruncateHolder);
+      this.truncateElement = this.container.querySelector(selectors$a.toggleTruncateContent);
+      this.formWrapper = this.container.querySelector(selectors$a.formWrapper);
+      this.cartBarExist = this.container.getAttribute(selectors$a.dataCartBar) === 'true';
+      this.cartBar = this.container.querySelector(selectors$a.cartBar);
+      this.scrollToTop = this.scrollToTop.bind(this);
+      this.scrollEvent = (e) => this.scrollEvents(e);
+      this.resizeEvent = (e) => this.resizeEvents(e);
       this.unlockTimer = 0;
       this.accessibility = a11y;
 
-      // Record recently viewed products when the product page is loading
-      Shopify.Products.recordRecentlyViewed();
-
-      if (this.scrollToButton) {
-        this.scrollToReviews();
-      }
-
-      this.shareToggle();
-
       if (this.truncateElementHolder && this.truncateElement) {
-        setTimeout(this.resizeEventTruncate, 50);
-        document.addEventListener('theme:resize', this.resizeEventTruncate);
+        setTimeout(() => this.truncateText(), 50);
+
+        document.addEventListener('theme:resize', this.resizeEvent);
       }
 
       // Stop parsing if we don't have the product json script tag when loading
       // section in the Theme Editor
-      const productJson = this.container.querySelector(selectors$G.productJson);
+      const productJson = this.container.querySelector(selectors$a.productJson);
       if ((productJson && !productJson.innerHTML) || !productJson) {
         const counter = new QuantityCounter(this.container);
         counter.init();
         return;
       }
+      const productJsonHandle = JSON.parse(productJson.innerHTML).handle;
+      let recentObj = {};
+      if (productJsonHandle) {
+        recentObj = {
+          handle: productJsonHandle,
+        };
+      }
 
-      this.form = this.container.querySelector(selectors$G.form);
+      // Record recently viewed products when the product page is loading
+      Shopify.Products.recordRecentlyViewed(recentObj);
+
+      this.form = this.container.querySelector(selectors$a.form);
 
       this.init();
 
-      if (this.stickyEnabled) {
-        this.stickyScroll();
+      if (this.sliders.length) {
+        this.sliders.forEach((slider, index) => {
+          slider.setAttribute(selectors$a.sliderIndex, index);
+          this.slider.push(new Slider(this.container, slider));
+        });
       }
 
-      if (this.container.getAttribute(selectors$G.dataCartBar) === 'true') {
+      if (this.cartBarExist) {
         this.initCartBar();
-      }
-
-      if (this.upsellButton) {
-        this.upsellButtonDemensions();
-      }
-
-      if (this.modalButton.length > 0) {
-        this.productPopup();
+        document.addEventListener('theme:scroll', this.scrollEvent);
       }
     }
 
@@ -11275,91 +12221,27 @@
       theme.mediaInstances[this.id].init();
     }
 
-    productPopup() {
-      this.modalButton.forEach((button) => {
-        button.addEventListener('click', (e) => {
-          e.preventDefault();
-          const modal = document.querySelector(`#${button.getAttribute(selectors$G.dataModalButton)}`);
-          const modalScrollContainer = modal.querySelector(selectors$G.modalScrollContainer);
-
-          if (window.getComputedStyle(modal).display !== 'none') {
-            fadeOut(modal);
-            this.formWrapper.classList.remove(classes$p.hasPopup);
-            this.accessibility.removeTrapFocus();
-
-            if (this.unlockTimer) {
-              clearTimeout(this.unlockTimer);
-            }
-            // delay scroll unlock to prevent content shifting
-            this.unlockTimer = setTimeout(() => {
-              document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
-            }, 300);
-          }
-
-          if (window.getComputedStyle(modal).display === 'none') {
-            fadeIn(modal);
-            this.formWrapper.classList.add(classes$p.hasPopup);
-            document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true, detail: modalScrollContainer}));
-            this.accessibility.trapFocus(modal);
-          }
-        });
-      });
-    }
-
-    upsellButtonDemensions() {
-      this.calcUpsellButtonDemensions();
-
-      document.addEventListener('theme:resize', this.resizeEventUpsell);
-    }
-
-    calcUpsellButtonDemensions() {
-      const upsellButtonText = this.upsellButton.querySelector(selectors$G.upsellButtonText);
-      if (upsellButtonText) {
-        this.upsellButton.style.setProperty('--btn-text-width', `${upsellButtonText.clientWidth}px`);
+    scrollEvents(e) {
+      if (this.cartBarExist) {
+        this.cartBarScroll();
       }
     }
 
-    stickyScroll() {
-      this.stickyScrollCheck();
-
-      document.addEventListener('theme:resize', this.resizeEventSticky);
-    }
-
-    stickyScrollCheck() {
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      const isDesktop = windowWidth >= window.theme.sizes.small;
-      const form = this.container.querySelector(selectors$G.formWrapper);
-      const targetFormWrapper = this.container.querySelector(`${selectors$G.productPage} ${selectors$G.formWrapper}`);
-
-      if (isDesktop) {
-        const slideshow = this.container.querySelector(selectors$G.slideshow);
-        if (!form || !slideshow) return;
-        const productCopyHeight = form.offsetHeight;
-        const productImagesHeight = slideshow.offsetHeight;
-
-        // Is the product description and form taller than window space
-        // Is is also shorter than the window and images
-        if (productCopyHeight < productImagesHeight || productCopyHeight < window.innerHeight) {
-          theme.variables.productPageSticky = true;
-
-          targetFormWrapper.classList.add(classes$p.classSticky);
-          if (this.headerSticky) {
-            targetFormWrapper.classList.add(classes$p.classStickyHeader);
-          }
-        } else {
-          theme.variables.productPageSticky = false;
-          targetFormWrapper.classList.remove(classes$p.classSticky);
-        }
-      } else {
-        targetFormWrapper.classList.remove(classes$p.classSticky);
-      }
+    resizeEvents(e) {
+      this.truncateText();
     }
 
     truncateText() {
-      if (this.truncateElementHolder.classList.contains(classes$p.classVisible)) return;
-      const truncateRows = 5;
+      if (this.truncateElementHolder.classList.contains(classes$7.visible)) return;
+      const styles = this.truncateElement.querySelectorAll('style');
+      if (styles.length) {
+        styles.forEach((style) => {
+          this.truncateElementHolder.prepend(style);
+        });
+      }
+
       const truncateElementCloned = this.truncateElement.cloneNode(true);
-      const truncateElementClass = this.truncateElement.getAttribute(selectors$G.toggleTruncateContentAttr);
+      const truncateElementClass = this.truncateElement.getAttribute(selectors$a.toggleTruncateContentAttr);
       const truncateNextElement = this.truncateElement.nextElementSibling;
       if (truncateNextElement) {
         truncateNextElement.remove();
@@ -11369,292 +12251,220 @@
 
       const truncateAppendedElement = this.truncateElement.nextElementSibling;
       truncateAppendedElement.classList.add(truncateElementClass);
-      truncateAppendedElement.removeAttribute(selectors$G.toggleTruncateContentAttr);
+      truncateAppendedElement.removeAttribute(selectors$a.toggleTruncateContentAttr);
 
       showElement(truncateAppendedElement);
 
-      ellipsed.ellipsis(truncateAppendedElement, truncateRows, {
+      ellipsis(truncateAppendedElement, 5, {
         replaceStr: '',
+        delimiter: ' ',
       });
 
       hideElement(truncateAppendedElement);
 
       if (this.truncateElement.innerHTML !== truncateAppendedElement.innerHTML) {
-        this.truncateElementHolder.classList.add(classes$p.classExpanded);
+        this.truncateElementHolder.classList.add(classes$7.expanded);
       } else {
         truncateAppendedElement.remove();
-        this.truncateElementHolder.classList.remove(classes$p.classExpanded);
+        this.truncateElementHolder.classList.remove(classes$7.expanded);
       }
 
       this.toggleTruncatedContent(this.truncateElementHolder);
     }
 
     toggleTruncatedContent(holder) {
-      const toggleButton = holder.querySelector(selectors$G.toggleTruncateButton);
+      const toggleButton = holder.querySelector(selectors$a.toggleTruncateButton);
       if (toggleButton) {
         toggleButton.addEventListener('click', (e) => {
           e.preventDefault();
-          holder.classList.remove(classes$p.classExpanded);
-          holder.classList.add(classes$p.classVisible);
-        });
-      }
-    }
-
-    shareToggle() {
-      if (this.shareButton) {
-        this.shareButton.addEventListener('click', function () {
-          const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
-          if (navigator.share && windowWidth <= 1024) {
-            const shareTitle = this.hasAttribute(selectors$G.dataProductShareTitleValue) ? this.getAttribute(selectors$G.dataProductShareTitleValue) : window.location.hostname;
-            const shareUrl = this.hasAttribute(selectors$G.dataProductShareValue) ? this.getAttribute(selectors$G.dataProductShareValue) : window.location.href;
-
-            navigator
-              .share({
-                title: shareTitle,
-                url: shareUrl,
-              })
-              .then(() => {
-                console.log('Thanks for sharing!');
-              })
-              .catch(console.error);
-          } else {
-            this.parentElement.classList.toggle(classes$p.classExpanded);
-          }
+          holder.classList.remove(classes$7.expanded);
+          holder.classList.add(classes$7.visible);
         });
       }
     }
 
     initCartBar() {
-      const cartBar = document.querySelector(selectors$G.cartBar);
-      const cartBarBtn = cartBar.querySelector(selectors$G.productSubmitAdd);
-
       // Submit product form on cart bar button click
-      if (cartBarBtn) {
-        cartBarBtn.addEventListener('click', (e) => {
+      this.cartBarBtn = this.cartBar.querySelector(selectors$a.productSubmitAdd);
+      if (this.cartBarBtn) {
+        this.cartBarBtn.addEventListener('click', (e) => {
           e.preventDefault();
 
-          if (e.target.hasAttribute(selectors$G.cartBarAdd)) {
-            if (theme.cartDrawerEnabled) {
-              e.target.classList.add(classes$p.classLoading);
-              e.target.setAttribute('disabled', 'disabled');
+          if (e.currentTarget.hasAttribute(selectors$a.cartBarAdd)) {
+            if (theme.settings.cartDrawerEnabled) {
+              e.currentTarget.classList.add(classes$7.loading);
+              e.currentTarget.setAttribute('disabled', 'disabled');
             }
 
-            this.form.querySelector(selectors$G.addToCart).dispatchEvent(
+            this.form.querySelector(selectors$a.addToCart).dispatchEvent(
               new Event('click', {
                 bubbles: true,
               })
             );
-          } else if (e.target.hasAttribute(selectors$G.cartBarScroll)) {
+          } else if (e.currentTarget.hasAttribute(selectors$a.cartBarScroll)) {
             this.scrollToTop();
           }
         });
 
-        if (cartBarBtn.hasAttribute(selectors$G.cartBarAdd)) {
-          document.addEventListener('product:bar:error', () => this.scrollToTop());
-        }
-
-        if (theme.cartDrawerEnabled) {
-          document.addEventListener('product:bar:button', () => {
-            if (cartBarBtn && cartBarBtn.classList.contains(classes$p.classLoading)) {
-              cartBarBtn.classList.remove(classes$p.classLoading);
-              cartBarBtn.removeAttribute('disabled');
-            }
-          });
+        if (this.cartBarBtn.hasAttribute(selectors$a.cartBarAdd)) {
+          document.addEventListener('theme:product:add-error', this.scrollToTop);
         }
       }
-
-      this.cartBar = cartBar;
-
-      document.addEventListener('theme:scroll', this.scrollEvent);
     }
 
     scrollToTop() {
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      const isDesktop = windowWidth >= window.theme.sizes.small;
-      const scrollTarget = isDesktop ? this.container : this.form;
+      const scrollTarget = isDesktop() ? this.container : this.form;
 
-      window.scrollTo({
-        top: scrollTarget.getBoundingClientRect().top + window.scrollY,
-        left: 0,
-        behavior: 'smooth',
-      });
+      scrollTo(scrollTarget.getBoundingClientRect().top);
     }
 
-    scrollTop() {
+    cartBarScroll() {
       const scrolled = window.pageYOffset;
-      const siteFooter = document.querySelector(selectors$G.siteFooterWrapper);
+      const element = theme.variables.productPageSticky && this.formWrapper ? this.formWrapper : this.form;
 
-      if (this.form && this.cartBar) {
-        const formOffset = this.form.offsetTop;
-        const formHeight = this.form.offsetHeight;
+      if (element && this.cartBar) {
+        const formOffset = element.offsetTop;
+        const formHeight = element.offsetHeight;
         const checkPosition = scrolled > formOffset + formHeight;
 
-        this.cartBar.classList.toggle(classes$p.classVisible, checkPosition);
-
-        const needsClick = document.querySelector('button.needsclick');
-        const cartBarHeight = this.cartBar.offsetHeight;
-        if(needsClick){
-          needsClick.classList.toggle('needsclick--change-pos', checkPosition);
-          document.documentElement.style.setProperty('--needsclick-pos-bottom', `${cartBarHeight + 10}px`);
-        };
-
-        siteFooter.classList.toggle(classes$p.classSiteFooterPush, checkPosition);
-        siteFooter.style.marginBottom = siteFooter.classList.contains(classes$p.classSiteFooterPush) ? `${this.cartBar.offsetHeight}px` : '0';
-      }
-    }
-
-    scrollToReviews() {
-      this.scrollToButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        const reviews = document.querySelector(this.scrollToButton.getAttribute(selectors$G.scrollToElementValue));
-
-        if (!reviews) return;
-
-        let timeoutFlag = false;
-
-        // Open Reviews accordion if they are inside it
-        if (reviews.querySelector(selectors$G.accordionToggle)) {
-          const accordionToggle = reviews.querySelector(selectors$G.accordionToggle);
-          const accordionHolder = accordionToggle.closest(selectors$G.accordionHolder);
-
-          if (!accordionToggle.classList.contains(classes$p.open) && accordionHolder && accordionHolder.querySelector(`${selectors$G.accordionToggle}.${classes$p.open}`)) {
-            timeoutFlag = true;
-          }
-
-          if (!accordionToggle.classList.contains(classes$p.open)) {
-            accordionToggle.dispatchEvent(new Event('click'));
-          }
-        }
-
-        if (timeoutFlag) {
-          setTimeout(() => this.scrollToElement(reviews), 500);
-        } else {
-          this.scrollToElement(reviews);
-        }
-      });
-    }
-
-    scrollToElement(element) {
-      const headerHeight = this.headerSticky ? document.querySelector(selectors$G.headerHeight).getBoundingClientRect().height : 0;
-
-      window.scrollTo({
-        top: element.getBoundingClientRect().top + window.scrollY - headerHeight,
-        left: 0,
-        behavior: 'smooth',
-      });
-
-      const tooltips = document.querySelectorAll(`${selectors$G.tooltip}:not([${selectors$G.tooltipStopMousenterValue}])`);
-      if (tooltips.length) {
-        tooltips.forEach((tooltip) => {
-          tooltip.setAttribute(selectors$G.tooltipStopMousenterValue, '');
-
-          setTimeout(() => {
-            tooltip.removeAttribute(selectors$G.tooltipStopMousenterValue);
-          }, 1000);
-        });
+        this.cartBar.classList.toggle(classes$7.visible, checkPosition);
       }
     }
 
     onUnload() {
+      document.removeEventListener('theme:product:add-error', this.scrollToTop);
+
       if (this.truncateElementHolder && this.truncateElement) {
-        document.removeEventListener('theme:resize', this.resizeEventTruncate);
+        document.removeEventListener('theme:resize', this.resizeEvent);
       }
 
-      if (this.stickyEnabled) {
-        document.removeEventListener('theme:resize', this.resizeEventSticky);
-      }
-
-      if (this.upsellButton) {
-        document.removeEventListener('theme:resize', this.resizeEventUpsell);
-      }
-
-      if (this.container.getAttribute(selectors$G.dataCartBar) === 'true') {
+      if (this.cartBarExist) {
         document.removeEventListener('theme:scroll', this.scrollEvent);
+      }
+    }
+
+    onBlockSelect(e) {
+      const slider = e.srcElement.closest(selectors$a.slider);
+      if (slider && this.slider.length) {
+        const sliderIndex = slider.hasAttribute(selectors$a.sliderIndex) ? slider.getAttribute(selectors$a.sliderIndex) : 0;
+        if (!this.slider[sliderIndex]) return;
+        this.slider[sliderIndex].onBlockSelect(e);
+      }
+    }
+
+    onBlockDeselect(e) {
+      const slider = e.srcElement.closest(selectors$a.slider);
+      if (slider && this.slider.length) {
+        const sliderIndex = slider.hasAttribute(selectors$a.sliderIndex) ? slider.getAttribute(selectors$a.sliderIndex) : 0;
+        if (!this.slider[sliderIndex]) return;
+        this.slider[sliderIndex].onBlockDeselect(e);
       }
     }
   }
 
   const productSection = {
     onLoad() {
-      sections$k[this.id] = new Product(this);
+      sections$8[this.id] = new Product(this);
     },
     onUnload(e) {
-      sections$k[this.id].onUnload(e);
+      sections$8[this.id].onUnload(e);
+    },
+    onBlockSelect(e) {
+      sections$8[this.id].onBlockSelect(e);
+    },
+    onBlockDeselect(e) {
+      sections$8[this.id].onBlockDeselect(e);
     },
   };
 
-  register('product', [productSection, pickupAvailability, productFormSection, swatchSection, tooltipSection, popoutSection, tabs, accordions, copyClipboard]);
+  register('product', [productSection, pickupAvailability, swatchSection, tooltipSection, popoutSection, tabs, productStickySection, initSlider]);
 
-  const selectors$H = {
-    dataRelatedSectionElem: '[data-related-section]',
-    dataRelatedProduct: '[data-product-grid-item]',
-    dataProductId: 'data-product-id',
-    dataLimit: 'data-limit',
-    dataMinimum: 'data-minimum',
+  if (!customElements.get('complementary-products')) {
+    customElements.define('complementary-products', ComplementaryProducts);
+  }
+
+  if (!customElements.get('share-button')) {
+    customElements.define('share-button', ShareButton);
+  }
+
+  if (!customElements.get('recipient-form')) {
+    customElements.define('recipient-form', RecipientForm);
+  }
+
+  if (!customElements.get('product-form')) {
+    customElements.define('product-form', ProductForm);
+  }
+
+  if (!customElements.get('product-modal')) {
+    customElements.define('product-modal', ProductModal);
+  }
+
+  const selectors$9 = {
+    apiRelatedProductsTemplate: '[data-api-related-template]',
+    relatedSection: '[data-related-section]',
+    relatedProduct: '[data-product-grid-item]',
     recentlyViewed: '[data-recent-wrapper]',
     recentlyViewedWrapper: '[data-recently-viewed-wrapper]',
-    recentlyProduct: '#recently-viewed-products',
-    dataProductItem: '.product-item',
+    productItem: '.product-item',
     slider: '[data-slider]',
   };
 
-  const classes$q = {
-    classHidden: 'hidden',
-    classIsHidden: 'is-hidden',
+  const attributes$5 = {
+    limit: 'data-limit',
+    minimum: 'data-minimum',
+    productId: 'data-product-id',
   };
 
+  const classes$6 = {
+    isHidden: 'is-hidden',
+  };
+
+  const sections$7 = {};
   class Related {
     constructor(section) {
       this.section = section;
       this.sectionId = section.id;
       this.container = section.container;
 
-      this.init();
+      this.related();
       this.recent();
     }
 
-    init() {
-      const relatedSection = this.container.querySelector(selectors$H.dataRelatedSectionElem);
+    related() {
+      const relatedSection = this.container.querySelector(selectors$9.relatedSection);
 
       if (!relatedSection) {
         return;
       }
 
-      const self = this;
-      const productId = relatedSection.getAttribute(selectors$H.dataProductId);
-      const limit = relatedSection.getAttribute(selectors$H.dataLimit);
-      const requestUrl = `${window.theme.routes.product_recommendations_url}?section_id=related&limit=${limit}&product_id=${productId}`;
+      const productId = relatedSection.getAttribute(attributes$5.productId);
+      const limit = relatedSection.getAttribute(attributes$5.limit);
+      const requestUrl = `${window.theme.routes.product_recommendations_url}?section_id=api-product-recommendation&limit=${limit}&product_id=${productId}&intent=related`;
 
       fetch(requestUrl)
-        .then(function (response) {
+        .then((response) => {
           return response.text();
         })
-        .then(function (data) {
-          const createdElement = document.createElement('div');
-          createdElement.innerHTML = data;
-          const inner = createdElement.querySelector(selectors$H.dataRelatedSectionElem);
+        .then((data) => {
+          const relatedContent = document.createElement('div');
+          relatedContent.innerHTML = new DOMParser().parseFromString(data, 'text/html').querySelector(selectors$9.apiRelatedProductsTemplate).innerHTML;
+          const hasProducts = relatedContent.querySelector(selectors$9.relatedProduct);
 
-          if (inner.querySelector(selectors$H.dataRelatedProduct)) {
-            const innerHtml = inner.innerHTML;
-            hideElement(relatedSection);
-            relatedSection.innerHTML = innerHtml;
-            slideDown(relatedSection);
+          if (hasProducts) {
+            relatedSection.innerHTML = relatedContent.innerHTML;
+            const relatedProducts = relatedSection.querySelectorAll(selectors$9.relatedProduct);
 
-            const relatedProducts = relatedSection.querySelectorAll(selectors$H.dataRelatedProduct);
+            makeGridSwatches(this.section);
 
-            relatedProducts.forEach((item) => {
-              new QuickAddProduct(item);
-            });
+            // Init Siblings
+            new Siblings(this.section);
 
-            makeGridSwatches(self.section);
-
-            if (relatedProducts.length > 4 && relatedSection.querySelector(selectors$H.slider)) {
+            if (relatedProducts.length > 4 && relatedSection.querySelector(selectors$9.slider)) {
               new Slider(relatedSection);
             }
           } else {
             relatedSection.dispatchEvent(
-              new CustomEvent('tabs:hideRelatedTab', {
+              new CustomEvent('theme:tab:hide', {
                 bubbles: true,
               })
             );
@@ -11662,7 +12472,7 @@
         })
         .catch(function () {
           relatedSection.dispatchEvent(
-            new CustomEvent('tabs:hideRelatedTab', {
+            new CustomEvent('theme:tab:hide', {
               bubbles: true,
             })
           );
@@ -11670,8 +12480,8 @@
     }
 
     recent() {
-      const recentlyViewed = this.container.querySelector(selectors$H.recentlyViewed);
-      const howManyToshow = recentlyViewed ? parseInt(recentlyViewed.getAttribute(selectors$H.dataLimit)) : 4;
+      const recentlyViewed = this.container.querySelector(selectors$9.recentlyViewed);
+      const howManyToshow = recentlyViewed ? parseInt(recentlyViewed.getAttribute(attributes$5.limit)) : 4;
 
       Shopify.Products.showRecentlyViewed({
         howManyToShow: howManyToshow,
@@ -11679,33 +12489,32 @@
         section: this.section,
         onComplete: (wrapper, section) => {
           const container = section.container;
-          const recentlyViewedHolder = container.querySelector(selectors$H.recentlyViewed);
-          const recentlyViewedWrapper = container.querySelector(selectors$H.recentlyViewedWrapper);
-          const recentProducts = wrapper.querySelectorAll(selectors$H.dataProductItem);
-          const minimumNumberProducts = recentlyViewedHolder.hasAttribute(selectors$H.dataMinimum) ? parseInt(recentlyViewedHolder.getAttribute(selectors$H.dataMinimum)) : 4;
+          const recentlyViewedHolder = container.querySelector(selectors$9.recentlyViewed);
+          const recentlyViewedWrapper = container.querySelector(selectors$9.recentlyViewedWrapper);
+          const recentProducts = wrapper.querySelectorAll(selectors$9.productItem);
+          const minimumNumberProducts = recentlyViewedHolder.hasAttribute(attributes$5.minimum) ? parseInt(recentlyViewedHolder.getAttribute(attributes$5.minimum)) : 4;
           const checkRecentInRelated = !recentlyViewedWrapper && recentProducts.length > 0;
           const checkRecentOutsideRelated = recentlyViewedWrapper && recentProducts.length >= minimumNumberProducts;
 
           if (checkRecentInRelated || checkRecentOutsideRelated) {
             if (checkRecentOutsideRelated) {
-              recentlyViewedWrapper.classList.remove(classes$q.classIsHidden);
+              recentlyViewedWrapper.classList.remove(classes$6.isHidden);
             }
 
             fadeIn(recentlyViewedHolder);
 
             recentlyViewedHolder.dispatchEvent(
-              new CustomEvent('tabs:checkRecentTab', {
+              new CustomEvent('theme:tab:check', {
                 bubbles: true,
               })
             );
 
-            recentProducts.forEach((item) => {
-              new QuickAddProduct(item);
-            });
-
             makeGridSwatches(section);
 
-            if (recentProducts.length > 4 && recentlyViewedHolder.querySelector(selectors$H.slider)) {
+            // Init Siblings
+            new Siblings(section);
+
+            if (recentProducts.length > 4 && recentlyViewedHolder.querySelector(selectors$9.slider)) {
               new Slider(recentlyViewedHolder);
             }
           }
@@ -11716,202 +12525,160 @@
 
   const relatedSection = {
     onLoad() {
-      this.section = new Related(this);
-
-      this.container.querySelectorAll(selectors$H.dataRelatedProduct).forEach((item) => {
-        new QuickAddProduct(item);
-      });
+      sections$7[this.id] = new Related(this);
     },
   };
 
   register('related', [relatedSection, popoutSection, tabs]);
 
-  register('reviews', accordions);
+  register('reviews', [slider, blockScroll]);
 
-  const selectors$I = {
-    scrollElement: '[data-block-scroll]',
-    flickityEnabled: 'flickity-enabled',
-  };
+  const sections$6 = {};
 
-  const sections$l = {};
-
-  class BlockScroll {
-    constructor(el) {
-      this.container = el.container;
-    }
-
-    onBlockSelect(evt) {
-      const scrollElement = this.container.querySelector(selectors$I.scrollElement);
-      if (scrollElement && !scrollElement.classList.contains(selectors$I.flickityEnabled)) {
-        const currentElement = evt.srcElement;
-        if (currentElement) {
-          scrollElement.scrollTo({
-            top: 0,
-            left: currentElement.offsetLeft,
-            behavior: 'smooth',
-          });
-        }
-      }
-    }
-  }
-
-  const blockScroll = {
-    onLoad() {
-      sections$l[this.id] = new BlockScroll(this);
-    },
-    onBlockSelect(e) {
-      sections$l[this.id].onBlockSelect(e);
-    },
-  };
-
-  const sections$m = {};
-
-  const selectors$J = {
-    logo: '[data-slider-logo]',
-    text: '[data-slider-text]',
+  const selectors$8 = {
+    sliderLogos: '[data-slider-logos]',
+    sliderText: '[data-slider-text]',
     slide: '[data-slide]',
-    slideData: 'data-slide',
-    asNavFor: '#nav-for-',
-    slideIndex: 'data-slide-index',
+    slideIndex: '[data-slide-index]',
+  };
+
+  const classes$5 = {
+    isSelected: 'is-selected',
     flickityEnabled: 'flickity-enabled',
   };
 
-  const classes$r = {
-    classIsSelected: 'is-selected',
+  const attributes$4 = {
+    slideData: 'data-slide',
+    slideIndex: 'data-slide-index',
   };
 
   class LogoList {
     constructor(section) {
       this.container = section.container;
-      this.slideshowNav = this.container.querySelector(selectors$J.logo);
-      if (!this.slideshowNav) return;
-      this.slideshowText = this.container.querySelector(selectors$J.text);
-      this.logoSlides = this.slideshowNav.querySelectorAll(selectors$J.slide);
-      this.resizeEvent = debounce(() => this.setSlideshowNavState(), 200);
+      this.slideshowNav = this.container.querySelector(selectors$8.sliderLogos);
+      this.slideshowText = this.container.querySelector(selectors$8.sliderText);
+      this.setSlideshowNavStateOnResize = () => this.setSlideshowNavState();
       this.flkty = null;
       this.flktyNav = null;
 
-      this.init();
-    }
-
-    init() {
-      if (this.slideshowText) {
-        this.flkty = new FlickityFade(this.slideshowText, {
-          fade: true,
-          autoPlay: false,
-          prevNextButtons: false,
-          cellAlign: 'left', // Prevents blurry text on Safari
-          contain: true,
-          pageDots: false,
-          wrapAround: false,
-          selectedAttraction: 0.2,
-          friction: 0.6,
-          draggable: false,
-        });
-
-        const textSlides = this.slideshowText.querySelectorAll(selectors$J.slide);
-        if (textSlides.length) {
-          let maxHeight = -1;
-          textSlides.forEach((element) => {
-            const elementHeight = parseFloat(getComputedStyle(element, null).height.replace('px', ''));
-
-            if (elementHeight > maxHeight) {
-              maxHeight = elementHeight;
-            }
-          });
-
-          textSlides.forEach((element) => {
-            const elementHeight = parseFloat(getComputedStyle(element, null).height.replace('px', ''));
-
-            if (elementHeight < maxHeight) {
-              const calculateMargin = Math.ceil((maxHeight - elementHeight) / 2);
-              element.style.margin = `${calculateMargin}px 0`;
-            }
-          });
-        }
-      }
-
-      this.logoSlides.forEach((element) => {
-        element.addEventListener('click', (e) => {
-          const index = parseInt(e.currentTarget.getAttribute(selectors$J.slideIndex));
-          const hasSlider = this.slideshowNav.classList.contains(selectors$J.flickityEnabled);
-
-          if (this.flkty) {
-            this.flkty.select(index);
-          }
-
-          if (hasSlider) {
-            this.flktyNav.select(index);
-            if (!this.slideshowNav.classList.contains(classes$r.classIsSelected)) {
-              this.flktyNav.playPlayer();
-            }
-          } else {
-            const selectedSlide = this.slideshowNav.querySelector(`.${classes$r.classIsSelected}`);
-            if (selectedSlide) {
-              selectedSlide.classList.remove(classes$r.classIsSelected);
-            }
-            e.currentTarget.classList.add(classes$r.classIsSelected);
-          }
-        });
-      });
-
+      this.initSlideshowText();
       this.initSlideshowNav();
     }
 
-    onUnload() {
-      if (!this.slideshowNav) return;
-      const sliderInitialized = this.slideshowNav.classList.contains(selectors$J.flickityEnabled);
-      if (sliderInitialized) {
-        this.flktyNav.destroy();
-      }
+    initSlideshowText() {
+      if (!this.slideshowText) return;
 
-      if (this.flkty) {
-        this.flkty.destroy();
-      }
+      this.flkty = new FlickityFade(this.slideshowText, {
+        fade: true,
+        autoPlay: false,
+        prevNextButtons: false,
+        cellAlign: 'left', // Prevents blurry text on Safari
+        contain: true,
+        pageDots: false,
+        wrapAround: false,
+        selectedAttraction: 0.2,
+        friction: 0.6,
+        draggable: false,
+        accessibility: false,
+        on: {
+          ready: () => this.sliderAccessibility(),
+          change: () => this.sliderAccessibility(),
+        },
+      });
 
-      window.removeEventListener('resize', this.resizeEvent);
+      const textSlides = this.slideshowText.querySelectorAll(selectors$8.slide);
+      if (textSlides.length) {
+        let maxHeight = -1;
+        textSlides.forEach((element) => {
+          const elementHeight = parseFloat(getComputedStyle(element, null).height.replace('px', ''));
+
+          if (elementHeight > maxHeight) {
+            maxHeight = elementHeight;
+          }
+        });
+
+        textSlides.forEach((element) => {
+          const elementHeight = parseFloat(getComputedStyle(element, null).height.replace('px', ''));
+
+          if (elementHeight < maxHeight) {
+            const calculateMargin = Math.ceil((maxHeight - elementHeight) / 2);
+            element.style.margin = `${calculateMargin}px 0`;
+          }
+        });
+      }
     }
 
-    onBlockSelect(evt) {
-      if (!this.slideshowNav) return;
-      const slide = this.slideshowNav.querySelector(`[${selectors$J.slideData}="${evt.detail.blockId}"]`);
-      const slideIndex = parseInt(slide.getAttribute(selectors$J.slideIndex));
+    sliderAccessibility() {
+      const buttons = this.slideshowText.querySelectorAll(`${selectors$8.slide} a, ${selectors$8.slide} button`);
 
-      if (this.slideshowNav.classList.contains(selectors$J.flickityEnabled)) {
-        this.flktyNav.select(slideIndex);
-        this.flktyNav.stopPlayer();
-        this.slideshowNav.classList.add(classes$r.classIsSelected);
-      } else {
-        slide.dispatchEvent(new Event('click'));
+      if (buttons.length) {
+        buttons.forEach((button) => {
+          const slide = button.closest(selectors$8.slide);
+          if (slide) {
+            const tabIndex = slide.classList.contains(classes$5.isSelected) ? 0 : -1;
+            button.setAttribute('tabindex', tabIndex);
+          }
+        });
       }
     }
 
-    onBlockDeselect() {
-      if (this.slideshowNav && this.slideshowNav.classList.contains(selectors$J.flickityEnabled)) {
-        this.flktyNav.playPlayer();
-        this.slideshowNav.classList.remove(classes$r.classIsSelected);
+    initSlideshowNav() {
+      if (!this.slideshowNav) return;
+
+      this.logoSlides = this.slideshowNav.querySelectorAll(selectors$8.slideIndex);
+
+      if (this.logoSlides.length) {
+        this.logoSlides.forEach((logoItem) => {
+          logoItem.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const index = parseInt(logoItem.getAttribute(attributes$4.slideIndex));
+            const hasSlider = this.slideshowNav.classList.contains(classes$5.flickityEnabled);
+
+            if (this.flkty) {
+              this.flkty.select(index);
+            }
+
+            if (hasSlider) {
+              this.flktyNav.select(index);
+              if (!this.slideshowNav.classList.contains(classes$5.isSelected)) {
+                this.flktyNav.playPlayer();
+              }
+            } else {
+              const selectedSlide = this.slideshowNav.querySelector(`.${classes$5.isSelected}`);
+              if (selectedSlide) {
+                selectedSlide.classList.remove(classes$5.isSelected);
+              }
+              logoItem.classList.add(classes$5.isSelected);
+            }
+          });
+        });
       }
+
+      this.setSlideshowNavState();
+
+      document.addEventListener('theme:resize', this.setSlideshowNavStateOnResize);
     }
 
     setSlideshowNavState() {
-      const slidesCount = this.slideshowNav.querySelectorAll(selectors$J.slide).length;
+      const slides = this.slideshowNav.querySelectorAll(selectors$8.slide);
+      const slidesCount = slides.length;
       const slideWidth = 200;
-      const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
       const slidesWidth = slidesCount * slideWidth;
-      const sliderInitialized = this.slideshowNav.classList.contains(selectors$J.flickityEnabled);
+      const sliderInitialized = this.slideshowNav.classList.contains(classes$5.flickityEnabled);
 
-      if (slidesWidth > windowWidth) {
+      if (slidesWidth > getWindowWidth()) {
         if (!sliderInitialized) {
-          const selectedSlide = this.slideshowNav.querySelector(`.${classes$r.classIsSelected}`);
+          const selectedSlide = this.slideshowNav.querySelector(`.${classes$5.isSelected}`);
           if (selectedSlide) {
-            selectedSlide.classList.remove(classes$r.classIsSelected);
+            selectedSlide.classList.remove(classes$5.isSelected);
           }
-          this.logoSlides[0].classList.add(classes$r.classIsSelected);
+          slides[0].classList.add(classes$5.isSelected);
 
           this.flktyNav = new Flickity(this.slideshowNav, {
             autoPlay: 4000,
             prevNextButtons: false,
-            contain: true,
+            contain: false,
             pageDots: false,
             wrapAround: true,
             watchCSS: true,
@@ -11928,7 +12695,7 @@
         }
       } else if (sliderInitialized) {
         this.flktyNav.destroy();
-        this.logoSlides[0].classList.add(classes$r.classIsSelected);
+        slides[0].classList.add(classes$5.isSelected);
 
         if (this.flkty) {
           this.flkty.select(0);
@@ -11936,37 +12703,66 @@
       }
     }
 
-    initSlideshowNav() {
-      this.setSlideshowNavState();
+    onBlockSelect(evt) {
+      if (!this.slideshowNav) return;
+      const slide = this.slideshowNav.querySelector(`[${attributes$4.slideData}="${evt.detail.blockId}"]`);
+      const slideIndex = parseInt(slide.getAttribute(attributes$4.slideIndex));
 
-      window.addEventListener('resize', this.resizeEvent);
+      if (this.slideshowNav.classList.contains(classes$5.flickityEnabled)) {
+        this.flktyNav.select(slideIndex);
+        this.flktyNav.stopPlayer();
+        this.slideshowNav.classList.add(classes$5.isSelected);
+      } else {
+        slide.dispatchEvent(new Event('click'));
+      }
+    }
+
+    onBlockDeselect() {
+      if (this.slideshowNav && this.slideshowNav.classList.contains(classes$5.flickityEnabled)) {
+        this.flktyNav.playPlayer();
+        this.slideshowNav.classList.remove(classes$5.isSelected);
+      }
+    }
+
+    onUnload() {
+      if (!this.slideshowNav) return;
+      const sliderInitialized = this.slideshowNav.classList.contains(classes$5.flickityEnabled);
+      if (sliderInitialized) {
+        this.flktyNav.destroy();
+      }
+
+      if (this.flkty) {
+        this.flkty.destroy();
+      }
+
+      document.removeEventListener('theme:resize', this.setSlideshowNavStateOnResize);
     }
   }
 
   const LogoListSection = {
     onLoad() {
-      sections$m[this.id] = new LogoList(this);
+      sections$6[this.id] = new LogoList(this);
     },
     onUnload(e) {
-      sections$m[this.id].onUnload(e);
+      sections$6[this.id].onUnload(e);
     },
     onBlockSelect(e) {
-      sections$m[this.id].onBlockSelect(e);
+      sections$6[this.id].onBlockSelect(e);
     },
     onBlockDeselect(e) {
-      sections$m[this.id].onBlockDeselect(e);
+      sections$6[this.id].onBlockDeselect(e);
     },
   };
 
   register('logos', [LogoListSection, blockScroll]);
 
-  const selectors$K = {
+  const selectors$7 = {
     videoPlay: '[data-video-play]',
     videoPlayValue: 'data-video-play',
   };
 
   class VideoPlay {
-    constructor(section, selector = selectors$K.videoPlay, selectorValue = selectors$K.videoPlayValue) {
+    constructor(section, selector = selectors$7.videoPlay, selectorValue = selectors$7.videoPlayValue) {
       this.container = section;
       this.videoPlay = this.container.querySelectorAll(selector);
 
@@ -11984,6 +12780,7 @@
               ];
 
               new LoadPhotoswipe(items);
+              window.accessibility.lastElement = button;
             }
           });
         });
@@ -11997,6 +12794,120 @@
     },
   };
 
+  const selectors$6 = {
+    videoId: '[data-video-id]',
+    videoPlayer: '[data-video-player]',
+    videoTemplate: '[data-video-template]',
+  };
+
+  const classes$4 = {
+    loading: 'is-loading',
+  };
+
+  const sections$5 = {};
+
+  /**
+   * Video section constructor.
+   * @param {string} container - selector for the section container DOM element
+   */
+  class VideoBackground {
+    constructor(section) {
+      this.container = section.container;
+      this.videoId = this.container.querySelector(selectors$6.videoId);
+      this.videoPlayer = this.container.querySelector(selectors$6.videoPlayer);
+      this.videoTemplate = this.container.querySelector(selectors$6.videoTemplate);
+      this.video = null;
+      this.init();
+    }
+
+    init() {
+      if (this.videoId) {
+        // Force video autoplay on iOS when Low Power Mode is On
+        this.container.addEventListener(
+          'touchstart',
+          () => {
+            this.video?.play();
+          },
+          {passive: true}
+        );
+
+        this.renderVideo();
+      }
+    }
+
+    renderVideo() {
+      /*
+        Observe video element and pull it out from its template tag
+      */
+      this.videoTemplateObserver = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const content = this.videoTemplate.innerHTML;
+
+              this.videoPlayer.innerHTML = content;
+              this.videoPlayer.classList.remove(classes$4.loading);
+              this.video = this.container.querySelector('video');
+              this.observeVideoPlayToggle();
+
+              // Stop observing element after it was animated
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          root: null,
+          rootMargin: '300px',
+          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+        }
+      );
+
+      this.videoTemplateObserver.observe(this.videoPlayer);
+    }
+
+    observeVideoPlayToggle() {
+      if (!this.video) return;
+
+      const options = {
+        rootMargin: '0px',
+        threshold: [0, 1.0],
+      };
+
+      this.videoPlayObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const isVisible = entry.isIntersecting;
+          if (isVisible && typeof this.video.play === 'function') {
+            this.video.play();
+          }
+          if (!isVisible && typeof this.video.pause === 'function') {
+            this.video.pause();
+          }
+        });
+      }, options);
+
+      this.videoPlayObserver.observe(this.video);
+    }
+
+    onUnload() {
+      if (this.videoTemplateObserver) {
+        this.videoTemplateObserver.disconnect();
+      }
+
+      if (this.videoPlayObserver) {
+        this.videoPlayObserver.disconnect();
+      }
+    }
+  }
+
+  const videoBackground = {
+    onLoad() {
+      sections$5[this.id] = new VideoBackground(this);
+    },
+    onUnload() {
+      sections$5[this.id].onUnload();
+    },
+  };
+
   /**
    * FeaturedVideo Template Script
    * ------------------------------------------------------------------------------
@@ -12005,11 +12916,132 @@
    * @namespace FeaturedVideo
    */
 
-  register('featured-video', [videoPlay, parallaxHero]);
+  register('featured-video', [videoPlay, videoBackground, parallaxHero]);
 
   register('slideshow', [slider, parallaxHero]);
 
-  register('custom-content', [slider, videoPlay, parallaxHero, quickAddProduct, swatchGridSection]);
+  const selectors$5 = {
+    imagesHolder: '[data-images-holder]',
+    imageHolder: '[data-image-holder]',
+    imageElement: '[data-image-element]',
+    imagesButton: '[data-images-button]',
+    dataStartPosition: 'data-start-position',
+  };
+
+  const sections$4 = {};
+
+  class CompareImages {
+    constructor(section) {
+      this.imagesHolder = section;
+
+      if (this.imagesHolder) {
+        this.imageHolder = this.imagesHolder.querySelector(selectors$5.imageHolder);
+        this.imageElement = this.imagesHolder.querySelector(selectors$5.imageElement);
+        this.imagesButton = this.imagesHolder.querySelector(selectors$5.imagesButton);
+        this.startPosition = this.imagesHolder.hasAttribute(selectors$5.dataStartPosition) ? this.imagesHolder.getAttribute(selectors$5.dataStartPosition) : 0;
+        this.startX = 0;
+        this.x = 0;
+        this.changeValuesEvent = (event) => this.changeValues(event);
+        this.onMoveEvent = (event) => this.onMove(event);
+        this.onStopEvent = (event) => this.onStop(event);
+        this.onStartEvent = (event) => this.onStart(event);
+
+        this.init();
+        document.addEventListener('theme:resize', this.changeValuesEvent);
+      }
+    }
+
+    init() {
+      this.changeValues();
+      this.imagesButton.addEventListener('mousedown', this.onStartEvent);
+      this.imagesButton.addEventListener('touchstart', this.onStartEvent, {passive: true});
+    }
+
+    changeValues(event) {
+      const imagesHolderWidth = this.imagesHolder.offsetWidth;
+      const buttonWidth = this.imagesButton.offsetWidth;
+
+      if (!event || (event && event.type !== 'touchmove' && event.type !== 'mousemove')) {
+        this.imageElement.style.width = `${imagesHolderWidth}px`;
+        this.imageHolder.style.width = `${100 - parseInt(this.startPosition)}%`;
+
+        if (this.startPosition !== 0) {
+          const newButtonPositionPixels = (imagesHolderWidth * parseInt(this.startPosition)) / 100;
+          this.x = newButtonPositionPixels - buttonWidth / 2;
+        }
+      }
+
+      if (this.x > imagesHolderWidth - buttonWidth) {
+        this.x = imagesHolderWidth - buttonWidth;
+      } else if (this.x < 0) {
+        this.x = 0;
+      }
+
+      this.imagesButton.style.left = `${(this.x / imagesHolderWidth) * 100}%`;
+      this.imageHolder.style.width = `${100 - ((this.x + buttonWidth / 2) / imagesHolderWidth) * 100}%`;
+    }
+
+    onStart(event) {
+      event.preventDefault();
+      let eventTouch = event;
+
+      if (event.touches) {
+        eventTouch = event.touches[0];
+      }
+
+      this.x = this.imagesButton.offsetLeft;
+      this.startX = eventTouch.pageX - this.x;
+
+      this.imagesHolder.addEventListener('mousemove', this.onMoveEvent);
+      this.imagesHolder.addEventListener('mouseup', this.onStopEvent);
+      this.imagesHolder.addEventListener('touchmove', this.onMoveEvent);
+      this.imagesHolder.addEventListener('touchend', this.onStopEvent);
+    }
+
+    onMove(event) {
+      let eventTouch = event;
+
+      if (event.touches) {
+        eventTouch = event.touches[0];
+      }
+
+      this.x = eventTouch.pageX - this.startX;
+
+      this.changeValues(event);
+    }
+
+    onStop(event) {
+      this.imagesHolder.removeEventListener('mousemove', this.onMoveEvent);
+      this.imagesHolder.removeEventListener('mouseup', this.onStopEvent);
+      this.imagesHolder.removeEventListener('touchmove', this.onMoveEvent);
+      this.imagesHolder.removeEventListener('touchend', this.onStopEvent);
+    }
+
+    onUnload() {
+      if (this.changeValuesEvent) {
+        document.removeEventListener('theme:resize', this.changeValuesEvent);
+      }
+    }
+  }
+
+  const compareImages = {
+    onLoad() {
+      sections$4[this.id] = [];
+      const els = this.container.querySelectorAll(selectors$5.imagesHolder);
+      els.forEach((el) => {
+        sections$4[this.id].push(new CompareImages(el));
+      });
+    },
+    onUnload() {
+      sections$4[this.id].forEach((el) => {
+        if (typeof el.onUnload === 'function') {
+          el.onUnload();
+        }
+      });
+    },
+  };
+
+  register('custom-content', [slider, videoPlay, videoBackground, parallaxHero, swatchGridSection, compareImages, newsletterCheckForResultSection, siblings]);
 
   var styles = {};
   styles.basic = [];
@@ -12189,7 +13221,7 @@
     var center = map.getCenter();
 
     // eslint-disable-next-line no-unused-vars
-    var marker = new google.maps.Marker({
+    new google.maps.Marker({
       map: map,
       position: center,
     });
@@ -12218,16 +13250,18 @@
     });
   }
 
-  register('search', [quickAddProduct, swatchGridSection]);
+  register('search', [swatchGridSection, siblings]);
 
-  const selectors$L = {
+  const selectors$4 = {
+    largePromo: '[data-large-promo]',
     largePromoInner: '[data-large-promo-inner]',
     trackingInner: '[data-tracking-consent-inner]',
     tracking: '[data-tracking-consent]',
     trackingAccept: '[data-confirm-cookies]',
+    cartBar: 'cart-bar',
     close: '[data-close-modal]',
     modalUnderlay: '[data-modal-underlay]',
-    modalBody: '[data-modal-body]',
+
     newsletterPopup: '[data-newsletter]',
     newsletterPopupHolder: '[data-newsletter-holder]',
     newsletterClose: '[data-newsletter-close]',
@@ -12240,58 +13274,32 @@
     dataTargetReferrer: 'data-target-referrer',
   };
 
-  const classes$s = {
-    hide: 'hide',
+  const classes$3 = {
+    hidden: 'hidden',
     hasValue: 'has-value',
+    cartBarVisible: 'cart-bar-visible',
+    isVisible: 'is-visible',
     success: 'has-success',
     selected: 'selected',
     hasBlockSelected: 'has-block-selected',
+    mobile: 'mobile',
+    desktop: 'desktop',
+    bottom: 'bottom',
   };
 
-  let sections$n = {};
+  const attributes$3 = {
+    enable: 'data-enable',
+  };
 
-  class PopupCookie {
-    constructor(name, value) {
-      this.configuration = {
-        expires: null, // session cookie
-        path: '/',
-        domain: window.location.hostname,
-      };
-      this.name = name;
-      this.value = value;
-    }
-
-    write() {
-      const hasCookie = document.cookie.indexOf('; ') !== -1 && !document.cookie.split('; ').find((row) => row.startsWith(this.name));
-      if (hasCookie || document.cookie.indexOf('; ') === -1) {
-        document.cookie = `${this.name}=${this.value}; expires=${this.configuration.expires}; path=${this.configuration.path}; domain=${this.configuration.domain}`;
-      }
-    }
-
-    read() {
-      if (document.cookie.indexOf('; ') !== -1 && document.cookie.split('; ').find((row) => row.startsWith(this.name))) {
-        const returnCookie = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith(this.name))
-          .split('=')[1];
-
-        return returnCookie;
-      } else return false;
-    }
-
-    destroy() {
-      if (document.cookie.split('; ').find((row) => row.startsWith(this.name))) {
-        document.cookie = `${this.name}=null; expires=${this.configuration.expires}; path=${this.configuration.path}; domain=${this.configuration.domain}`;
-      }
-    }
-  }
+  let sections$3 = {};
 
   class DelayShow {
     constructor(holder, element, callback = null) {
       this.element = element;
-      this.delay = holder.getAttribute(selectors$L.delayAttribite);
+      this.delay = holder.getAttribute(selectors$4.delayAttribite);
       this.isSubmitted = window.location.href.indexOf('accepts_marketing') !== -1 || window.location.href.indexOf('customer_posted=true') !== -1;
       this.callback = callback;
+      this.showPopupOnScrollEvent = () => this.showPopupOnScroll();
 
       if (this.delay === 'always' || this.isSubmitted) {
         this.always();
@@ -12320,15 +13328,6 @@
       setTimeout(() => {
         fadeIn(this.element, null, this.callback);
       }, seconds * 1000);
-    }
-
-    // Scroll to the bottom of the page
-    bottom() {
-      window.addEventListener('scroll', () => {
-        if (window.scrollY + window.innerHeight >= document.body.clientHeight) {
-          fadeIn(this.element, null, this.callback);
-        }
-      });
     }
 
     // Idle for 1 min
@@ -12371,6 +13370,22 @@
 
       startTimer();
     }
+
+    // Scroll to the bottom of the page
+    bottom() {
+      document.addEventListener('theme:scroll', this.showPopupOnScrollEvent);
+    }
+
+    showPopupOnScroll() {
+      if (window.scrollY + window.innerHeight >= document.body.clientHeight) {
+        fadeIn(this.element, null, this.callback);
+        document.removeEventListener('theme:scroll', this.showPopupOnScrollEvent);
+      }
+    }
+
+    onUnload() {
+      document.removeEventListener('theme:scroll', this.showPopupOnScrollEvent);
+    }
   }
 
   class TargetReferrer {
@@ -12378,7 +13393,7 @@
       this.el = el;
       this.locationPath = location.href;
 
-      if (!this.el.hasAttribute(selectors$L.dataTargetReferrer)) {
+      if (!this.el.hasAttribute(selectors$4.dataTargetReferrer)) {
         return false;
       }
 
@@ -12386,7 +13401,7 @@
     }
 
     init() {
-      if (this.locationPath.indexOf(this.el.getAttribute(selectors$L.dataTargetReferrer)) === -1 && !window.Shopify.designMode) {
+      if (this.locationPath.indexOf(this.el.getAttribute(selectors$4.dataTargetReferrer)) === -1 && !window.Shopify.designMode) {
         this.el.parentNode.removeChild(this.el);
       }
     }
@@ -12395,12 +13410,11 @@
   class LargePopup {
     constructor(el) {
       this.popup = el;
-      this.modal = this.popup.querySelector(selectors$L.largePromoInner);
-      this.modalBody = this.popup.querySelector(selectors$L.modalBody);
-      this.close = this.popup.querySelector(selectors$L.close);
-      this.underlay = this.popup.querySelector(selectors$L.modalUnderlay);
-      this.form = this.popup.querySelector(selectors$L.newsletterForm);
-      this.cookie = new PopupCookie(this.popup.getAttribute(selectors$L.cookieNameAttribute), 'user_has_closed');
+      this.modal = this.popup.querySelector(selectors$4.largePromoInner);
+      this.close = this.popup.querySelector(selectors$4.close);
+      this.underlay = this.popup.querySelector(selectors$4.modalUnderlay);
+      this.form = this.popup.querySelector(selectors$4.newsletterForm);
+      this.cookie = new PopupCookie(this.popup.getAttribute(selectors$4.cookieNameAttribute), 'user_has_closed');
       this.isTargeted = new TargetReferrer(this.popup);
       this.a11y = a11y;
 
@@ -12409,13 +13423,26 @@
 
     init() {
       const cookieExists = this.cookie.read() !== false;
+      const targetMobile = this.popup.classList.contains(classes$3.mobile);
+      const targetDesktop = this.popup.classList.contains(classes$3.desktop);
+      const isMobileView = !isDesktop();
+      let targetMatches = true;
+
+      if ((targetMobile && !isMobileView) || (targetDesktop && isMobileView)) {
+        targetMatches = false;
+      }
+
+      if (!targetMatches) {
+        this.scrollUnlock();
+        return;
+      }
 
       if (!cookieExists || window.Shopify.designMode) {
         if (!window.Shopify.designMode) {
-          new DelayShow(this.popup, this.modal, this.scrollLock.bind(this));
+          new DelayShow(this.popup, this.modal, () => this.scrollLock());
         }
 
-        if (this.form && this.form.classList.contains(classes$s.success)) {
+        if (this.form && this.form.classList.contains(classes$3.success)) {
           this.checkForSuccess();
         }
 
@@ -12424,7 +13451,7 @@
     }
 
     checkForSuccess() {
-      fadeIn(this.modal, null, this.scrollLock.bind(this));
+      fadeIn(this.modal, null, () => this.scrollLock());
       this.cookie.write();
     }
 
@@ -12441,8 +13468,10 @@
     }
 
     scrollLock() {
-      this.a11y.trapFocus(this.modal);
-      document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true, detail: this.modalBody}));
+      if (window.getComputedStyle(this.popup).display !== 'none') {
+        this.a11y.trapFocus(this.modal);
+        document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
+      }
     }
 
     scrollUnlock() {
@@ -12452,9 +13481,9 @@
 
     onBlockSelect(evt) {
       if (this.popup.contains(evt.target)) {
-        fadeIn(this.modal, null, this.scrollLock.bind(this));
-        this.popup.classList.add(classes$s.selected);
-        this.popup.parentNode.classList.add(classes$s.hasBlockSelected);
+        fadeIn(this.modal, null, () => this.scrollLock());
+        this.popup.classList.add(classes$3.selected);
+        this.popup.parentNode.classList.add(classes$3.hasBlockSelected);
       }
     }
 
@@ -12462,8 +13491,8 @@
       if (this.popup.contains(evt.target)) {
         fadeOut(this.modal);
         this.scrollUnlock();
-        this.popup.classList.remove(classes$s.selected);
-        this.popup.parentNode.classList.remove(classes$s.hasBlockSelected);
+        this.popup.classList.remove(classes$3.selected);
+        this.popup.parentNode.classList.remove(classes$3.hasBlockSelected);
       }
     }
   }
@@ -12471,10 +13500,9 @@
   class Tracking {
     constructor(el) {
       this.popup = el;
-      this.modal = document.querySelector(selectors$L.tracking);
-      this.close = this.modal.querySelector(selectors$L.close);
-      this.acceptButton = this.modal.querySelector(selectors$L.trackingAccept);
-      this.enable = this.modal.getAttribute('data-enable') === 'true';
+      this.modal = document.querySelector(selectors$4.tracking);
+      this.acceptButton = this.modal.querySelector(selectors$4.trackingAccept);
+      this.enable = this.modal.getAttribute(attributes$3.enable) === 'true';
       this.showPopup = false;
 
       window.Shopify.loadFeatures(
@@ -12512,13 +13540,6 @@
     }
 
     clickEvents() {
-      this.close.addEventListener('click', (event) => {
-        event.preventDefault();
-
-        window.Shopify.customerPrivacy.setTrackingConsent(false, () => fadeOut(this.modal));
-        document.documentElement.style.setProperty('--cookie-bar-height', '0px');
-      });
-
       this.acceptButton.addEventListener('click', (event) => {
         event.preventDefault();
 
@@ -12535,16 +13556,16 @@
     onBlockSelect(evt) {
       if (this.popup.contains(evt.target) && this.showPopup) {
         fadeIn(this.modal);
-        this.popup.classList.add(classes$s.selected);
-        this.popup.parentNode.classList.add(classes$s.hasBlockSelected);
+        this.popup.classList.add(classes$3.selected);
+        this.popup.parentNode.classList.add(classes$3.hasBlockSelected);
       }
     }
 
     onBlockDeselect(evt) {
       if (this.popup.contains(evt.target)) {
         fadeOut(this.modal);
-        this.popup.classList.remove(classes$s.selected);
-        this.popup.parentNode.classList.remove(classes$s.hasBlockSelected);
+        this.popup.classList.remove(classes$3.selected);
+        this.popup.parentNode.classList.remove(classes$3.hasBlockSelected);
       }
     }
   }
@@ -12552,8 +13573,8 @@
   class PromoText {
     constructor(el) {
       this.popup = el;
-      this.close = this.popup.querySelector(selectors$L.close);
-      this.cookie = new PopupCookie(this.popup.getAttribute(selectors$L.cookieNameAttribute), 'user_has_closed');
+      this.close = this.popup.querySelector(selectors$4.close);
+      this.cookie = new PopupCookie(this.popup.getAttribute(selectors$4.cookieNameAttribute), 'user_has_closed');
       this.isTargeted = new TargetReferrer(this.popup);
 
       this.init();
@@ -12585,16 +13606,16 @@
     onBlockSelect(evt) {
       if (this.popup.contains(evt.target)) {
         fadeIn(this.popup);
-        this.popup.classList.add(classes$s.selected);
-        this.popup.parentNode.classList.add(classes$s.hasBlockSelected);
+        this.popup.classList.add(classes$3.selected);
+        this.popup.parentNode.classList.add(classes$3.hasBlockSelected);
       }
     }
 
     onBlockDeselect(evt) {
       if (this.popup.contains(evt.target)) {
         fadeOut(this.popup);
-        this.popup.classList.remove(classes$s.selected);
-        this.popup.parentNode.classList.remove(classes$s.hasBlockSelected);
+        this.popup.classList.remove(classes$3.selected);
+        this.popup.parentNode.classList.remove(classes$3.hasBlockSelected);
       }
     }
   }
@@ -12602,26 +13623,38 @@
   class NewsletterPopup {
     constructor(el) {
       this.popup = el;
-      this.holder = this.popup.querySelector(selectors$L.newsletterPopupHolder);
-      this.close = this.popup.querySelector(selectors$L.newsletterClose);
-      this.heading = this.popup.querySelector(selectors$L.newsletterHeading);
-      this.newsletterField = this.popup.querySelector(selectors$L.newsletterField);
-      this.cookie = new PopupCookie(this.popup.getAttribute(selectors$L.cookieNameAttribute), 'newsletter_is_closed');
-      this.form = this.popup.querySelector(selectors$L.newsletterForm);
+      this.holder = this.popup.querySelector(selectors$4.newsletterPopupHolder);
+      this.close = this.popup.querySelector(selectors$4.newsletterClose);
+      this.heading = this.popup.querySelector(selectors$4.newsletterHeading);
+      this.newsletterField = this.popup.querySelector(selectors$4.newsletterField);
+      this.cookie = new PopupCookie(this.popup.getAttribute(selectors$4.cookieNameAttribute), 'newsletter_is_closed');
+      this.form = this.popup.querySelector(selectors$4.newsletterForm);
       this.isTargeted = new TargetReferrer(this.popup);
+      this.resetClassTimer = 0;
 
       this.init();
     }
 
     init() {
       const cookieExists = this.cookie.read() !== false;
+      const submissionSuccess = window.location.search.indexOf('?customer_posted=true') !== -1;
+      const classesString = [...this.holder.classList].toString();
+      const isPositionBottom = classesString.includes(classes$3.bottom);
+
+      if (submissionSuccess) {
+        this.delay = 0;
+      }
 
       if (!cookieExists || window.Shopify.designMode) {
         this.show();
 
-        if (this.form.classList.contains(classes$s.success)) {
+        if (this.form.classList.contains(classes$3.success)) {
           this.checkForSuccess();
         }
+      }
+
+      if (isPositionBottom) {
+        this.observeCartBar();
       }
     }
 
@@ -12642,12 +13675,42 @@
       this.cookie.write();
     }
 
+    observeCartBar() {
+      this.cartBar = document.getElementById(selectors$4.cartBar);
+
+      if (!this.cartBar) return;
+
+      const config = {attributes: true, childList: false, subtree: false};
+      let isVisible = this.cartBar.classList.contains(classes$3.isVisible);
+      document.body.classList.toggle(classes$3.cartBarVisible, isVisible);
+
+      // Callback function to execute when mutations are observed
+      const callback = (mutationList) => {
+        for (const mutation of mutationList) {
+          if (mutation.type === 'attributes') {
+            isVisible = mutation.target.classList.contains(classes$3.isVisible);
+            document.body.classList.toggle(classes$3.cartBarVisible, isVisible);
+          }
+        }
+      };
+
+      this.observer = new MutationObserver(callback);
+      this.observer.observe(this.cartBar, config);
+    }
+
     showForm() {
       this.heading.addEventListener('click', (event) => {
         event.preventDefault();
 
-        this.heading.classList.add(classes$s.hide);
+        this.heading.classList.add(classes$3.hidden);
+        this.form.classList.remove(classes$3.hidden);
         this.newsletterField.focus();
+      });
+
+      this.heading.addEventListener('keyup', (event) => {
+        if (event.code === window.theme.keyboardKeys.ENTER) {
+          this.heading.dispatchEvent(new Event('click'));
+        }
       });
     }
 
@@ -12661,77 +13724,100 @@
     }
 
     inputField() {
-      this.newsletterField.addEventListener('input', () => {
-        if (this.newsletterField.value !== '') {
-          this.holder.classList.add(classes$s.hasValue, this.newsletterField.value !== '');
+      const setClass = () => {
+        // Reset timer if exists and is active
+        if (this.resetClassTimer) {
+          clearTimeout(this.resetClassTimer);
         }
-      });
 
-      this.newsletterField.addEventListener('focus', () => {
         if (this.newsletterField.value !== '') {
-          this.holder.classList.add(classes$s.hasValue, this.newsletterField.value !== '');
+          this.holder.classList.add(classes$3.hasValue);
         }
-      });
+      };
 
-      this.newsletterField.addEventListener('focusout', () => {
-        setTimeout(() => {
-          this.holder.classList.remove(classes$s.hasValue);
+      const unsetClass = () => {
+        // Reset timer if exists and is active
+        if (this.resetClassTimer) {
+          clearTimeout(this.resetClassTimer);
+        }
+
+        // Reset class
+        this.resetClassTimer = setTimeout(() => {
+          this.holder.classList.remove(classes$3.hasValue);
         }, 2000);
-      });
+      };
+
+      this.newsletterField.addEventListener('input', setClass);
+      this.newsletterField.addEventListener('focus', setClass);
+      this.newsletterField.addEventListener('focusout', unsetClass);
     }
 
     onBlockSelect(evt) {
       if (this.popup.contains(evt.target)) {
         fadeIn(this.holder);
-        this.popup.classList.add(classes$s.selected);
-        this.popup.parentNode.classList.add(classes$s.hasBlockSelected);
+        this.popup.classList.add(classes$3.selected);
+        this.popup.parentNode.classList.add(classes$3.hasBlockSelected);
       }
     }
 
     onBlockDeselect(evt) {
       if (this.popup.contains(evt.target)) {
         fadeOut(this.holder);
-        this.popup.classList.remove(classes$s.selected);
-        this.popup.parentNode.classList.remove(classes$s.hasBlockSelected);
+        this.popup.classList.remove(classes$3.selected);
+        this.popup.parentNode.classList.remove(classes$3.hasBlockSelected);
+      }
+    }
+
+    onUnload() {
+      if (this.observer) {
+        this.observer.disconnect();
       }
     }
   }
 
   const popupSection = {
     onLoad() {
-      sections$n[this.id] = [];
+      sections$3[this.id] = [];
 
-      const newsletters = this.container.querySelectorAll('[data-large-promo]');
+      const newsletters = this.container.querySelectorAll(selectors$4.largePromo);
       newsletters.forEach((el) => {
-        sections$n[this.id].push(new LargePopup(el));
+        sections$3[this.id].push(new LargePopup(el));
       });
 
-      const tracking = this.container.querySelectorAll(selectors$L.tracking);
+      const tracking = this.container.querySelectorAll(selectors$4.tracking);
       tracking.forEach((el) => {
-        sections$n[this.id].push(new Tracking(el));
+        sections$3[this.id].push(new Tracking(el));
       });
 
-      const newsletterPopup = this.container.querySelectorAll(selectors$L.newsletterPopup);
+      const newsletterPopup = this.container.querySelectorAll(selectors$4.newsletterPopup);
       newsletterPopup.forEach((el) => {
-        sections$n[this.id].push(new NewsletterPopup(el));
+        sections$3[this.id].push(new NewsletterPopup(el));
       });
 
-      const promoPopup = this.container.querySelectorAll(selectors$L.promoPopup);
+      const promoPopup = this.container.querySelectorAll(selectors$4.promoPopup);
       promoPopup.forEach((el) => {
-        sections$n[this.id].push(new PromoText(el));
+        sections$3[this.id].push(new PromoText(el));
       });
     },
+
     onBlockSelect(evt) {
-      sections$n[this.id].forEach((el) => {
+      sections$3[this.id].forEach((el) => {
         if (typeof el.onBlockSelect === 'function') {
           el.onBlockSelect(evt);
         }
       });
     },
     onBlockDeselect(evt) {
-      sections$n[this.id].forEach((el) => {
+      sections$3[this.id].forEach((el) => {
         if (typeof el.onBlockDeselect === 'function') {
           el.onBlockDeselect(evt);
+        }
+      });
+    },
+    onUnload() {
+      sections$3[this.id].forEach((el) => {
+        if (typeof el.onUnload === 'function') {
+          el.onUnload();
         }
       });
     },
@@ -12739,57 +13825,77 @@
 
   register('popups', [popupSection, newsletterCheckForResultSection]);
 
-  const selectors$M = {
-    loginToggle: '#AdminLoginToggle',
-    newsletterToggle: '#NewsletterToggle',
-    login: '#AdminLogin',
-    signup: '#CustomerSignup',
-    errors: '.errors',
-    contactErrors: '#contact_form .errors',
+  const selectors$3 = {
+    passwordLogin: '[data-password-login]',
+    passwordModal: '[data-password-modal]',
+    modalBody: '[data-modal-body]',
+    close: '[data-modal-close]',
     loginErrors: '#login_form .errors',
+  };
+
+  const classes$2 = {
+    open: 'is-open',
   };
 
   class Password {
     constructor(section) {
       this.container = section.container;
-      this.loginToggle = this.container.querySelector(selectors$M.loginToggle);
-      this.newsletterToggle = this.container.querySelector(selectors$M.newsletterToggle);
-      this.login = this.container.querySelector(selectors$M.login);
-      this.signup = this.container.querySelector(selectors$M.signup);
-      this.errors = this.container.querySelector(selectors$M.errors);
-      this.contactErrors = this.container.querySelector(selectors$M.contactErrors);
-      this.loginErrors = this.container.querySelector(selectors$M.loginErrors);
+      this.passwordLogin = this.container.querySelectorAll(selectors$3.passwordLogin);
+      this.modal = this.container.querySelector(selectors$3.passwordModal);
+      this.modalBody = this.container.querySelector(selectors$3.modalBody);
+      this.closeButtons = this.container.querySelectorAll(selectors$3.close);
+      this.a11y = a11y;
+      this.loginErrors = this.container.querySelector(selectors$3.loginErrors);
       this.init();
     }
 
     init() {
-      this.loginToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        slideDown(this.login);
-        hideElement(this.signup);
-        if (this.errors) {
-          hideElement(this.errors);
+      if (this.passwordLogin.length && this.modal && this.modalBody) {
+        this.passwordLogin.forEach((passwordLogin) => {
+          passwordLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openModal();
+          });
+        });
+
+        if (this.closeButtons.length) {
+          this.closeButtons.forEach((closeButton) => {
+            closeButton.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.closeModal();
+            });
+          });
         }
-      });
 
-      this.newsletterToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        hideElement(this.login);
-        slideDown(this.signup);
-        if (this.errors) {
-          hideElement(this.errors);
+        if (this.loginErrors) {
+          this.openModal();
         }
+      }
+    }
+
+    openModal() {
+      fadeIn(this.modal, 'block', () => {
+        this.modal.classList.add(classes$2.open);
       });
+      this.scrollLock();
+    }
 
-      if (this.contactErrors) {
-        hideElement(this.login);
-        slideDown(this.signup);
-      }
+    closeModal() {
+      fadeOut(this.modal);
+      this.modal.classList.remove(classes$2.open);
+      this.scrollUnlock();
+    }
 
-      if (this.loginErrors) {
-        slideDown(this.login);
-        hideElement(this.signup);
+    scrollLock() {
+      if (window.getComputedStyle(this.modal).display !== 'none') {
+        this.a11y.trapFocus(this.modal);
+        document.dispatchEvent(new CustomEvent('theme:scroll:lock', {bubbles: true}));
       }
+    }
+
+    scrollUnlock() {
+      this.a11y.removeTrapFocus();
+      document.dispatchEvent(new CustomEvent('theme:scroll:unlock', {bubbles: true}));
     }
   }
 
@@ -12801,26 +13907,265 @@
 
   register('password-template', passwordSection);
 
-  register('faq', accordions);
+  register('supporting-menu', [popoutSection]);
 
-  register('list-collections', [slider, quickAddProduct, swatchGridSection, blockScroll]);
+  register('list-collections', [slider, swatchGridSection, blockScroll, siblings]);
 
-  register('columns-with-image', [slider, blockScroll, videoPlay]);
+  register('columns', [blockScroll, slider]);
 
   register('newsletter', newsletterCheckForResultSection);
+
+  register('before-after', [compareImages]);
+
+  const selectors$2 = {
+    scrollToElement: '[data-scroll-to]',
+    tooltip: '[data-tooltip]',
+    collapsibleTrigger: '[data-collapsible-trigger]',
+  };
+
+  const attributes$2 = {
+    open: 'open',
+    dataScrollTo: 'data-scroll-to',
+    tooltipStopMousenterValue: 'data-tooltip-stop-mouseenter',
+  };
+
+  const sections$2 = {};
+
+  class ScrollToElement {
+    constructor(section) {
+      this.section = section;
+      this.container = section.container;
+      this.scrollToButtons = this.container.querySelectorAll(selectors$2.scrollToElement);
+
+      if (this.scrollToButtons.length) {
+        this.init();
+      }
+    }
+
+    init() {
+      this.scrollToButtons.forEach((element) => {
+        element.addEventListener('click', () => {
+          const target = this.container.querySelector(element.getAttribute(attributes$2.dataScrollTo));
+
+          if (!target || element.tagName === 'A') return;
+
+          this.scrollToElement(target);
+        });
+      });
+    }
+
+    scrollToElement(element) {
+      scrollTo(element.getBoundingClientRect().top + 1);
+
+      const collapsibleElement = element.nextElementSibling.matches('details') ? element.nextElementSibling : null;
+
+      if (collapsibleElement) {
+        const collapsibleTrigger = collapsibleElement?.querySelector(selectors$2.collapsibleTrigger);
+        const isOpen = collapsibleElement.hasAttribute(attributes$2.open);
+
+        if (!isOpen) {
+          collapsibleTrigger?.dispatchEvent(new Event('click'));
+        }
+      }
+
+      const tooltips = document.querySelectorAll(`${selectors$2.tooltip}:not([${attributes$2.tooltipStopMousenterValue}])`);
+      if (tooltips.length) {
+        tooltips.forEach((tooltip) => {
+          tooltip.setAttribute(attributes$2.tooltipStopMousenterValue, '');
+
+          setTimeout(() => {
+            tooltip.removeAttribute(attributes$2.tooltipStopMousenterValue);
+          }, 1000);
+        });
+      }
+    }
+  }
+
+  const scrollToElement = {
+    onLoad() {
+      sections$2[this.id] = new ScrollToElement(this);
+    },
+  };
+
+  const selectors$1 = {
+    scrollSpy: '[data-scroll-spy]',
+    headerSticky: '[data-header-sticky]',
+  };
+
+  const classes$1 = {
+    selected: 'is-selected',
+  };
+
+  const attributes$1 = {
+    scrollSpy: 'data-scroll-spy',
+    mobile: 'data-scroll-spy-mobile',
+    desktop: 'data-scroll-spy-desktop',
+  };
+
+  const sections$1 = {};
+
+  class ScrollSpy {
+    constructor(section) {
+      this.section = section;
+      this.container = section.container;
+      this.scrollSpyAnchors = this.container.querySelectorAll(selectors$1.scrollSpy);
+      this.loopAnchors = this.loopAnchors.bind(this);
+      this.observers = [];
+
+      this.init();
+    }
+
+    init() {
+      this.loopAnchors();
+      document.addEventListener('theme:resize:width', this.loopAnchors);
+    }
+
+    loopAnchors() {
+      if (!this.scrollSpyAnchors.length) return;
+
+      this.scrollSpyAnchors.forEach((anchor) => {
+        this.toggleObserver(anchor);
+      });
+    }
+
+    toggleObserver(anchor) {
+      const anchorSpy = this.container.querySelector(anchor.getAttribute(attributes$1.scrollSpy));
+
+      if (!anchorSpy) return;
+
+      // Stop observer to prevent running it multuple times
+      if (this.observers[anchorSpy.id]) {
+        this.observers[anchorSpy.id].unobserve(anchorSpy);
+      }
+
+      const isDesktopView = isDesktop();
+      const isEligible =
+        (!isDesktopView && anchor.hasAttribute(attributes$1.mobile)) ||
+        (isDesktopView && anchor.hasAttribute(attributes$1.desktop)) ||
+        (!anchor.hasAttribute(attributes$1.desktop) && !anchor.hasAttribute(attributes$1.mobile));
+
+      if (isEligible) {
+        this.runObserver(anchorSpy);
+      }
+    }
+
+    runObserver(anchorSpy) {
+      let {menuHeight} = readHeights();
+      const stickyHeader = Boolean(document.querySelector(selectors$1.headerSticky));
+      const headerHeight = stickyHeader ? menuHeight : 0;
+      const rootMargin = stickyHeader ? headerHeight * -1 + 'px 0px 0px 0px' : '0px';
+
+      const options = {
+        rootMargin: rootMargin,
+        threshold: [0.5, 1],
+      };
+
+      this.observers[anchorSpy.id] = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const anchorOld = this.container.querySelector(`[${attributes$1.scrollSpy}].${classes$1.selected}`);
+          const anchorNew = this.container.querySelector(`[${attributes$1.scrollSpy}="#${entry.target.id}"]`);
+
+          if (entry.intersectionRatio > 0.5 && entry.boundingClientRect.top - headerHeight <= entry.boundingClientRect.height) {
+            anchorOld?.classList.remove(classes$1.selected);
+            anchorNew?.classList.add(classes$1.selected);
+          }
+        });
+      }, options);
+      this.observers[anchorSpy.id].observe(anchorSpy);
+    }
+
+    onUnload() {
+      document.removeEventListener('theme:resize:width', this.loopAnchors);
+
+      if (this.observers.length) {
+        this.observers.forEach((observer) => {
+          observer.disconnect();
+        });
+      }
+    }
+  }
+
+  const scrollSpy = {
+    onLoad() {
+      sections$1[this.id] = new ScrollSpy(this);
+    },
+    onUnload() {
+      sections$1[this.id].onUnload();
+    },
+  };
+
+  register('sidebar', [scrollToElement, scrollSpy]);
+
+  const selectors = {
+    button: '[data-hover-target]',
+    image: '[data-collection-image]',
+  };
+
+  const attributes = {
+    target: 'data-hover-target',
+  };
+
+  const classes = {
+    visible: 'is-visible',
+    selected: 'is-selected',
+  };
+
+  let sections = {};
+
+  class CollectionsHover {
+    constructor(section) {
+      this.container = section.container;
+      this.buttons = this.container.querySelectorAll(selectors.button);
+
+      this.init();
+    }
+
+    init() {
+      if (this.buttons.length) {
+        this.buttons.forEach((button) => {
+          button.addEventListener('mouseenter', (e) => {
+            const targetId = e.currentTarget.getAttribute(attributes.target);
+
+            this.updateState(targetId);
+          });
+        });
+      }
+    }
+
+    updateState(targetId) {
+      const button = this.container.querySelector(`[${attributes.target}="${targetId}"]`);
+      const target = this.container.querySelector(`#${targetId}:not(.${classes.visible})`);
+      const buttonSelected = this.container.querySelector(`${selectors.button}.${classes.selected}`);
+      const imageVisible = this.container.querySelector(`${selectors.image}.${classes.visible}`);
+
+      if (target && isDesktop()) {
+        imageVisible?.classList.remove(classes.visible);
+        buttonSelected?.classList.remove(classes.selected);
+
+        target.classList.add(classes.visible);
+        button.classList.add(classes.selected);
+      }
+    }
+
+    onBlockSelect(e) {
+      this.updateState(e.target.id);
+    }
+  }
+
+  const collectionsHover = {
+    onLoad() {
+      sections[this.id] = new CollectionsHover(this);
+    },
+    onBlockSelect(e) {
+      sections[this.id].onBlockSelect(e);
+    },
+  };
+
+  register('collections-hover', [collectionsHover, scrollSpy]);
 
   document.addEventListener('DOMContentLoaded', function () {
     // Load all registered sections on the page.
     load('*');
-
-    // Animate on scroll
-    const showAnimations = document.body.getAttribute('data-animations') === 'true';
-    if (showAnimations) {
-      AOS.init({
-        once: true,
-        offset: 0,
-      });
-    }
 
     // Scroll to top button
     const scrollTopButton = document.querySelector('[data-scroll-top-button]');
@@ -12836,14 +14181,6 @@
         scrollTopButton.classList.toggle('is-visible', window.pageYOffset > window.innerHeight);
       });
     }
-
-    // When images load, clear the background color
-    document.addEventListener('lazyloaded', function (event) {
-      const lazyImage = event.target.parentNode;
-      if (lazyImage.classList.contains('lazy-image')) {
-        lazyImage.style.backgroundImage = 'none';
-      }
-    });
 
     if (window.self !== window.top) {
       document.querySelector('html').classList.add('iframe');
@@ -12861,4 +14198,4 @@
     document.documentElement.className = document.documentElement.className.replace('supports-no-cookies', 'supports-cookies');
   }
 
-}(themeVendor.BodyScrollLock, themeVendor.themeAddresses, themeVendor.themeCurrency, themeVendor.Sqrl, themeVendor.themeImages, themeVendor.Flickity, themeVendor.FlickityFade, themeVendor.Rellax, themeVendor.ellipsis, themeVendor.AOS));
+})(themeVendor.ScrollLock, themeVendor.themeAddresses, themeVendor.themeCurrency, themeVendor.Rellax, themeVendor.Flickity, themeVendor.FlickityFade, themeVendor.themeImages);

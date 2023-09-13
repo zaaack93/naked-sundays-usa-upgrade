@@ -5,7 +5,7 @@
   assign filter_layout = section.settings.filter_layout
 
   assign show_group_filters = false
-  
+
   if filter_layout == 'inline-open'
     assign show_group_filters = true
   endif
@@ -15,12 +15,12 @@
   endcomment
 
   assign product_limit = section.settings.product_limit
-  if section.blocks.size > 0
+  assign blocks_featured_image = section.blocks | where: "type", "featured_image"
+  if blocks_featured_image.size > 0
     assign product_limit = product_limit | minus: 1
   endif
 
   assign section_blocks_filter_group = section.blocks | where: "type", "group"
-
   assign show_group_filter = false
   assign show_filter = false
   if section.settings.enable_filters and section_blocks_filter_group.size > 0
@@ -29,41 +29,48 @@
     assign show_filter = true
   endif
 
-  assign mobile_class = 'small--one-whole'
-  if section.settings.grid_mobile == '2'
-    assign mobile_class = 'small--one-half'
+  assign columns_desktop = section.settings.grid | plus: 0
+  assign columns_medium = 3
+  assign columns_small = 2
+  assign columns_mobile = section.settings.grid_mobile | plus: 0
+
+  if columns_desktop == 2 or columns_desktop == 4
+    assign columns_medium = 2
   endif
 
-  case section.settings.grid
-    when 2
-      assign grid_strings = 'large-up--one-half medium--one-half ' | append: mobile_class
-    when 3
-      assign grid_strings = 'large-up--one-third medium--one-third ' | append: mobile_class
-    when 4
-      assign grid_strings = 'large-up--one-quarter medium--one-half ' | append: mobile_class
-    when 5
-      assign grid_strings = 'large-up--one-fifth medium--one-third ' | append: mobile_class
-    else
-      assign grid_strings = 'large-up--one-sixth medium--one-third ' | append: mobile_class
-  endcase
-
   assign animation_anchor = '.collection-' | append: collection.handle
+  assign animation_duration = 800
 -%}
+
+{%- capture image_sizes -%}
+  (min-width: 1400px) calc(100vw / {{ columns_desktop }}), (min-width: 750px) calc(100vw / {{ columns_medium }}), (min-width: 480px) calc(100vw / {{ columns_small }}), calc(100vw / {{ columns_mobile }})
+{%- endcapture -%}
+
+{%- style -%}
+  #Collection--{{ section.id }} {
+    --PT: {{ section.settings.padding_top }}px;
+    --PB: {{ section.settings.padding_bottom }}px;
+
+    --COLUMNS: {{ columns_desktop }};
+    --COLUMNS-MEDIUM: {{ columns_medium }};
+    --COLUMNS-SMALL: {{ columns_small }};
+    --COLUMNS-MOBILE: {{ columns_mobile }};
+  }
+{%- endstyle -%}
 
 {%- capture collection_sidebar_class -%}
   {%- if filter_layout == 'slide-out' -%}
     collection__sidebar__slide-out
     {%- else -%}
-    collection__sidebar__slider{% if show_group_filters %} expanding expanded no-mobile-animation{% endif %}
+    collection__sidebar__slider{% if show_group_filters %} expanded drawer--animated no-mobile-animation{% endif %}
   {%- endif -%}
 {%- endcapture -%}
 
 {%- paginate collection.products by product_limit -%}
-  <section class="collection collection-{{ collection.handle }}"
+  <section class="collection collection-products collection-{{ collection.handle }} section-padding"
+    id="Collection--{{ section.id }}"
     data-section-id="{{ section.id }}"
     data-section-type="collection"
-    data-section-type="collection-grid"
-    data-section-type="collection-hero"
     data-sort="{{ show_sort }}"
     data-collection="{{ collection.url | default: '/collections/all' }}">
 
@@ -79,33 +86,56 @@
     {%- if show_sort or show_filter or show_group_filter -%}
       <nav class="collection__nav {{ align_classes }}" data-collection-nav>
         {%- if show_filter or show_group_filter -%}
+          {%- liquid
+            assign filter_active_count = 0
+
+            if show_filter
+              for filter in collection.filters
+                assign filter_active_count = filter_active_count | plus: filter.active_values.size
+              endfor
+            endif
+
+            if show_group_filter and current_tags.size > 0
+              assign filter_active_count = current_tags.size
+            endif
+          -%}
           <div class="popout--group">
             <button
               type="button"
-              class="popout__toggle"
+              class="popout__toggle{% unless filter_layout == 'slide-out' %} popout__toggle--filters{% endunless %}"
               aria-expanded="{% if show_group_filters %}true{% else %}false{% endif %}"
               aria-controls="filter-groups"
               data-aria-toggle
               data-group-tags-enabled>
-              {{ 'collections.general.filter' | t }}
-
-              {%- assign filter_active_count = 0 -%}
-              {%- if show_filter -%}
-                {%- for filter in collection.filters -%}
-                  {%- assign filter_active_count = filter_active_count | plus: filter.active_values.size -%}
-                {%- endfor -%}
-              {%- endif -%}
-              
-              {%- if show_group_filter and current_tags.size > 0 -%}
-                {%- assign filter_active_count = current_tags.size -%}
-              {%- endif -%}
-              
-              <span{% if filter_active_count < 1 %} class="hidden"{% endif %} data-active-filters>{{filter_active_count}}</span>
-
               {%- render 'icon-filter' -%}
+
+              {%- if filter_layout == 'slide-out' -%}
+                {{ 'collections.general.filters' | t }}
+              {%- else -%}
+                <span class="popout__toggleable-text">
+                  <span class="popout__expanded-show">
+                    {{- 'collections.general.show_filters' | t -}}
+                    <span class="filter-count{% if filter_active_count < 1 %} hidden{% endif %}" data-active-filters>
+                      {{- filter_active_count -}}
+                    </span>
+                  </span>
+
+                  <span class="popout__expanded-hide">
+                    {{- 'collections.general.hide_filters' | t -}}
+                    <span class="filter-count{% if filter_active_count < 1 %} hidden{% endif %}" data-active-filters>
+                      {{- filter_active_count -}}
+                    </span>
+                  </span>
+                </span>
+              {%- endif -%}
+
+              {%- unless filter_layout == 'slide-out' -%}
+                {%- render 'icon-nav-arrow-down' -%}
+              {%- endunless -%}
             </button>
           </div>
         {%- endif -%}
+
         {%- if show_sort -%}
           {% render 'collection-sorting' %}
         {%- endif -%}
@@ -115,16 +145,21 @@
     <div class="collection__products{% if show_filter or show_group_filter %} collection__products--group-tags{% endif %}">
       {%- if show_filter or show_group_filter -%}
         <div class="{{ collection_sidebar_class }}" id="filter-groups" data-collection-sidebar>
-          {%- if section.settings.filter_layout == 'slide-out' -%}
-            <div class="collection__sidebar__head">
-              {%- assign products_count = search.results_count | default: collection.products_count -%}
-              <h3>{{ 'collections.general.items_with_count' | t: count: products_count }}</h3>
-          
-              <a href="#filters-group" class="collection__sidebar__close" data-collection-sidebar-close aria-label="{{ 'general.accessibility.close' | t }} {{ 'collections.general.filter' | t }}">
-                {%- render 'icon-close' -%}
-              </a>
-            </div>
-          {%- endif -%}
+          <div class="collection__sidebar__head{% unless filter_layout == 'slide-out' %} collection__sidebar__head--mobile{% endunless %}">
+            <h3>
+              {{- 'collections.general.filters' | t -}}
+
+              <span
+                class="filter-count{% if filter_active_count < 1 %} hidden{% endif %}"
+                data-active-filters>
+                {{- filter_active_count -}}
+              </span>
+            </h3>
+
+            <a href="#filters-group" class="collection__sidebar__close" data-collection-sidebar-close aria-label="{{ 'collections.general.hide_filters' | t }}">
+              {%- render 'icon-cancel' -%}
+            </a>
+          </div>
 
           {%- if show_filter -%}
             {%- render 'collection-filters-sidebar', section: section -%}
@@ -136,113 +171,123 @@
         </div>
       {%- endif -%}
 
-      {%- if filter_layout == 'slide-out' -%}
-        <span class="drawer__underlay" data-drawer-underlay></span>
-      {%- endif -%}
+      <div class="drawer__underlay" data-drawer-underlay></div>
 
-      <div class="product-grid product-grid--loader{% unless settings.product_grid_outline %} product-grid--borderless{% endunless %}" id="CollectionLoop" data-products-grid>
-        {%- if paginate.current_page == 1 and collection.products.size > 0 -%}
-          {%- for block in section.blocks -%}
-            {%- case block.type -%}
-              {%- when 'featured_image' -%}
-                {%- liquid
-                  assign featured_image = block.settings.featured_image
-                  assign featured_image_bg_position = block.settings.featured_image_bg_position
-                  assign featured_header = block.settings.featured_heading
-                  assign featured_text = block.settings.featured_text
-                  assign featured_button_text = block.settings.featured_button_text
-                  assign featured_button_link = block.settings.featured_button_link
-                  assign featured_color_text = block.settings.featured_color_text
-                  assign featured_color_overlay = block.settings.featured_color_overlay
-                  assign featured_overlay_opacity = block.settings.featured_overlay_opacity | times: 0.01
-                -%}
-              
-                {%- style -%}
-                  .product-item__image-overlay { color: {{ featured_color_text }}; }
-                  .product-item__image-overlay::before { opacity: {{ featured_overlay_opacity }}; background-color: {{ featured_color_overlay }}; }
-                  .product-item__image-content .btn:hover { color: {{ featured_color_overlay }}; background-color: {{ featured_color_text }}; border-color: {{ featured_color_text }}; }
-                {%- endstyle -%}
+      <div class="grid-outer" data-products-grid>
+        <div class="grid" id="CollectionLoop">
+          {%- if paginate.current_page == 1 and collection.products_count > 0 -%}
+            {%- for block in section.blocks -%}
+              {%- case block.type -%}
+                {%- when 'featured_image' -%}
+                  {%- liquid
+                    assign featured_image = block.settings.featured_image
+                    assign featured_header = block.settings.featured_heading
+                    assign featured_text = block.settings.featured_text
+                    assign featured_button_text = block.settings.featured_button_text
+                    assign featured_button_link = block.settings.featured_button_link
+                    assign featured_color_text = block.settings.featured_color_text
+                    assign featured_color_overlay = block.settings.featured_color_overlay
+                    assign featured_overlay_opacity = block.settings.featured_overlay_opacity | times: 0.01
 
-                <div class="product-item product-item--featured-image {{ grid_strings }}" {{ block.shopify_attributes }}>
-                  {%- capture featured_image_content -%}
-                    <div class="product-item__image-overlay">
-                      <div class="product-item__image-content">
-                        {%- if featured_header != blank -%}
-                          <h3>{{ featured_header }}</h3>
-                        {%- endif -%}
+                    assign button_style = block.settings.button_style
+                    if button_style == 'btn--text' and block.settings.show_arrow
+                      assign button_style = button_style | append: ' btn--text-no-underline'
+                    endif
+                  -%}
 
-                        {%- if featured_text != blank -%}
-                          {{ featured_text }}
-                        {%- endif -%}
+                  {%- style -%}
+                    #Product-item--{{ block.id }} .product-item__image-overlay {
+                      {%- unless featured_color_text == 'rgba(0,0,0,0)' or featured_color_text == blank -%}
+                        color: {{ featured_color_text }};
+                      {%- endunless -%}
+                    }
+                    #Product-item--{{ block.id }} .product-item__image-overlay::before { opacity: {{ featured_overlay_opacity }}; background-color: {{ featured_color_overlay }}; }
+                  {%- endstyle -%}
 
-                        {%- if featured_button_text != blank -%}
-                          <a href="{{ featured_button_link }}" class="btn btn--large btn--outline caps aos-init aos-animate" data-aos="fade-up" data-aos-anchor="{{ animation_anchor }}" data-aos-duration="700" data-aos-delay="200">{{ featured_button_text }}</a>
+                  <div class="grid-item product-item product-item--featured-image"
+                    id="Product-item--{{ block.id }}"
+                    {{ block.shopify_attributes }}>
+                    {%- capture featured_image_content -%}
+                      <div class="product-item__image-overlay">
+                        <div class="product-item__image-content">
+                          {%- if featured_header != blank -%}
+                            <h3>{{ featured_header }}</h3>
+                          {%- endif -%}
+
+                          {%- if featured_text != blank -%}
+                            {{ featured_text }}
+                          {%- endif -%}
+
+                          {%- if featured_button_text != blank -%}
+                            <a href="{{ featured_button_link }}" class="btn {{ button_style }} {{ block.settings.button_type }} {{ block.settings.button_size }}" data-aos="fade-up" data-aos-anchor="{{ animation_anchor }}" data-aos-duration="{{ animation_duration }}" data-aos-delay="200">
+                              <span>{{ featured_button_text }}</span>
+
+                              {%- if block.settings.show_arrow -%}
+                                {%- render 'icon-arrow-right' -%}
+                              {%- endif -%}
+                            </a>
+                          {%- endif -%}
+                        </div>
+
+                        {%- if featured_button_text == blank and featured_button_link != blank -%}
+                          <a href="{{ featured_button_link }}" class="product-item__image-link" aria-label="{{ featured_image.alt | default: featured_header | default: featured_text | strip_html | escape }}"></a>
                         {%- endif -%}
                       </div>
+                    {%- endcapture -%}
 
-                      {% if featured_button_text == blank and featured_button_link != blank %}
-                        <a href="{{ featured_button_link }}" class="product-item__image-link"></a>
-                      {% endif %}
-                    </div>
-                  {%- endcapture -%}
+                    {%- unless featured_image == blank -%}
+                      <div class="product-item__image">
+                        <div class="product-item__bg"
+                          data-aos="img-in"
+                          data-aos-anchor="{{ animation_anchor }}"
+                          data-aos-delay="{{ animation_delay | times: 150 }}"
+                          data-aos-duration="{{ animation_duration }}"
+                          data-aos-easing="ease-out-quart">
+                          {%- render 'image' image: featured_image, sizes: image_sizes, loading: 'eager', preload: 'true', fetchpriority: 'high', cover: true -%}
+                         </div>
 
-                  {%- unless featured_image == blank -%}
-                    <div class="product-item__image">
-                      <div class="product-item__bg lazyload"
-                        style="background-position: {{ featured_image_bg_position | replace: '-', ' ' }};"
-                        data-aos="img-in"
-                        data-aos-anchor="{{ animation_anchor }}"
-                        data-aos-delay="{{ animation_delay | times: 150 }}"
-                        data-aos-duration="{{ animation_delay | times: 100 | plus: 800 }}"
-                        data-aos-easing="ease-out-quart"
-                        data-bgset="{% render 'bgset', image: featured_image %}"></div>
-                      {{ featured_image_content }}
-                    </div>
-
-                    <noscript>
-                      <div class="product-item__image no-js-image" style="background-image: url('{{ featured_image | img_url: '540x' }}'); background-position: {{ featured_image_bg_position | replace: '-', ' ' }}; background-size: cover; background-repeat: no-repeat;"
-                        >
                         {{ featured_image_content }}
                       </div>
-                    </noscript>
-                  {%- else -%}
-                    <div class="product-item__image svg-placeholder">
-                      {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
-                      {{ 'collection-' | append: current | placeholder_svg_tag }}
+                    {%- else -%}
+                      <div class="product-item__image">
+                        <div class="svg-placeholder">
+                          {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                          {{ 'collection-' | append: current | placeholder_svg_tag }}
+                        </div>
 
-                      {{ featured_image_content }}
-                    </div>
-                  {%- endunless -%}
-                </div>
-            {%- endcase -%}
-          {%- endfor -%}
-        {%- endif -%}
+                        {{ featured_image_content }}
+                      </div>
+                    {%- endunless -%}
+                  </div>
+              {%- endcase -%}
+            {%- endfor -%}
+          {%- endif -%}
 
-        {%- if collection.products.size > 0 -%}
-          {%- for product in collection.products -%}
-          {% if product.type != 'FREEGIFT_HIDDEN' %}
-            {%- assign grid_int = section.settings.grid | times: 1 -%}
-            {%- assign animation_delay = forloop.index0 | modulo: grid_int | times: 1 -%}
-            {%- render 'product-grid-item', product: product, grid_strings: grid_strings, animation_delay: animation_delay, index: forloop.index -%}
-          {% endif %}
-          {%- endfor -%}
-        {%- else -%}
-          <div class="no-results">
-            <p><strong>{{ 'collections.general.no_matches' | t }}</strong></p>
-            {%- assign sort_by_string = '' -%}
-            {%- if collection.sort_by != blank -%}
-              {%- assign sort_by_string = '?sort_by=' | append: collection.sort_by -%}
-            {%- endif -%}
-            <a class="btn caps btn--primary" href="{{ collection.url | append: sort_by_string }}" data-filter-update-url><span>{{ 'collections.general.reset' | t }}</span></a>
-          </div>
-        {%- endif -%}
+          {%- if collection.products_count > 0 -%}
+            {%- for product in collection.products -%}
+              {%- assign grid_int = section.settings.grid | times: 1 -%}
+              {%- assign animation_delay = forloop.index0 | modulo: grid_int | times: 1 -%}
+              {%- render 'product-grid-item', product: product, animation_delay: animation_delay, index: forloop.index, sizes: image_sizes -%}
+            {%- endfor -%}
+          {%- else -%}
+            <div class="no-results">
+              <p><strong>{{ 'collections.general.no_matches' | t }}</strong></p>
+              {%- assign sort_by_string = '' -%}
+              {%- if collection.sort_by != blank -%}
+                {%- assign sort_by_string = '?sort_by=' | append: collection.sort_by -%}
+              {%- endif -%}
+              <a class="btn caps btn--primary" href="{{ collection.url | append: sort_by_string }}" data-filter-update-url><span>{{ 'collections.general.reset' | t }}</span></a>
+            </div>
+          {%- endif -%}
+        </div>
 
         {%- render 'pagination', paginate: paginate -%}
 
-        <div class="product-grid__loader">
-          <div class="loader product-grid__loader-line"><div class="loader-indeterminate"></div></div>
+        <div class="grid__loader">
+          <div class="loader grid__loader-line"><div class="loader-indeterminate"></div></div>
         </div>
       </div>
+
     </div>
   </section>
 {%- endpaginate -%}
@@ -276,20 +321,26 @@
         ]
       },
       {
+        "type": "link_list",
+        "id": "collection_linklist",
+        "label": "Sidebar navigation",
+        "info": "This menu won't show dropdown items."
+      },
+      {
         "type": "header",
         "content": "Product grid"
       },
       {
         "type":    "range",
         "id":      "grid",
+        "label":   "Products per row on desktop",
         "min":     2,
         "max":     6,
         "step":    1,
-        "label":   "Products per row on desktop",
-        "default": 4
+        "default": 3
       },
       {
-        "type": "select",
+        "type": "radio",
         "id": "grid_mobile",
         "label": "Products per row on mobile",
         "options": [
@@ -312,6 +363,30 @@
         "step":    1,
         "label":   "Products per page",
         "default": 36
+      },
+      {
+        "type": "header",
+        "content": "Section padding"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding top",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding bottom",
+        "default": 0
       }
     ],
     "blocks": [
@@ -326,19 +401,6 @@
             "label": "Image"
           },
           {
-            "type": "select",
-            "id": "featured_image_bg_position",
-            "label": "Position",
-            "default": "center-center",
-            "options": [
-              { "label": "Top", "value": "center-top" },
-              { "label": "Right", "value": "right-center" },
-              { "label": "Center", "value": "center-center" },
-              { "label": "Left", "value": "left-center" },
-              { "label": "Bottom", "value": "center-bottom" }
-            ]
-          },
-          {
             "type": "text",
             "id": "featured_heading",
             "label": "Heading",
@@ -348,7 +410,7 @@
             "type": "richtext",
             "id": "featured_text",
             "label": "Text",
-            "default":"<p>Promote products or collections<p>"
+            "default":"<p>Promote products or collections</p>"
           },
           {
             "type": "text",
@@ -360,6 +422,46 @@
             "type": "url",
             "id": "featured_button_link",
             "label": "Button link"
+          },
+          {
+            "type": "select",
+            "id": "button_type",
+            "label": "Color",
+            "default": "btn--primary",
+            "options": [
+              {"value": "btn--primary", "label": "Primary"},
+              {"value": "btn--secondary", "label": "Secondary"},
+              {"value": "btn--white", "label": "White"},
+              {"value": "btn--black", "label": "Black"}
+            ]
+          },
+          {
+            "type": "select",
+            "id": "button_size",
+            "label": "Size",
+            "default": "",
+            "options": [
+              { "label": "Small", "value": "btn--small" },
+              { "label": "Medium", "value": "" },
+              { "label": "Large", "value": "btn--large" }
+            ]
+          },
+          {
+            "type": "select",
+            "id": "button_style",
+            "label": "Style",
+            "default": "btn--outline",
+            "options": [
+              { "label": "Solid", "value": "btn--solid" },
+              { "label": "Outline", "value": "btn--outline" },
+              { "label": "Text", "value": "btn--text" }
+            ]
+          },
+          {
+            "type": "checkbox",
+            "id": "show_arrow",
+            "label": "Show button arrow",
+            "default": false
           },
           {
             "type": "color",

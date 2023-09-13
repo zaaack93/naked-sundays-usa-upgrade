@@ -1,0 +1,228 @@
+{
+  "sections": {
+    "hero": {
+      "type": "collection-image-with-title",
+      "settings": {
+        "show_title": true,
+        "show_description": true,
+        "flex_align": "align--middle-center",
+        "bg_color": "",
+        "color": "",
+        "show_image": false,
+        "banner_layout": "overlay",
+        "height": "screen-height-one-third",
+        "mobile_height": "screen-height-one-half--mobile",
+        "overlay_opacity": 0,
+        "overlay_color": "#000000",
+        "show_overlay_text": false,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "66c8cdd1-d5ac-4cc6-b8b4-eb41fbefabd6": {
+      "type": "section-text-with-products",
+      "blocks": {
+        "template--16802695479554__66c8cdd1-d5ac-4cc6-b8b4-eb41fbefabd6-product-1": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "image": "shopify:\/\/shop_images\/3_b40f977e-e268-42ce-9666-b4620d14f55d.png",
+            "aspect_ratio": 1,
+            "image_position": 1,
+            "width": 80
+          }
+        },
+        "template--16802695479554__66c8cdd1-d5ac-4cc6-b8b4-eb41fbefabd6-image-1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/BronzeLidOn.jpg",
+            "aspect_ratio": 1,
+            "image_position": 5,
+            "width": 80,
+            "link": ""
+          }
+        },
+        "template--16802695479554__66c8cdd1-d5ac-4cc6-b8b4-eb41fbefabd6-collection-1": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "image": "shopify:\/\/shop_images\/4_0df76cb1-1b5b-4112-8a76-a73468d55964_1.png",
+            "aspect_ratio": 1,
+            "image_position": 7,
+            "width": 80
+          }
+        }
+      },
+      "block_order": [
+        "template--16802695479554__66c8cdd1-d5ac-4cc6-b8b4-eb41fbefabd6-product-1",
+        "template--16802695479554__66c8cdd1-d5ac-4cc6-b8b4-eb41fbefabd6-image-1",
+        "template--16802695479554__66c8cdd1-d5ac-4cc6-b8b4-eb41fbefabd6-collection-1"
+      ],
+      "disabled": true,
+      "settings": {
+        "title": "NEW! Where Makeup Meets SPF Meets Skincare",
+        "heading_size": 7,
+        "width": "wrapper",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "subcollections": {
+      "type": "subcollections",
+      "settings": {
+        "subcollection_layout": "grid",
+        "subcollection_description": false,
+        "select_image": "collection",
+        "color": "#ffffff",
+        "bg_color": "",
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
+    },
+    "main": {
+      "type": "collection",
+      "settings": {
+        "enable_sort": false,
+        "enable_filters": false,
+        "filter_layout": "inline-open",
+        "collection_linklist": "",
+        "grid": 3,
+        "grid_mobile": "2",
+        "product_limit": 36,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "06c8512a-7209-4157-a944-e5b6a6d5a744": {
+      "type": "section-highlights",
+      "blocks": {
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-1": {
+          "type": "highlight",
+          "settings": {
+            "heading": "",
+            "url": "",
+            "image": "shopify:\/\/shop_images\/5_47dd39ad-6990-4b55-82aa-7ccde625b801.jpg",
+            "color": "",
+            "bg_color": "#F0F0F0",
+            "border_color": ""
+          }
+        },
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-2": {
+          "type": "highlight",
+          "settings": {
+            "heading": "",
+            "url": "",
+            "image": "shopify:\/\/shop_images\/2_9a6b6fb9-c788-4087-a93c-df911779d943.jpg",
+            "color": "",
+            "bg_color": "#F0F0F0",
+            "border_color": ""
+          }
+        },
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-3": {
+          "type": "highlight",
+          "settings": {
+            "heading": "",
+            "url": "",
+            "image": "shopify:\/\/shop_images\/4_ef280af4-59e5-4717-ba03-2c27f8265f5a.jpg",
+            "color": "",
+            "bg_color": "#F0F0F0",
+            "border_color": ""
+          }
+        },
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-4": {
+          "type": "highlight",
+          "settings": {
+            "heading": "",
+            "url": "",
+            "image": "shopify:\/\/shop_images\/1_a19e8019-0262-46b4-a60b-3e1989d221b3.jpg",
+            "color": "",
+            "bg_color": "#F0F0F0",
+            "border_color": ""
+          }
+        },
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-5": {
+          "type": "highlight",
+          "disabled": true,
+          "settings": {
+            "heading": "Sales",
+            "url": "",
+            "color": "",
+            "bg_color": "#F0F0F0",
+            "border_color": ""
+          }
+        },
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-6": {
+          "type": "highlight",
+          "disabled": true,
+          "settings": {
+            "heading": "New Arrivals",
+            "url": "",
+            "color": "",
+            "bg_color": "#F0F0F0",
+            "border_color": ""
+          }
+        }
+      },
+      "block_order": [
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-1",
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-2",
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-3",
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-4",
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-5",
+        "template--16802695479554__06c8512a-7209-4157-a944-e5b6a6d5a744-highlight-6"
+      ],
+      "settings": {
+        "style": "square",
+        "grid": 4,
+        "width": "wrapper",
+        "heading": "Before & After",
+        "heading_position": "text-center",
+        "heading_size": 8,
+        "text_size": 3,
+        "color": "",
+        "bg_color": "",
+        "layout_mobile": "2",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "6c60e0fd-b5ef-400b-9ba8-84802f09723b": {
+      "type": "featured-posts",
+      "blocks": {
+        "template--16802695479554__6c60e0fd-b5ef-400b-9ba8-84802f09723b-featured_post-1": {
+          "type": "featured_post",
+          "settings": {
+            "featured_post": "",
+            "subheading": "Featured post"
+          }
+        }
+      },
+      "block_order": [
+        "template--16802695479554__6c60e0fd-b5ef-400b-9ba8-84802f09723b-featured_post-1"
+      ],
+      "disabled": true,
+      "settings": {
+        "height": "five-fifty-height-hero",
+        "mobile_height": "screen-height-one-half--mobile",
+        "width": "wrapper--full",
+        "show_author": false,
+        "show_date": false,
+        "show_button": true,
+        "bg_color": "",
+        "color": "",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "66c8cdd1-d5ac-4cc6-b8b4-eb41fbefabd6",
+    "subcollections",
+    "main",
+    "06c8512a-7209-4157-a944-e5b6a6d5a744",
+    "6c60e0fd-b5ef-400b-9ba8-84802f09723b"
+  ]
+}

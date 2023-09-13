@@ -1,59 +1,83 @@
 <!-- /sections/list-collections.liquid -->
 
-{% liquid
-  
-  assign mobile_class = 'small--one-whole'
-  if section.settings.layout_mobile == '2'
-  assign mobile_class = 'small--one-half'
-  endif
-
-  case section.settings.grid
-    when 1
-      assign grid_strings = 'large-up--one-half medium--one-half ' | append: mobile_class
-    when 2
-      assign grid_strings = 'large-up--one-half medium--one-half ' | append: mobile_class
-    when 3
-      assign grid_strings = 'large-up--one-third medium--one-third ' | append: mobile_class
-    when 4
-      assign grid_strings = 'large-up--one-quarter medium--one-half ' | append: mobile_class
-    when 5
-      assign grid_strings = 'large-up--one-fifth medium--one-third ' | append: mobile_class
-    else
-      assign grid_strings = 'large-up--one-sixth medium--one-third ' | append: mobile_class
-  endcase
-
+{%- liquid
   assign limit = section.settings.grid | times: section.settings.rows
   assign heading = section.settings.title
-%}
 
-<div class="index-list-collections" data-section-id="{{ section.id }}" data-section-type="list-collections">
+  assign columns_desktop = section.settings.grid | plus: 0
+  assign columns_medium = 3
+  assign columns_small = 2
+  assign columns_mobile = section.settings.layout_mobile | plus: 0
+
+  if columns_desktop == 2 or columns_desktop == 4
+    assign columns_medium = 2
+  endif
+
+  assign excluded_collections_strict = settings.exclude_collections_strict | split: ','
+  assign excluded_collections = settings.exclude_collections_contain | split: ','
+-%}
+
+{%- style -%}
+  .index-list-collections {
+    --PT: {{ section.settings.padding_top }}px;
+    --PB: {{ section.settings.padding_bottom }}px;
+
+    --COLUMNS: {{ columns_desktop }};
+    --COLUMNS-MEDIUM: {{ columns_medium }};
+    --COLUMNS-SMALL: {{ columns_small }};
+    --COLUMNS-MOBILE: {{ columns_mobile }};
+  }
+{%- endstyle -%}
+
+<div class="index-list-collections section-padding"
+  data-section-id="{{ section.id }}"
+  data-section-type="list-collections">
   {%- if heading != blank -%}
-  <h2 class="grid__heading">{{ heading }}</h2>
+    <div class="grid__heading-holder text-center">
+      <h2 class="grid__heading heading-size-5">{{ heading }}</h2>
+    </div>
   {%- endif -%}
 
-  <div class="container">
-    <div class="collection-list">
-      {%- if section.settings.display_type == 'all' -%}
-        {%- for collection in collections -%}
-          {% if collection.handle != 'frontpage' and collection.products.size > 0 %}
-            <div class="collection-block__wrapper collection-block__wrapper--{{ collection.handle }}">
-              {%- render 'collection-block', section: section, collection: collection, block: block, grid_strings: grid_strings, limit: limit -%}
-            </div>
-          {% endif %}
-        {%- endfor -%}
-      {%- else -%}
-        {%- for block in section.blocks -%}
-          {%- assign collection = collections[block.settings.collection] -%}
+  <div class="collection-list">
+    {%- if section.settings.display_type == 'all' -%}
+      {%- for collection in collections -%}
+        {%- liquid
+          assign skip_collection = false
 
-          <div class="collection-block__wrapper collection-block__wrapper--{{ block.id }}" {{ block.shopify_attributes }}>
-            {%- render 'collection-block', section: section, collection: collection, block: block, grid_strings: grid_strings, limit: limit -%}
+          for exclude in excluded_collections_strict
+            assign exclude_handle = exclude | handle
+
+            if exclude_handle == collection.handle
+              assign skip_collection = true
+            endif
+          endfor
+
+          for exclude in excluded_collections
+            assign exclude_handle = exclude | handle
+
+            if collection.handle contains exclude_handle
+              assign skip_collection = true
+            endif
+          endfor
+        -%}
+
+        {%- if skip_collection == false and collection.products_count > 0 -%}
+          <div class="collection-block__wrapper collection-block__wrapper--{{ collection.handle }}">
+            {%- render 'collection-block', collection: collection, block: block, limit: limit -%}
           </div>
-        {%- endfor -%}
-      {%- endif -%}
-    </div>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for block in section.blocks -%}
+        {%- assign collection = collections[block.settings.collection] -%}
+
+        <div class="collection-block__wrapper collection-block__wrapper--{{ block.id }}" {{ block.shopify_attributes }}>
+          {%- render 'collection-block', collection: collection, block: block, limit: limit -%}
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
   </div>
 </div>
-
 
 {% schema %}
 {
@@ -92,7 +116,7 @@
     {
       "type":    "range",
       "id":      "grid",
-      "min":     1,
+      "min":     2,
       "max":     6,
       "step":    1,
       "label":   "Products per row",
@@ -130,6 +154,30 @@
         }
       ],
       "default": "carousel"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 32
     }
   ],
   "blocks": [
@@ -153,19 +201,6 @@
           "id": "image",
           "label": "Image",
           "info": "Replace the collection image with a custom image"
-        },
-        {
-          "type": "select",
-          "id": "bg_position",
-          "label": "Position",
-          "default": "center-center",
-          "options": [
-            { "label": "Top", "value": "center-top" },
-            { "label": "Right", "value": "right-center" },
-            { "label": "Center", "value": "center-center" },
-            { "label": "Left", "value": "left-center" },
-            { "label": "Bottom", "value": "center-bottom" }
-          ]
         }
       ]
     }

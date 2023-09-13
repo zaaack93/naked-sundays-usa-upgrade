@@ -4,18 +4,31 @@
 
     Accepts:
     - product: {Object} product (required)
-    - grid_strings: {String} contains a string of grid classes
-    - heading_title: {String} contains a string from section settings
+    - limit: {Integer} A maxmimum products to show
+    - product_recently_minimum: {Integer} A minimum products to show
 
     Usage:
-    {% render 'products-recently-viewed', product: product, grid_strings: grid_strings, heading_title: section.settings.product_recently_heading %}
+    {% render 'products-recently-viewed', product: product, product_recently_minimum: product_recently_minimum %}
 {% endcomment %}
 
-{%- assign limit = limit | default: 4 -%}
+{%- liquid
+  assign limit = limit | default: 4
+  assign column_count = limit
 
-<div class="recent__wrapper" id="RecentlyViewed-{{ section.id }}" data-recent-wrapper data-limit="{{ limit }}" data-minimum="{{ product_recently_minimum }}">
-  <div class="product-grid-outer">
-    <div class="recent__content product-grid{% unless settings.product_grid_outline %} product-grid--borderless{% endunless %} flickity-button-circle product-grid--mobile-slider" id="recently-viewed-products-{{ section.id }}" style="display:none" data-slider data-watch-css="true" data-cell-align="left" data-adaptive-height="false" data-dots="hidden" data-arrows="true" data-arrow-position-middle data-equalize-height="true" data-infinite="false">
+  if limit > 4
+    assign column_count = '4'
+  endif
+-%}
+
+<div class="recent__wrapper" id="RecentlyViewed-{{ section.id }}" data-recent-wrapper data-limit="{{ limit }}" data-minimum="{{ product_recently_minimum }}"{% if block %} {{ block.shopify_attributes }}{% endif %}>
+  <div class="grid-outer" style="--column-count: {{ column_count }}">
+    <div class="recent__content grid grid--slider grid--slider-alt grid--mobile-slider"
+      id="recently-viewed-products-{{ section.id }}"
+      data-slider
+      data-options='{"watchCSS": true, "cellAlign": "left", "pageDots": false, "prevNextButtons": true, "adaptiveHeight": false, "wrapAround": false, "groupCells": true}'
+      data-arrow-position-middle
+      data-equalize-height="true"
+      style="display:none">
     </div>
   </div>
 </div>

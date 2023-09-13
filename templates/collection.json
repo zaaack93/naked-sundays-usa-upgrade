@@ -5,43 +5,30 @@
       "settings": {
         "show_title": true,
         "show_description": true,
-        "text_color": "text-dark",
         "flex_align": "align--middle-center",
-        "transparent": false,
+        "bg_color": "",
+        "color": "",
         "show_image": false,
         "banner_layout": "overlay",
-        "height": "screen-height-one-half",
+        "height": "screen-height-one-third",
+        "mobile_height": "screen-height-one-half--mobile",
         "overlay_opacity": 0,
-        "overlay_color": "#000000"
-      }
-    },
-    "30845340-b486-4192-a342-9d01400de68f": {
-      "type": "section-rich-text",
-      "disabled": true,
-      "settings": {
-        "subheading": "",
-        "title": "",
-        "text": "<p>Non sticky. No SPF taste. World first formula.<\/p>",
-        "text_size": 2,
-        "text_columns": 1,
-        "align_text": "text-center",
-        "button_text": "",
-        "button_url": "",
-        "button_color": "btn--neutral",
-        "button_style": "caps--large",
-        "height": "margin--small",
-        "width": "wrapper",
-        "text_color": "text-dark",
-        "bg_color": "#ffffff"
+        "overlay_color": "#000000",
+        "show_overlay_text": false,
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     },
     "subcollections": {
       "type": "subcollections",
-      "disabled": true,
       "settings": {
         "subcollection_layout": "grid",
         "subcollection_description": false,
-        "select_image": "collection"
+        "select_image": "collection",
+        "color": "#ffffff",
+        "bg_color": "",
+        "padding_top": 20,
+        "padding_bottom": 20
       }
     },
     "main": {
@@ -50,15 +37,17 @@
         "enable_sort": false,
         "enable_filters": false,
         "filter_layout": "inline-open",
+        "collection_linklist": "",
         "grid": 3,
-        "grid_mobile": "1",
-        "product_limit": 36
+        "grid_mobile": "2",
+        "product_limit": 36,
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     }
   },
   "order": [
     "hero",
-    "30845340-b486-4192-a342-9d01400de68f",
     "subcollections",
     "main"
   ]

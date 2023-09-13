@@ -5,47 +5,43 @@
 {% endcomment %}
 
 {% if paginate.pages > 1 %}
-  <ul class="pagination-custom">
-    {% if paginate.previous %}
-      <li class="pagination-custom__arr">
-        <a href="{{ paginate.previous.url }}" title="{{ paginate.previous.title }}"><span class="visually-hidden">{{ paginate.previous.title }}</span></a>
-      </li>
-    {% else %}
-      <li class="disabled pagination-custom__arr">
-        <span><span class="visually-hidden">{{ paginate.current_page }}</span></span>
-      </li>
-    {% endif %}
-    <li class="pagination-custom__spacer"><span>&#8203;</span></li>
-    {% for part in paginate.parts %}
-      {% if part.is_link %}
-        <li class="pagination-custom__num">
-          <a href="{{ part.url }}" title="">{{ part.title }}</a>
-        </li>
-      {% else %}
-        {% if part.title == paginate.current_page %}
-          <li class="pagination-custom__num active">
-            <span>
-              <span>
-                {{ part.title }}
-              </span>
-            </span>
-          </li>
-        {% else %}
-          <li class="pagination-custom__num pagination-custom__num--dots">
-            <span>{{ part.title }}</span>
-          </li>
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-    <li class="pagination-custom__spacer"><span>&#8203;</span></li>
-    {% if paginate.next %}
-      <li class="pagination-custom__arr">
-        <a href="{{ paginate.next.url }}" title="{{ paginate.next.title }}"><span class="visually-hidden">{{ paginate.next.title }}</span></a>
-      </li>
-    {% else %}
-      <li class="disabled pagination-custom__arr">
-        <span><span class="visually-hidden">{{ paginate.current_page }}</span></span>
-      </li>
-    {% endif %}
-  </ul>
+  <nav class="pagination-custom">
+    {%- if paginate.previous -%}
+      <a class="pagination-custom__prev" href="{{ paginate.previous.url }}" title="{{ 'general.pagination.prev' | t }}">
+        <span>{{ 'general.pagination.prev' | t }}</span>
+        {%- render 'icon-arrow-left' -%}
+      </a>
+    {%- else -%}
+      <span class="pagination-custom__prev is-hidden">
+        <span>{{ 'general.pagination.prev' | t }}</span>
+        {%- render 'icon-arrow-left' -%}
+      </span>
+    {%- endif -%}
+
+    <div class="pagination-custom__inner">
+      {%- for part in paginate.parts -%}
+        {%- if part.is_link -%}
+          <a href="{{ part.url }}" title="{{ part.title }}" class="pagination-custom__page">{{ part.title }}</a>
+        {%- else -%}
+          {%- if part.title == paginate.current_page -%}
+            <span class="pagination-custom__page pagination-custom__page--active">{{ part.title }}</span>  
+          {%- else -%}
+            <span class="pagination-custom__sep">{{ part.title }}</span>  
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if paginate.next -%}
+      <a class="pagination-custom__next" href="{{ paginate.next.url }}" title="{{ 'general.pagination.next' | t }}">
+        <span>{{ 'general.pagination.next' | t }}</span>
+        {%- render 'icon-arrow-right' -%}
+      </a>
+    {%- else -%}
+    <span class="pagination-custom__next is-hidden">
+      <span>{{ 'general.pagination.next' | t }}</span>
+      {%- render 'icon-arrow-right' -%}
+    </span>
+    {%- endif -%}
+  </nav>
 {% endif %}

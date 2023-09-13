@@ -1,161 +1,203 @@
 {
   "sections": {
-    "16553797266bd2cec6": {
+    "8875005f-33f2-454c-bcb2-f3ae544c046f": {
       "type": "section-slideshow",
       "blocks": {
-        "16553797266043c823-0": {
+        "template--16765437575426__8875005f-33f2-454c-bcb2-f3ae544c046f-image-1": {
           "type": "image",
           "settings": {
-            "bg_position": "center-center",
-            "image": "shopify:\/\/shop_images\/TGP_6351_Edit.jpg",
+            "image": "shopify:\/\/shop_images\/tgp_8691_lowres.jpg",
             "overlay_opacity": 0,
-            "overlay_color": "#000000",
-            "title": "",
+            "overlay_color": "#000",
+            "show_overlay_text": false,
+            "title": "About Us",
+            "heading_size": 11,
             "description": "",
+            "text_size": 5,
             "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
-            "link_text": "",
-            "link": "",
-            "button_color": "btn--white",
-            "button_style": "hero__btn btn btn--large btn--outline caps"
+            "bg_color": "",
+            "color": "#FFFFFF",
+            "first_button_text": "",
+            "first_button_link": "",
+            "first_button_type": "btn--primary",
+            "first_button_size": "",
+            "first_button_style": "btn--solid",
+            "first_button_show_arrow": false,
+            "second_button_text": "",
+            "second_button_link": "",
+            "second_button_type": "btn--white",
+            "second_button_size": "",
+            "second_button_style": "btn--solid",
+            "second_button_show_arrow": false
+          }
+        },
+        "template--16765437575426__8875005f-33f2-454c-bcb2-f3ae544c046f-image-2": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "overlay_opacity": 0,
+            "overlay_color": "#000",
+            "show_overlay_text": false,
+            "title": "Image slide",
+            "heading_size": 11,
+            "description": "Tell your brand's story through images.",
+            "text_size": 5,
+            "flex_align": "align--middle-center",
+            "bg_color": "",
+            "color": "#FFFFFF",
+            "first_button_text": "View products",
+            "first_button_link": "",
+            "first_button_type": "btn--primary",
+            "first_button_size": "",
+            "first_button_style": "btn--solid",
+            "first_button_show_arrow": false,
+            "second_button_text": "",
+            "second_button_link": "",
+            "second_button_type": "btn--white",
+            "second_button_size": "",
+            "second_button_style": "btn--solid",
+            "second_button_show_arrow": false
           }
         }
       },
       "block_order": [
-        "16553797266043c823-0"
+        "template--16765437575426__8875005f-33f2-454c-bcb2-f3ae544c046f-image-1",
+        "template--16765437575426__8875005f-33f2-454c-bcb2-f3ae544c046f-image-2"
       ],
       "settings": {
         "height": "screen-height-two-thirds",
+        "mobile_height": "screen-height-three-quarters--mobile",
+        "width": "wrapper--full",
         "transition": "slide",
-        "arrows_style": true,
-        "dots_style": "hidden",
+        "show_arrows": true,
         "autoplay": false,
         "autoplay_speed": 8
       }
     },
-    "16468240777dfec14c": {
-      "type": "section-split-hero",
-      "disabled": true,
-      "settings": {
-        "image_height": "screen-height-two-thirds",
-        "mobile_layout": "stacked",
-        "image_desktop_left": "shopify:\/\/shop_images\/Product_Page_-_Rich_Image_with_Text_f512bf3d-f3ee-4f99-86b5-ff1d1b81bfcb.jpg",
-        "bg_position_left": "center-center",
-        "image_desktop_right": "shopify:\/\/shop_images\/naked_sundays_330406_r_copy_small_3a8c450d-4fef-4b0d-9dee-35b22ad86d67.jpg",
-        "bg_position_right": "center-center",
-        "overlay_color": "#000000",
-        "overlay_opacity": 0,
-        "title": "ABOUT US",
-        "description": "",
-        "flex_align": "align--middle-center",
-        "text_color": "text-dark",
-        "transparent": true,
-        "link_text": "",
-        "link": "",
-        "button_color": "btn--white",
-        "button_style": "hero__btn btn btn--large btn--outline caps"
-      }
-    },
-    "1646564000d0820cde": {
+    "b93f17a5-2ba8-4a2b-b6b9-405dc7ca3211": {
       "type": "section-custom-content",
       "blocks": {
-        "1646564000987ab47a-0": {
+        "template--16765437575426__b93f17a5-2ba8-4a2b-b6b9-405dc7ca3211-image-1": {
           "type": "image",
-          "disabled": true,
           "settings": {
-            "image": "shopify:\/\/shop_images\/Untitled_design-4.png",
-            "bg_position": "center-center",
+            "image": "shopify:\/\/shop_images\/NS_63_d68caea4-dcf2-492a-bdd1-1d061236bb98.jpg",
             "overlay_opacity": 0,
-            "overlay_color": "#000000",
+            "overlay_color": "#000",
+            "show_overlay_text": false,
             "title": "",
+            "heading_size": 7,
             "description": "",
+            "text_size": 3,
             "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
+            "bg_color": "",
+            "color": "#FFFFFF",
             "link_text": "",
             "link": "",
-            "button_color": "btn--white",
-            "button_style": "hero__btn btn btn--large btn--outline caps"
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
           }
         },
-        "1646564000987ab47a-1": {
+        "template--16765437575426__b93f17a5-2ba8-4a2b-b6b9-405dc7ca3211-text-1": {
           "type": "text",
           "settings": {
             "subheading": "",
-            "title": "OUR STORY",
-            "text": "<p>Welcome to Naked Sundays! Home of Australian-made SPF \"BeautyScreens\" - a hybrid between a beauty product and high performance SPF. We are Vegan & Cruelty Free with zero whitecast, packed skin-loving ingredients, SPF50 UVA & UVB protection made in Australia (with the strictest SPF rules in the world!) all wrapped up in cute as heck packaging to boot. <\/p><p><\/p><p><strong>WHY WE LAUNCHED! <\/strong><\/p><p>We launched out of sheer necessity. Our founder, Samantha Brett, has been a television news reporter out on the road in the blazing sun for hours on end with heavy makeup and bright camera lights. Despite the prevalance of skin cancer in Australia, Samantha quickly found that there <strong>was no way to top up her SPF. <\/strong><\/p><p>After witnessing two colleagues have to get skin cancers cut out of their faces, Samantha knew something needed to be done. <\/p><p>After working with the best makeup artists and skin experts in the world as part of her decade-long television career, she knew they too struggled to find an SPF that didn't throw whitecast, didn't pill under makeup, could be reapplied OVER makeup (never been done before) <em>and <\/em>double up as skincare too. <\/p><p>So ... Naked Sundays was born. An SPF for women, by women with makeup wearers in mind, and those who just want damn good skin all year round. <\/p>",
-            "text_size": 2,
-            "text_columns": 1,
-            "align_text": "text-left",
-            "text_color": "text-dark",
-            "bg_color": "#ffffff",
+            "subheading_size": 3,
+            "title": "Our Story",
+            "heading_size": 7,
+            "text": "<p>Naked Sundays is your SPF \"BeautyScreen\" - a hybrid between sunscreen & skincare. We are Vegan & Cruelty Free with zero whitecast, packed skin-loving ingredients, high performance SPF made in Australia (with the strictest SPF rules in the world!) and cute AF packaging to boot. <\/p><p><\/p><p><strong>WHY WE LAUNCHED! <\/strong><\/p><p>We launched out of sheer necessity. Our founder, Samantha Brett, has been a television news reporter out on the road in the blazing sun for hours on end with heavy makeup and bright camera lights. Despite the prevalance of skin cancer in Australia, Samantha quickly found that there <strong>was no way to top up her SPF. <\/strong><\/p><p>After witnessing two colleagues have to get skin cancers cut out of their faces, Samantha knew something needed to be done. <\/p><p>After working with the best makeup artists and skin experts in the world as part of her career under bright studio lights, she knew they too struggled to find an SPF that didn't throw whitecast, didn't pill under makeup, could be reapplied OVER makeup (never been done before) <em>and <\/em>double up as skincare too. <\/p><p>So ... Naked Sundays was born. An SPF for women, by women with makeup wearers in mind, and those who just want damn good skin without a 5-step process. <\/p>",
+            "use_content_via_metafield": false,
+            "text_size": 3,
             "button_text": "",
             "button_url": "",
-            "button_color": "btn--neutral",
-            "button_style": "hero__btn btn btn--large btn--outline caps"
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false,
+            "show_social_links": false,
+            "text_columns": 1,
+            "align_text": "text-left",
+            "bg_color": "",
+            "color": ""
           }
         }
       },
       "block_order": [
-        "1646564000987ab47a-0",
-        "1646564000987ab47a-1"
+        "template--16765437575426__b93f17a5-2ba8-4a2b-b6b9-405dc7ca3211-image-1",
+        "template--16765437575426__b93f17a5-2ba8-4a2b-b6b9-405dc7ca3211-text-1"
       ],
       "settings": {
-        "height": "screen-height-one-half",
-        "padding": false,
+        "height": "screen-height-full",
+        "mobile_height": "screen-height-one-half--mobile",
+        "width": "wrapper--full",
         "borders": false,
-        "wrapper": false
+        "reverse_blocks": false,
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     },
-    "16465643844bae1f64": {
+    "8392ff44-04d7-41f8-a95f-2ccff03f3e32": {
       "type": "section-custom-content",
       "blocks": {
-        "1646564384a4dda9cd-1": {
+        "d4b1a627-21c1-4b64-b9c0-e6542aad54d0": {
           "type": "text",
           "settings": {
             "subheading": "",
+            "subheading_size": 3,
             "title": "",
+            "heading_size": 7,
             "text": "<p><strong>WHAT WE STAND FOR<\/strong><\/p><p>We are vegan friendly and cruelty free, with no oxybenzone, no octinoxate, no whitecast, no mineral oil, no parabens and no BS. We are also free from sulfates (SLS\/SLES), GOs, petrolatum or synthetic colours. Our cremes, serums and lotions are 100% fragrance free too.<br\/><br\/><strong>OUR MOTTO<\/strong><\/p><p><br\/>Protect your skin now... for kickass (and glowy and healthy) skin in the future. We aim to encourage you to wear SPF Every Day.<\/p><p><strong>WHY NAKED SUNDAYS? <\/strong><\/p><p>We want you love and revel in every day of your life like it's a Sunday; filled with self love and carefree vibes, and of course, a whole 'lotta lilac! <br\/><br\/><strong>SPF INNOVATION AT ITS BEST<\/strong><\/p><p>Our first to market formulations are made in TGA-listed labs in Australia, where every batch is tested for SPF levels. Australia has some of the strictest SPF rules on the planet, so you know you're in good hands.<\/p>",
-            "text_size": 2,
-            "text_columns": 1,
-            "align_text": "text-left",
-            "text_color": "text-dark",
-            "bg_color": "#ffffff",
+            "use_content_via_metafield": false,
+            "text_size": 3,
             "button_text": "",
             "button_url": "",
-            "button_color": "btn--neutral",
-            "button_style": "hero__btn btn btn--large btn--outline caps"
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false,
+            "show_social_links": false,
+            "text_columns": 1,
+            "align_text": "text-left",
+            "bg_color": "",
+            "color": ""
           }
         },
-        "1646564384a4dda9cd-0": {
+        "54c5c6b0-d01c-423f-a940-ebdeb79de70f": {
           "type": "image",
           "settings": {
-            "image": "shopify:\/\/shop_images\/NS_63.jpg",
-            "bg_position": "center-center",
+            "image": "shopify:\/\/shop_images\/Image_with_text_overlay_1_44d18b56-295b-490e-839a-ad5c088b7386.jpg",
             "overlay_opacity": 0,
-            "overlay_color": "#000000",
+            "overlay_color": "#000",
+            "show_overlay_text": false,
             "title": "",
+            "heading_size": 7,
             "description": "",
+            "text_size": 3,
             "flex_align": "align--middle-center",
-            "text_color": "text-light",
-            "transparent": true,
+            "bg_color": "",
+            "color": "#FFFFFF",
             "link_text": "",
             "link": "",
-            "button_color": "btn--white",
-            "button_style": "hero__btn btn btn--large btn--outline caps"
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
           }
         }
       },
       "block_order": [
-        "1646564384a4dda9cd-1",
-        "1646564384a4dda9cd-0"
+        "d4b1a627-21c1-4b64-b9c0-e6542aad54d0",
+        "54c5c6b0-d01c-423f-a940-ebdeb79de70f"
       ],
       "settings": {
-        "height": "screen-height-two-thirds",
-        "padding": false,
+        "height": "screen-height-full",
+        "mobile_height": "screen-height-one-half--mobile",
+        "width": "wrapper--full",
         "borders": false,
-        "wrapper": false
+        "reverse_blocks": true,
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     },
     "main": {
@@ -163,36 +205,201 @@
       "disabled": true,
       "settings": {
         "subheading": "",
-        "show_title": false,
+        "subheading_size": 3,
+        "show_title": true,
+        "heading_size": 8,
         "show_content": true,
-        "text_size": 2,
-        "align_text": "text-center",
-        "height": "margin--medium",
+        "text_size": 4,
+        "align_text": "text-left",
         "width": "wrapper",
-        "text_color": "text-dark",
-        "bg_color": "#ffffff"
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50
       }
     },
-    "1646563129eca30528": {
-      "type": "section-collection-carousel",
+    "announcement": {
+      "type": "section-announcement",
+      "disabled": true,
+      "blocks": {
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Make an announcement<\/strong> | More info<\/p>",
+            "target_device_enabled": false,
+            "target_device": "mobile"
+          }
+        }
+      },
+      "block_order": [
+        "text"
+      ],
       "settings": {
-        "heading": "Shop the collection",
+        "layout": "marquee",
+        "slider_speed": 7,
+        "marquee_speed": 100,
+        "text_size": 2,
+        "bg_color": "",
+        "color": "",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "collections-list": {
+      "type": "section-collections-list",
+      "disabled": true,
+      "blocks": {
+        "collection-1": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": ""
+          }
+        },
+        "collection-2": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": ""
+          }
+        },
+        "collection-3": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": ""
+          }
+        },
+        "collection-4": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": ""
+          }
+        }
+      },
+      "block_order": [
+        "collection-1",
+        "collection-2",
+        "collection-3",
+        "collection-4"
+      ],
+      "settings": {
+        "title": "",
         "description": "",
-        "text_alignment": "inline",
-        "link_text": "Shop All",
+        "layout": "grid",
+        "aspect_ratio": 1.2,
+        "grid": 4,
+        "layout_mobile": "slider",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 32
+      }
+    },
+    "press-logos": {
+      "type": "section-press-logos",
+      "disabled": true,
+      "blocks": {
+        "logo-item-1": {
+          "type": "logo-item",
+          "settings": {
+            "logo_width": 150,
+            "link": "",
+            "description": "<p>Include a brief quote from a brand that loves your products<\/p>",
+            "heading_size": 6
+          }
+        },
+        "logo-item-2": {
+          "type": "logo-item",
+          "settings": {
+            "logo_width": 150,
+            "link": "",
+            "description": "<p>Include a brief quote from a brand that loves your products<\/p>",
+            "heading_size": 6
+          }
+        },
+        "logo-item-3": {
+          "type": "logo-item",
+          "settings": {
+            "logo_width": 150,
+            "link": "",
+            "description": "<p>Include a brief quote from a brand that loves your products<\/p>",
+            "heading_size": 6
+          }
+        },
+        "logo-item-4": {
+          "type": "logo-item",
+          "settings": {
+            "logo_width": 150,
+            "link": "",
+            "description": "<p>Include a brief quote from a brand that loves your products<\/p>",
+            "heading_size": 6
+          }
+        }
+      },
+      "block_order": [
+        "logo-item-1",
+        "logo-item-2",
+        "logo-item-3",
+        "logo-item-4"
+      ],
+      "settings": {
+        "title": "As seen in",
+        "enable_heading_slider": false,
+        "text_style": "font-body",
+        "logo_opacity": 60,
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "divider": {
+      "type": "section-divider",
+      "disabled": true,
+      "settings": {
+        "show_line": true,
+        "width": "wrapper--full-padded",
+        "border_color": "",
+        "bg_color": "",
+        "padding_top": 31,
+        "padding_bottom": 50
+      }
+    },
+    "f6b7cd77-1217-4851-8f09-916aef213a11": {
+      "type": "section-collection",
+      "settings": {
+        "heading": "Best Sellers",
+        "description": "",
+        "layout": "inline",
+        "link_text": "Shop Now",
         "link_url": "shopify:\/\/collections\/all",
-        "button_color": "btn--black",
-        "button_style": "hero__btn btn btn--input btn--outline caps",
-        "featured_collection": "all"
+        "button_type": "btn--primary",
+        "button_size": "",
+        "button_style": "btn--solid",
+        "show_arrow": false,
+        "featured_collection": "all",
+        "style": "grid",
+        "grid": 4,
+        "rows": 2,
+        "layout_mobile": "2",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50
       }
     }
   },
   "order": [
-    "16553797266bd2cec6",
-    "16468240777dfec14c",
-    "1646564000d0820cde",
-    "16465643844bae1f64",
+    "8875005f-33f2-454c-bcb2-f3ae544c046f",
+    "b93f17a5-2ba8-4a2b-b6b9-405dc7ca3211",
+    "8392ff44-04d7-41f8-a95f-2ccff03f3e32",
     "main",
-    "1646563129eca30528"
+    "announcement",
+    "collections-list",
+    "press-logos",
+    "divider",
+    "f6b7cd77-1217-4851-8f09-916aef213a11"
   ]
 }

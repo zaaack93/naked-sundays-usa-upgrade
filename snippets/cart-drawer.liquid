@@ -1,165 +1,347 @@
-{%- assign subtotal = cart.total_price | plus: 0 -%}
-{%- assign original_subtotal = cart.original_total_price | plus: 0 -%}
-{%- assign cart_items_size = cart.item_count -%}
-{%- assign cart_discount_size = cart.cart_level_discount_applications.size -%}
+{%- liquid
+  assign animation_name = 'cart-items-fade'
+  assign animation_duration = 500
+  assign animation_delay = 200
+  assign animation_delay_increment = 50
+  assign animation_delay_cart_empty = 0
+  assign is_cart_drawer = true
+  assign cart_item_count = cart.item_count
+  assign cart_custom_message_text = settings.cart_custom_message_text
+  assign show_empty_cart_menu = settings.show_empty_cart_menu
+  assign empty_cart_menu = settings.empty_cart_menu
+  assign custom_message_color = settings.cart_cust_message_color
+  assign show_wheel = false
+  assign show_progress_bar = true
+-%}
 
-<div class="cart-dropdown" id="cart-dropdown" data-cart-dropdown tabindex="1">
-  <header class="cart-dropdown__head">
-    <h3>{{ 'cart.general.title' | t }}</h3>
+{%- unless custom_message_color == 'rgba(0,0,0,0)' or custom_message_color == blank -%}
+  {%- style -%}
+    .drawer__message--custom { --text: {{ custom_message_color }}; }
+  {%- endstyle -%}
+{%- endunless -%}
 
-    <a href="#cart-dropdown" class="cart-dropdown__close" data-cart-toggle aria-label="{{ 'general.accessibility.close' | t }} {{ 'cart.general.title' | t }}">
-      {%- render 'icon-close' -%}
-    </a>
-  </header>
+{%- capture upsell_products -%}
+  {%- render 'cart-line-items', part: 'upsell-items' -%}
+{%- endcapture -%}
 
-  <div class="cart-dropdown__body" data-cart-dropdown-body>
-    {% assign free_shipping_text = block.settings.message | default: settings.message %}
-{% assign is_enable = false %}
-{% assign show_wheel = true %}
+<div class="drawer drawer--cart" id="cart-drawer" data-cart-drawer tabindex="0">
+  <div class="drawer__inner" data-scroll-lock-scrollable>
+    {%- if cart_custom_message_text != blank -%}
+      <div
+        class="drawer__message cart__message drawer__message--custom"
+        data-animation="{{ animation_name }}"
+        data-animation-duration="{{ animation_duration }}"
+        data-animation-delay="{{ animation_delay }}"
+        {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+      >
+        {{ cart_custom_message_text }}
+      </div>
+    {%- endif -%}
 
-{% if block.settings.show_wheel == false %}
-  {% assign show_wheel = false %}
-{% endif %}
+    <header
+      class="drawer__head"
+      data-animation="{{ animation_name }}"
+      data-animation-duration="{{ animation_duration }}"
+      data-animation-delay="{{ animation_delay }}"
+      {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+    >
+      <h3>{{ 'cart.general.title' | t }}</h3>
 
-{% if block.settings.message != blank %}
-  {% assign is_enable = true %}
-{% endif %}
+      <button type="button" class="drawer__close" data-cart-drawer-close aria-label="{{ 'general.accessibility.close' | t }} {{ 'cart.general.title' | t }}">
+        {%- render 'icon-cancel' -%}
+      </button>
+    </header>
 
-{% if settings.show_free_shipping_message and settings.free_shipping_limit != blank and free_shipping_text != blank %}
-  {% assign is_enable = true %}
-{% endif %}
+    <div class="drawer__body" data-cart-drawer-body data-scroll-lock-scrollable>
+      {% comment %} Free shipping {% endcomment %}
 
-{% if is_enable %}
-  {% assign limit = settings.free_shipping_limit | plus: 0 %}
-  {% assign limit_currency = limit | times: 100 %}
-  {% assign subtotal_without_currency = cart.total_price | plus: 0 | divided_by: 100 %}
+{%- liquid
+  assign free_shipping_text = block.settings.message | default: settings.message
+  assign show_message = false
 
-  {% capture left_to_spend %}
-    <span data-left-to-spend>{{ limit_currency | minus: cart.total_price | money_without_trailing_zeros }}</span>
-  {% endcapture %}
+  if block.settings.message != blank
+    assign show_message = true
+  endif
 
-  {% assign free_shipping_message = free_shipping_text | replace: '||amount||', left_to_spend %}
-  {% assign qualified_shipping_message = 'cart.general.qualified_shipping_message' | t %}
-  {% assign class_message = '' %}
+  if settings.show_free_shipping_message and settings.free_shipping_limit != blank and free_shipping_text != blank
+    assign show_message = true
+  endif
+-%}
 
-  {% if subtotal_without_currency >= limit %}
-    {% if qualified_shipping_message != blank %}
-      {% assign class_message = 'is-success' %}
-    {% else %}
-      {% assign class_message = 'is-hidden' %}
-    {% endif %}
-  {% elsif subtotal_without_currency == 0 %}
-    {% assign class_message = 'is-hidden' %}
-  {% endif %}
+{%- if show_message -%}
+  {%- liquid
+    assign limit = settings.free_shipping_limit | plus: 0
+    assign limit_currency = limit | times: 100
+    assign subtotal_without_currency = cart.total_price | plus: 0 | divided_by: 100
+    assign percent = limit | minus: subtotal_without_currency | times: 100 | divided_by: limit
+    assign percent = 100 | minus: percent
 
-  <p class="cart-dropdown__message cart__message {{ class_message }}" {{ block_attibutes }} data-cart-message="{% if qualified_shipping_message != blank %}true{% else %}false{% endif %}" data-limit="{{ limit }}">
-    {% if show_wheel %}  
-      {% assign percent = limit | minus: subtotal_without_currency | times: 100 | divided_by: limit %}
-      {% assign percent = 100 | minus: percent %}
+    if settings.currency_code_enable
+      assign limit_currency = limit_currency | minus: cart.total_price | money_with_currency | remove: '.00' | remove: ',00'
+    else
+      assign limit_currency = limit_currency | minus: cart.total_price | money_without_trailing_zeros
+    endif
 
-      {% if percent > 100 %}
-        {% assign percent = 100 %}
+    capture left_to_spend
+      echo '<span data-left-to-spend>' | append: limit_currency | append: '</span>'
+    endcapture
+
+    assign free_shipping_message = free_shipping_text | replace: '||amount||', left_to_spend
+    assign qualified_shipping_message = 'cart.general.qualified_shipping_message' | t
+
+    capture free_shipping_classes
+      if is_cart_drawer
+        echo 'drawer__message '
+      endif
+
+      if template.name == 'cart'
+        echo 'cart__message '
+      endif
+
+      echo 'free-shipping'
+
+      if subtotal_without_currency >= limit and qualified_shipping_message != blank
+        echo ' is-success'
+      endif
+    endcapture
+  -%}
+
+  <div class="{{ free_shipping_classes }}"
+    data-free-shipping="{% if qualified_shipping_message != blank %}true{% else %}false{% endif %}"
+    data-free-shipping-limit="{{ limit }}"
+    {% if template.name == 'cart' or is_cart_drawer %}
+      data-animation="{{ animation_name }}"
+      data-animation-duration="{{ animation_duration }}"
+      {% if empty_cart %}
+        {% assign animation_cart_empty_delay = animation_cart_empty_delay | plus: 50 %}
+        data-animation-delay="{{ animation_cart_empty_delay }}"
+      {% else %}
+      {% assign animation_delay = animation_delay | plus: 50 %}
+        data-animation-delay="{{ animation_delay }}"
       {% endif %}
-
-      <small class="cart__graph">
-        <small class="cart__graph-dot cart__graph-dot--1"></small>
-        <small class="cart__graph-dot cart__graph-dot--2"></small>
-        <small class="cart__graph-dot cart__graph-dot--3"></small>
-        <small class="cart__graph-dot cart__graph-dot--4"></small>
-        <small class="cart__graph-dot cart__graph-dot--5"></small>
-        <small class="cart__graph-dot cart__graph-dot--6"></small>
-        
+    {% endif %}
+    >
+    {%- if show_wheel -%}
+      <div class="free-shipping__graph" data-progress-graph style="--stroke-dashoffset: 87.96459430051421;">
         <svg height="18" width="18">
           <circle r="7" cx="9" cy="9" />
-          <circle class="cart__graph-progress" stroke-dasharray="87.96459430051421 87.96459430051421" style="stroke-dashoffset: 87.96459430051421" data-cart-progress data-percent="{{- percent -}}" r="7" cx="9" cy="9" />
+          <circle class="free-shipping__graph-progress" stroke-dasharray="87.96459430051421 87.96459430051421" r="7" cx="9" cy="9" />
         </svg>
-      </small>
-    {% endif %}
+      </div>
+    {%- endif -%}
 
-    {% if qualified_shipping_message != blank %}
-      <span class="cart__message-success">{{ qualified_shipping_message }}</span>
-    {% endif %}
+    {%- if qualified_shipping_message != blank -%}
+      <span class="free-shipping__success-message">{{ qualified_shipping_message }}</span>
+    {%- endif -%}
 
-    <span class="cart__message-default">
+    <span class="free-shipping__default-message">
       {{ free_shipping_message }}
     </span>
-  </p>
-{% endif %}
 
-    <div class="cart__errors cart__errors-dropdown" data-cart-errors>
-      <h5 class="cart__errors__heading">{{- 'cart.general.limit_message' | t -}}</h5>
+    {%- if show_progress_bar -%}
+      <progress class="free-shipping__progress-bar" data-progress-bar value="{{ percent }}" max="100"></progress>
+    {%- endif -%}
 
-      <p class="cart__errors__content" data-error-message></p>
-
-      <button type="button" data-cart-error-close aria-label="{{ 'general.accessibility.close' | t }} {{ 'cart.general.title' | t }}">
-        <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-close-thin" viewBox="0 0 27 27">
-          <g stroke="#979797" fill="none" fill-rule="evenodd" stroke-linecap="square">
-            <path d="M.5.5l26 26M26.5.5l-26 26"></path>
-          </g>
-        </svg>
-      </button>
+    <div class="confetti">
+      <span class="confetti__dot confetti__dot--1"></span>
+      <span class="confetti__dot confetti__dot--2"></span>
+      <span class="confetti__dot confetti__dot--3"></span>
+      <span class="confetti__dot confetti__dot--4"></span>
+      <span class="confetti__dot confetti__dot--5"></span>
+      <span class="confetti__dot confetti__dot--6"></span>
     </div>
-
-    <div class="cart-dropdown__items {% if cart_items_size <= 0 %} is-hidden{% endif %}" data-items-holder>
-      {%- capture items_html -%}
-        {%- render 'cart-line-items' cart: cart -%}
-      {%- endcapture -%}
-
-      {{ items_html }}
-    </div>
-
-    <p class="cart-dropdown__empty-message {% if cart_items_size > 0 %} is-hidden{% endif %}" data-empty-message>{{- 'cart.general.empty' | t -}}</p>
   </div>
+{%- endif -%}
 
-  <div class="cart__foot cart-dropdown__foot {% if cart_items_size <= 0 %} is-hidden{% endif %}" data-foot-holder>
-    <div class="cart__widget is-hidden" data-cart-widget data-pair-products-holder>
-      <a href="#pair-with-products" class="is-active" data-expand-button>
-        {{- 'cart.general.pair_products' | t -}}
-      </a>
+      {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
 
-      <div class="cart__widget-content" style="display: block;" id="pair-with-products">
-        <div class="cart__widget-content-inner" data-pair-products></div>
+      <div class="cart__errors drawer__errors"
+        data-cart-errors
+        data-animation="{{ animation_name }}"
+        data-animation-duration="{{ animation_duration }}"
+        data-animation-delay="{{ animation_delay }}">
+        <div class="cart__errors__inner">
+          <h5 class="cart__errors__heading">{{ 'cart.general.limit_message' | t }}</h5>
+
+          <p class="cart__errors__content" data-error-message></p>
+
+          <button class="cart__errors__close" type="button" data-cart-error-close aria-label="{{ 'general.accessibility.close' | t }} {{ 'cart.general.title' | t }}">
+            {%- render 'icon-cancel' -%}
+          </button>
+        </div>
+      </div>
+
+      <div class="drawer__items{% if cart_item_count <= 0 %} is-hidden{% endif %}"
+        data-items-holder
+        style="--base-animation-delay: {{ animation_delay }}ms">
+
+        {%- render 'cart-line-items', part: 'line-items' -%}
+        {%- liquid
+          comment
+            Incraese animation delay by using the cart item count limited up to 3
+          endcomment
+          assign animation_multiplier = cart_item_count | at_most: 3
+          assign animation_delay_after_items = animation_multiplier | times: animation_delay_increment
+          assign animation_delay = animation_delay | plus: animation_delay_after_items
+        -%}
+      </div>
+
+      <div class="drawer__empty{% if cart_item_count > 0 %} is-hidden{% endif %}"
+        data-cart-empty
+        style="--base-animation-delay: {{ animation_delay }}ms">
+
+        <div class="drawer__empty__inner">
+          <p class="drawer__empty__message" data-animation="{{ animation_name }}" data-animation-duration="{{ animation_duration }}" data-animation-delay="{{ animation_delay_cart_empty }}">
+            {{- 'cart.general.empty' | t -}}
+          </p>
+          {%- assign animation_delay_cart_empty = animation_delay_cart_empty | plus: animation_delay_increment -%}
+
+          {%- if show_empty_cart_menu and linklists[empty_cart_menu].links.size > 0 -%}
+            <div class="drawer__empty__buttons">
+              {%- for link in linklists[empty_cart_menu].links -%}
+                {%- liquid
+                  assign is_odd_last = false
+                  capture index_type
+                    cycle 'odd', 'even'
+                  endcapture
+
+                  if forloop.last and index_type == 'odd'
+                    assign is_odd_last = true
+                  endif
+                -%}
+
+                <div
+                  class="drawer__empty__item{% if is_odd_last %} drawer__empty__item--odd--last{% endif %}"
+                  data-animation="{{ animation_name }}"
+                  data-animation-duration="{{ animation_duration }}"
+                  data-animation-delay="{{ animation_delay_cart_empty }}"
+                  {%- assign animation_delay_cart_empty = animation_delay_cart_empty | plus: animation_delay_increment -%}
+                >
+                  <a href="{{ link.url }}" class="btn btn--full btn--primary btn--outline">
+                    {{ link.title | strip_html | escape }}
+                  </a>
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          {%- if settings.cart_product -%}
+            <div class="drawer__empty__product"
+              data-animation="{{ animation_name }}"
+              data-animation-duration="{{ animation_duration }}"
+              data-animation-delay="{{ animation_delay_cart_empty }}"
+            >
+              {%- render 'upsell-product', upsell_product: settings.cart_product -%}
+            </div>
+          {%- endif -%}
+        </div>
       </div>
     </div>
 
-    <form action="{{- routes.cart_url -}}" method="post" novalidate class="form-cart">
-      {% if settings.enable_order_notes %}
-        <div class="cart__widget" data-cart-widget>
-          <a href="#notes" data-expand-button>
-            {{- 'cart.general.cart_notes_label' | t -}}
-          </a>
+    <div class="drawer__foot cart__foot{% if cart_item_count == 0 %} is-hidden{% endif %}" data-foot-holder>
+      <collapsible-elements single="true">
+        <details
+          class="cart__widget cart__widget--products accordion{% if upsell_products == blank %} is-hidden{% endif %}"
+          {% if upsell_products != blank %}
+            open="true"
+          {% endif %}
+          data-collapsible
+          data-upsell-widget
+          data-animation="{{ animation_name }}"
+          data-animation-duration="{{ animation_duration }}"
+          data-animation-delay="{{ animation_delay }}"
+          {% if cart_item_count > 0 %}
+            {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+          {% endif %}>
+          <summary class="cart__widget__title" data-collapsible-trigger>
+            {{- 'cart.general.pair_products' | t -}}
 
-          <div class="cart__widget-content" id="notes">
-            <label for="note">{{ 'cart.general.customer_note' | t }}</label>
+            {%- render 'icon-plus' -%}
+            {%- render 'icon-minus' -%}
+          </summary>
 
-            <textarea id="note" name="note" class="cart__field cart__field--textarea"  aria-label="{{ 'cart.general.customer_note' | t }}">{{- cart.note -}}</textarea>
+          <div class="cart__widget__content"{% if upsell_products != blank %} style="height: auto;"{% endif %} data-collapsible-body>
+            <div class="cart__widget__content__inner" data-collapsible-content>
+              <div class="cart__widget__products" data-upsell-products>
+                {{- upsell_products -}}
+              </div>
+            </div>
           </div>
-        </div>
-      {% endif %}
+        </details>
 
-      {% if settings.enable_gift_notes %}
-        <div class="cart__widget" data-cart-widget>
-          <a href="#gift-notes" data-expand-button>
-            {{- 'cart.general.gift_notes_label' | t -}}
-          </a>
+        <form action="{{ routes.cart_url }}" method="post" novalidate class="cart__form">
+          {%- if settings.enable_order_notes -%}
+            <details
+              class="cart__widget accordion"
+              data-collapsible
+              data-animation="{{ animation_name }}"
+              data-animation-duration="{{ animation_duration }}"
+              data-animation-delay="{{ animation_delay }}"
+              {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}>
+              <summary class="cart__widget__title" data-collapsible-trigger>
+                {{- 'cart.general.cart_notes_label' | t -}}
 
-          <div class="cart__widget-content" id="gift-notes">
-            {%- assign gift_note_attribute = 'cart.general.gift_note_attribute' | t -%}
-            <label for="gift-note">{{ 'cart.general.customer_note' | t }}</label>
+                {%- render 'icon-plus' -%}
+                {%- render 'icon-minus' -%}
+              </summary>
 
-            <textarea id="gift-note" name="attributes[{{ gift_note_attribute }}]" class="cart__field cart__field--textarea" aria-label="{{ 'cart.general.customer_note' | t }}">{{ cart.attributes[gift_note_attribute] }}</textarea>
-          </div>
-        </div>
-      {% endif %}
+              <div class="cart__widget__content" data-collapsible-body>
+                <div class="cart__widget__content__inner" data-collapsible-content>
+                  <label for="note">{{ 'cart.general.customer_note' | t }}</label>
+                  <textarea id="note" name="note" class="cart__field cart__field--textarea"  aria-label="{{ 'cart.general.customer_note' | t }}">
+                    {{- cart.note -}}
+                  </textarea>
+                </div>
+              </div>
+            </details>
+          {%- endif -%}
 
-      {%- if settings.enable_estimate_shipping -%}
-        <div class="cart__widget" data-cart-widget>
-          <a href="#estimate-shipping-calculator" data-expand-button>
-            {{- 'cart.general.estimate_shipping_label' | t -}}
-          </a>
+          {%- if settings.enable_gift_notes -%}
+            <details
+              class="cart__widget accordion"
+              data-collapsible
+              data-animation="{{ animation_name }}"
+              data-animation-duration="{{ animation_duration }}"
+              data-animation-delay="{{ animation_delay }}"
+              {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}>
+              <summary class="cart__widget__title" data-collapsible-trigger>
+                {{- 'cart.general.gift_notes_label' | t -}}
 
-          <div class="cart__widget-content" id="estimate-shipping-calculator">
-            <!-- /partials/cart-shipping-calculator.liquid -->
+                {%- render 'icon-plus' -%}
+                {%- render 'icon-minus' -%}
+              </summary>
+
+              <div class="cart__widget__content" data-collapsible-body>
+                <div class="cart__widget__content__inner" data-collapsible-content>
+                  {%- assign gift_note_attribute_default = 'Gift note' -%}
+                  {%- assign gift_note_attribute_string = 'cart.general.gift_note_attribute' | t -%}
+                  {%- assign gift_note_attribute = gift_note_attribute_string | default: gift_note_attribute_default -%}
+
+                  <label for="gift-note">{{ 'cart.general.customer_note' | t }}</label>
+                  <textarea id="gift-note" name="attributes[{{ gift_note_attribute }}]" class="cart__field cart__field--textarea" aria-label="{{ 'cart.general.customer_note' | t }}">{{ cart.attributes[gift_note_attribute] }}</textarea>
+                </div>
+              </div>
+            </details>
+          {%- endif -%}
+
+          {%- if settings.enable_estimate_shipping -%}
+            <details
+              class="cart__widget accordion"
+              data-collapsible
+              data-animation="{{ animation_name }}"
+              data-animation-duration="{{ animation_duration }}"
+              data-animation-delay="{{ animation_delay }}"
+              {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}>
+              <summary class="cart__widget__title" data-collapsible-trigger>
+                {{- 'cart.general.estimate_shipping_label' | t -}}
+
+                {%- render 'icon-plus' -%}
+                {%- render 'icon-minus' -%}
+              </summary>
+
+              <div class="cart__widget__content" data-collapsible-body>
+                <div class="cart__widget__content__inner" data-collapsible-content>
+                  <!-- /partials/cart-shipping-calculator.liquid -->
 {% assign calculate_shipping_btn = 'cart.shipping_calculator.calculate_shipping' | t %}
 
 <div id="shipping-calculator" class="shipping-calculator">
@@ -196,7 +378,7 @@
 
     <div class="p">
       <label for="address_country">{{ 'customer.addresses.country' | t }}</label>
-      <select id="address_country" name="address[country]" class="cart__field" {% if shop.customer_accounts_enabled and customer %}data-default="{{ customer.default_address.country_code }}" data-default-fullname="{{ customer.default_address.country }}"{% else %}data-default="{{ default_country.iso_code }}" data-default-fullname="{{ default_country }}"{% endif %}></select>
+      <select id="address_country" name="address[country]" class="cart__field" {% if shop.customer_accounts_enabled and customer %}data-default="{{ customer.default_address.country_code }}" data-default-fullname="{{ customer.default_address.country }}"{% elsif default_country != '' %}data-default="{{ default_country.iso_code }}" data-default-fullname="{{ default_country }}"{% endif %}></select>
     </div>
 
     <div id="address_province_container"  class="p shipping-calculator__province">
@@ -206,7 +388,7 @@
 
     <div class="p">
       <label for="address_zip">{{ 'customer.addresses.zip' | t }}</label>
-      <input type="text" id="address_zip" class="cart__field" name="address[zip]"{% if shop.customer_accounts_enabled and customer %} value="{{ customer.default_address.zip }}"{% endif %} />
+      <input type="text" id="address_zip" class="cart__field" name="address[zip]"{% if shop.customer_accounts_enabled and customer %} value="{{ customer.default_address.zip }}"{% endif %}>
     </div>
 
     <div class="is-hidden">
@@ -214,10 +396,10 @@
       <input type="tel" id="AddressPhone" name="address[phone]" value="{{ form.phone }}">
     </div>
   </div>
-  
+
   <div id="wrapper-response"></div>
 
-  <input type="button" class="get-rates{% if cart.item_count > 0 %} get-rates--trigger{% endif %} btn btn--outline btn--input btn--full" value="{{ calculate_shipping_btn }}" />
+  <button type="button" class="get-rates{% if cart.item_count > 0 %} get-rates--trigger{% endif %} btn btn--outline btn--primary btn--full">{{ calculate_shipping_btn }}</button>
 </div>
 
 <script id="shipping-calculator-response-template" type="text/template">
@@ -231,63 +413,151 @@
   </ul>
 </script>
 
-          </div>
-        </div>
-      {%- endif -%}
-
-      <div class="cart__foot-inner">
-        <div class="cart__total {% if original_subtotal < subtotal or cart_discount_size <= 0 %} is-hidden{% endif %}" data-cart-original-total>
-          <span>{{- 'cart.general.subtotal_items' | t -}}</span>
-
-          <span data-cart-original-total-price>
-            {%- if original_subtotal == 0 -%}
-              {{ 'general.money.free' | t }}
-            {%- else -%}
-              {{- original_subtotal | money -}}
-            {%- endif -%}
-          </span>
-        </div>
-
-        <div class="cart__discounts {% if cart_discount_size <= 0 %} is-hidden{% endif %}" data-cart-discounts-holder>
-          {%- if cart.cart_level_discount_applications.size > 0 -%}
-            {%- for discount in cart.cart_level_discount_applications -%}
-              <div class="cart__total" data-cart-discount>
-                <span data-cart-discount-title>
-                  {{- discount.title -}}
-                </span>
-
-                <span data-cart-discount-price>
-                  -{{- discount.total_allocated_amount | money -}}
-                </span>
+                </div>
               </div>
-            {%- endfor -%}
+            </details>
           {%- endif -%}
-        </div>
 
-        <div class="cart__total">
-          <span>{{- 'cart.general.subtotal' | t -}}</span>
+          <div class="cart__foot__inner"
+            data-animation="{{ animation_name }}"
+            data-animation-duration="{{ animation_duration }}"
+            data-animation-delay="{{ animation_delay }}">
 
-          <span class="cart__total__money" data-cart-total>
-            {%- if subtotal == 0 -%}
-              {{ 'general.money.free' | t }}
-            {%- else -%}
-              {{- subtotal | money -}}
-            {%- endif -%}
+            <div class="cart__price__holder" data-cart-price-holder>
+              {%- liquid
+  assign subtotal = cart.total_price | plus: 0
+  assign cart_discount_size = cart.cart_level_discount_applications.size
+  assign original_subtotal = cart.original_total_price | plus: 0
+  assign currency_code_enable = settings.currency_code_enable
+
+  if currency_code_enable
+    assign original_subtotal_formatted = original_subtotal | money_with_currency
+  else
+    assign original_subtotal_formatted = original_subtotal | money
+  endif
+
+  if original_subtotal < subtotal or cart_discount_size == 0
+    assign cart_total_hidden = true
+  endif
+
+  if cart_discount_size == 0
+    assign cart_total_discount_hidden = true
+  endif
+-%}
+
+<div class="cart__total{% if cart_total_hidden %} is-hidden{% endif %}"
+  {% unless cart_total_hidden %}
+    data-animation="{{ animation_name }}"
+    data-animation-duration="{{ animation_duration }}"
+    data-animation-delay="{{ animation_delay }}"
+    {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+  {% endunless %}
+>
+  <span class="cart__total__label">{{ 'cart.general.subtotal_items' | t }}</span>
+
+  <span class="cart__total__price">
+    {%- if original_subtotal == 0 -%}
+      {{ 'general.money.free' | t }}
+    {%- else -%}
+      {{- original_subtotal_formatted -}}
+    {%- endif -%}
+  </span>
+</div>
+
+<div class="cart__total__discount{% if cart_total_discount_hidden %} is-hidden{% endif %}"
+  {% unless cart_total_discount_hidden %}
+    data-animation="{{ animation_name }}"
+    data-animation-duration="{{ animation_duration }}"
+    data-animation-delay="{{ animation_delay }}"
+    {% if cart_discount_size > 0 %}
+      {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+    {% endif %}
+  {% endunless %}
+>
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    {%- for discount in cart.cart_level_discount_applications -%}
+      {%- liquid
+        if currency_code_enable
+          assign discount_total_allocated_amount = discount.total_allocated_amount | money_with_currency
+        else
+          assign discount_total_allocated_amount = discount.total_allocated_amount | money
+        endif
+      -%}
+
+      <div class="cart__total">
+        <div>
+          {%- render 'icon-tags' -%}
+
+          <span>
+            {{- discount.title -}}
           </span>
         </div>
 
-        <em>{{- 'cart.general.subtotal_note' | t -}}</em>
-
-        <button type="submit" name="checkout" class="btn btn--full btn--large cart__checkout">
-          {{- 'cart.general.checkout' | t -}}
-        </button>
+        <span>
+          -{{- discount_total_allocated_amount -}}
+        </span>
       </div>
+    {%- endfor -%}
+  {%- endif -%}
+</div>
 
-      {%- if settings.enable_additional_buttons and additional_checkout_buttons -%}
-        <div class="additional-checkout-buttons">
-          {{- content_for_additional_checkout_buttons -}}
-        </div>
-      {%- endif -%}
-    </form>
+<div class="cart__total"
+  data-animation="{{ animation_name }}"
+  data-animation-duration="{{ animation_duration }}"
+  data-animation-delay="{{ animation_delay }}"
+  {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+>
+  <span class="cart__total__label">{{- 'cart.general.subtotal' | t -}}</span>
+
+  <span class="cart__total__price cart__total__price--animated" data-cart-total="{{ subtotal }}">
+    {%- if subtotal == 0 -%}
+      {{ 'general.money.free' | t }}
+    {%- else -%}
+      {{- subtotal | money_with_currency -}}
+    {%- endif -%}
+  </span>
+
+  <div class="cart__price__loader loader"><div class="loader-indeterminate"></div></div>
+</div>
+            </div>
+
+            <div class="cart__button"
+              data-animation="{{ animation_name }}"
+              data-animation-duration="{{ animation_duration }}"
+              data-animation-delay="{{ animation_delay }}"
+              {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}>
+              <a href="/cart" name="checkout" class="btn btn--primary btn--solid btn--full cart__checkout">
+                {%- if settings.show_lock_icon -%}
+                  {%- render 'animated-icon', filename: 'icon-lock' -%}
+                {%- endif -%}
+
+                {{- 'cart.general.checkout' | t -}}
+              </a>
+              <span class="center label--block callout-label">{{- 'cart.general.collout_shipping_note' | t -}}</span>
+            </div>
+
+            <em class="cart__note"
+              data-animation="{{ animation_name }}"
+              data-animation-duration="{{ animation_duration }}"
+              data-animation-delay="{{ animation_delay }}"
+              {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}>
+              {{- 'cart.general.subtotal_note' | t -}}
+            </em>
+          </div>
+
+          {%- if settings.enable_additional_buttons and additional_checkout_buttons -%}
+            <div class="additional-checkout-buttons additional-checkout-buttons--vertical"
+              data-animation="{{ animation_name }}"
+              data-animation-duration="{{ animation_duration }}"
+              data-animation-delay="{{ animation_delay }}"
+              {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}>
+              {{- content_for_additional_checkout_buttons -}}
+            </div>
+          {%- endif -%}
+        </form>
+      </collapsible-elements>
+    </div>
   </div>
+
+  <span class="drawer__underlay" data-drawer-underlay></span>
 </div>

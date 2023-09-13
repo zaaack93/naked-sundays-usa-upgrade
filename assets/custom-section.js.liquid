@@ -1,0 +1,35 @@
+// Select all elements with the desired class name
+const elements = document.querySelectorAll('.product__icon__row');
+
+// Create and define the custom element
+class ProductIconRow extends HTMLElement {
+  connectedCallback() {
+    if (this.innerHTML.trim() === '') {
+      this.classList.add('empty-div');
+      const previousSibling = this.previousElementSibling;
+      if (previousSibling && previousSibling.classList.contains('product__block--divider')) {
+        previousSibling.classList.add('empty-div');
+      }
+    }
+  }
+}
+
+customElements.define('product-icon-row', ProductIconRow);
+
+// Iterate over each selected element
+elements.forEach((element) => {
+  // Create an instance of the custom element with the new node name
+  const customElement = document.createElement('product-icon-row');
+
+  // Clone the attributes and children from the original element to the custom element
+  Array.from(element.attributes).forEach((attr) => {
+    customElement.setAttribute(attr.name, attr.value);
+  });
+
+  while (element.firstChild) {
+    customElement.appendChild(element.firstChild);
+  }
+
+  // Replace the original element with the new custom element
+  element.parentNode.replaceChild(customElement, element);
+});

@@ -1,0 +1,110 @@
+{
+  "sections": {
+    "8b385988-f761-4eae-b044-afd96aa9ffa5": {
+      "type": "section-hero",
+      "blocks": {
+        "template--16801263419650__8b385988-f761-4eae-b044-afd96aa9ffa5-heading-1": {
+          "type": "heading",
+          "settings": {
+            "title": "COMING SOON!",
+            "heading_size": 13
+          }
+        },
+        "template--16801263419650__8b385988-f761-4eae-b044-afd96aa9ffa5-text-1": {
+          "type": "text",
+          "settings": {
+            "description": "Sign up to be the FIRST to know and get your FREE gift on launch day!",
+            "text_size": 6,
+            "text_style": "font-heading"
+          }
+        },
+        "template--16801263419650__8b385988-f761-4eae-b044-afd96aa9ffa5-button-1": {
+          "type": "button",
+          "settings": {
+            "link_text": "",
+            "link": "",
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_arrow": false
+          }
+        }
+      },
+      "block_order": [
+        "template--16801263419650__8b385988-f761-4eae-b044-afd96aa9ffa5-heading-1",
+        "template--16801263419650__8b385988-f761-4eae-b044-afd96aa9ffa5-text-1",
+        "template--16801263419650__8b385988-f761-4eae-b044-afd96aa9ffa5-button-1"
+      ],
+      "settings": {
+        "height": "screen-height-one-half",
+        "width": "wrapper--full",
+        "image_1": "shopify:\/\/shop_images\/Cabana_Glow-Unedited-455.jpg",
+        "mobile_height": "screen-height-three-quarters--mobile",
+        "flex_align": "align--middle-center",
+        "overlay_opacity": 20,
+        "overlay_color": "#000000",
+        "show_overlay_text": true,
+        "bg_color": "",
+        "color": "#ffffff"
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "subheading": "",
+        "subheading_size": 3,
+        "show_title": true,
+        "heading_size": 8,
+        "show_content": true,
+        "text_size": 4,
+        "align_text": "text-left",
+        "width": "wrapper",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "4d7864bd-f8be-4c15-9e7f-57dc7c95fd69": {
+      "type": "section-custom-code",
+      "settings": {
+        "code": "<div style=\"width: 100%; max-width: 1200px; padding: 12px 15px; margin: 0 auto;\"><div><script type=\"text\/javascript\" src=\"https:\/\/forms-akamai.smsbump.com\/450278\/form_71928.js?ver=1692774039\"><\/script><\/div><\/div>",
+        "width": "wrapper--full-padded",
+        "bg_color": "#e7d8fa",
+        "color": "",
+        "padding_top": 49,
+        "padding_bottom": 50
+      }
+    },
+    "b15f25a2-6315-4c39-9388-9b25d0ce1623": {
+      "type": "section-collection",
+      "settings": {
+        "heading": "Best Sellers",
+        "description": "",
+        "layout": "inline",
+        "link_text": "",
+        "link_url": "",
+        "button_type": "btn--primary",
+        "button_size": "",
+        "button_style": "btn--solid",
+        "show_arrow": false,
+        "featured_collection": "all",
+        "style": "grid",
+        "grid": 4,
+        "rows": 3,
+        "layout_mobile": "carousel",
+        "bg_color": "",
+        "color": "",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    }
+  },
+  "order": [
+    "8b385988-f761-4eae-b044-afd96aa9ffa5",
+    "main",
+    "4d7864bd-f8be-4c15-9e7f-57dc7c95fd69",
+    "b15f25a2-6315-4c39-9388-9b25d0ce1623"
+  ]
+}
