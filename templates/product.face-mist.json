@@ -360,7 +360,7 @@
         "b8061428-4f71-49d5-9fb5-c0818df6ec53": {
           "type": "video",
           "settings": {
-            "video": "shopify:\/\/files\/videos\/Mist2.mp4",
+            "video": "",
             "external_video_url_metafield": "",
             "show_video_popup": false,
             "video_popup_social": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc",

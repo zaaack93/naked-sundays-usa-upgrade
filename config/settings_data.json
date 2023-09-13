@@ -81,12 +81,6 @@
     "empty_cart_menu": "cart-menu",
     "free_gift_limit": "60",
     "collection": "free-gift",
-    "link_hover_color": "#bcb2a8",
-    "header_link_hover": "#AB8C52",
-    "show_logo_bg": false,
-    "menu_link_hover_color": "#AB8C52",
-    "submenu_link_hover_color": "#AB8C52",
-    "footer_link_hover": "#212121",
     "checkout_logo_position": "left",
     "checkout_logo_size": "medium",
     "checkout_body_background_color": "#fff",
@@ -97,6 +91,12 @@
     "checkout_accent_color": "#c5aa76",
     "checkout_button_color": "#c5aa76",
     "checkout_error_color": "#c85c42",
+    "link_hover_color": "#bcb2a8",
+    "header_link_hover": "#AB8C52",
+    "show_logo_bg": false,
+    "menu_link_hover_color": "#AB8C52",
+    "submenu_link_hover_color": "#AB8C52",
+    "footer_link_hover": "#212121",
     "enable_free_shipping_message": true,
     "sale_background_color": "#be563f",
     "content_for_index": [
@@ -121,33 +121,10 @@
         "settings": {
         }
       },
-      "5149645339031002760": {
-        "type": "shopify:\/\/apps\/order-limits-minmaxify\/blocks\/app-embed-block\/3acfba32-89f3-4377-ae20-cbb9abc48475",
-        "disabled": false,
-        "settings": {
-          "async": false
-        }
-      },
       "1173261918193615741": {
         "type": "shopify:\/\/apps\/geo-pro-geolocation-redirects\/blocks\/geopro\/16fc5313-7aee-4e90-ac95-f50fc7c8b657",
         "disabled": false,
         "settings": {
-        }
-      },
-      "17151115064775110295": {
-        "type": "shopify:\/\/apps\/recharge-subscriptions\/blocks\/recharge-theme\/371eed76-0b44-4869-9813-730372ea378e",
-        "disabled": false,
-        "settings": {
-          "color_brand": "#467C99",
-          "contrast_color": "#FFFFFF",
-          "color_brand_secondary": "#467C99",
-          "corners": "8px",
-          "app_background": "#f9f8f4",
-          "app_container": 1200,
-          "app_vertical_padding": 32,
-          "images_aspect_ratio": "1",
-          "cards_background": "#FFFFFF",
-          "cards_border_color": "rgba(0,0,0,0)"
         }
       }
     }

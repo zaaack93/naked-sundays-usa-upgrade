@@ -287,6 +287,7 @@
         "logos-0": {
           "type": "logo-item",
           "settings": {
+            "logo": "shopify:\/\/shop_images\/Untitled_design-40.png",
             "logo_width": 100,
             "link": "",
             "description": "<p>AS SEEN IN… <\/p>",
@@ -296,6 +297,7 @@
         "logos-2": {
           "type": "logo-item",
           "settings": {
+            "logo": "shopify:\/\/shop_images\/Harpers_Bazaar_logo_logotype.png",
             "logo_width": 130,
             "link": "",
             "description": "",
@@ -305,6 +307,7 @@
         "fb1d6ce0-99a3-4247-8ba8-d382a7833858": {
           "type": "logo-item",
           "settings": {
+            "logo": "shopify:\/\/shop_images\/Vanity_Fair_Logo_svg.png",
             "logo_width": 150,
             "link": "",
             "description": "",
@@ -314,6 +317,7 @@
         "logos-1": {
           "type": "logo-item",
           "settings": {
+            "logo": "shopify:\/\/shop_images\/Untitled_design-38.png",
             "logo_width": 100,
             "link": "",
             "description": "",
@@ -323,6 +327,7 @@
         "3df55dfd-ae08-4de1-9edf-d7a8ba3913ce": {
           "type": "logo-item",
           "settings": {
+            "logo": "shopify:\/\/shop_images\/vogue_ad2cba07-192e-413f-aef8-d9bef36547eb.png",
             "logo_width": 120,
             "link": "",
             "description": "",
