@@ -1,0 +1,14 @@
+{
+  "type": "aside",
+  "name": "Overlay",
+  "sections": {
+    "popups": {
+      "type": "popups",
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "popups"
+  ]
+}

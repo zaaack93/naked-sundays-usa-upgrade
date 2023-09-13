@@ -1,0 +1,93 @@
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "footer-0": {
+          "type": "newsletter",
+          "settings": {
+            "title": "Keep up to date!",
+            "text": "<p>Subscribe to get special offers, free giveaways, and the first dibs on all new products!<\/p>",
+            "show_name": false,
+            "button_text": "Join",
+            "show_arrow": false,
+            "terms": false,
+            "button_type": "btn--primary",
+            "button_size": "",
+            "button_style": "btn--solid",
+            "show_social_links": true,
+            "column_width": 25
+          }
+        },
+        "footer-1": {
+          "type": "linklist",
+          "settings": {
+            "linklist": "support",
+            "title": "",
+            "column_width": 24
+          }
+        },
+        "4e72a60e-e01c-4761-ae9c-8bf78650e415": {
+          "type": "social",
+          "disabled": true,
+          "settings": {
+            "title": "Social",
+            "text": "",
+            "column_width": 33
+          }
+        },
+        "62a875a8-668a-45ff-b07d-4ec9dd1cba13": {
+          "type": "text",
+          "settings": {
+            "image_width": 150,
+            "title": "Warning",
+            "text": "<p>Use SPF as directed. Reapply Often. Stay out of the sun where possible. Wear protective clothing and eyewear as SPF is only one form of sun protection.<\/p>",
+            "column_width": 25
+          }
+        },
+        "8881181a-bbd1-4378-a938-284e1b21022f": {
+          "type": "linklist",
+          "disabled": true,
+          "settings": {
+            "linklist": "mobile-secondary",
+            "title": "Shop",
+            "column_width": 24
+          }
+        }
+      },
+      "block_order": [
+        "footer-0",
+        "footer-1",
+        "4e72a60e-e01c-4761-ae9c-8bf78650e415",
+        "62a875a8-668a-45ff-b07d-4ec9dd1cba13",
+        "8881181a-bbd1-4378-a938-284e1b21022f"
+      ],
+      "settings": {
+        "logo": "shopify:\/\/shop_images\/NakedSundays-Logo_MultiColor_1997x_ceace983-9ddf-462c-bb09-e14ad59fac54.png",
+        "logo_image_width": 150,
+        "overlay_opacity": 75,
+        "overlay_color": "#ffffff",
+        "padding_top": 75,
+        "padding_bottom": 30
+      }
+    },
+    "supporting-menu": {
+      "type": "section-supporting-menu",
+      "settings": {
+        "linklist": "footer",
+        "footer_payment_enable": true,
+        "show_locale_selector": true,
+        "show_currency_selector": false,
+        "type": "currency",
+        "padding_top": 30,
+        "padding_bottom": 30
+      }
+    }
+  },
+  "order": [
+    "footer",
+    "supporting-menu"
+  ]
+}

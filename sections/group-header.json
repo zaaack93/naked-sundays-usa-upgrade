@@ -1,0 +1,79 @@
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "announcement": {
+      "type": "announcement",
+      "blocks": {
+        "7baebcdf-7b37-407a-a964-c8c0a920a700": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "text": "<p>UPDATE: ILLUMINATING CabanaGlow SOLD OUT; PRE-ORDER the next drop!! <\/p>",
+            "target_url_enabled": false,
+            "target_url": "",
+            "target_referrer_enabled": false,
+            "target_referrer": "",
+            "target_device_enabled": false,
+            "target_device": "mobile"
+          }
+        },
+        "c93da064-6218-4956-9c6d-1239d76942cc": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>FREE SPF50 Glow Balm with orders $60+ (Today Only!) <\/strong><\/p>",
+            "target_url_enabled": false,
+            "target_url": "",
+            "target_referrer_enabled": false,
+            "target_referrer": "",
+            "target_device_enabled": false,
+            "target_device": "mobile"
+          }
+        }
+      },
+      "block_order": [
+        "7baebcdf-7b37-407a-a964-c8c0a920a700",
+        "c93da064-6218-4956-9c6d-1239d76942cc"
+      ],
+      "settings": {
+        "layout": "slider",
+        "slider_speed": 7,
+        "show_arrows": false,
+        "marquee_speed": 100,
+        "text_size": 2,
+        "bg_color": "#ebdcff",
+        "color": "#545454"
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "header_sticky": false,
+        "header_style": "logo_above",
+        "show_icons": true,
+        "icon_as_circle": false,
+        "cart_icon_family": "bag",
+        "logo": "shopify:\/\/shop_images\/NakedSundays-Logo_MultiColor_1997x_ceace983-9ddf-462c-bb09-e14ad59fac54.png",
+        "logo_max_limit": 165,
+        "main_menu_linklist": "",
+        "enable_search": false,
+        "show_social_icons": false,
+        "show_locale_selector": false,
+        "show_currency_selector": true,
+        "type": "currency",
+        "highlight_item": "Sale",
+        "highlight_item_color": "#d02e2e",
+        "transparent_home": false,
+        "transparent_collection": false,
+        "transparent_article": false,
+        "transparent_page": false,
+        "secondary_menu_linklist": "",
+        "tertiary_menu_linklist": ""
+      }
+    }
+  },
+  "order": [
+    "announcement",
+    "header"
+  ]
+}
