@@ -52,12 +52,6 @@
             "padding_bottom": 16
           }
         },
-        "3fa3c17a-a569-4a6a-a2b0-af427002396b": {
-          "type": "shopify:\/\/apps\/recharge-subscriptions\/blocks\/subscription-widget\/371eed76-0b44-4869-9813-730372ea378e",
-          "settings": {
-            "product": "{{product}}"
-          }
-        },
         "buttons": {
           "type": "buttons",
           "settings": {
@@ -194,7 +188,6 @@
         "price",
         "variants",
         "304f09b5-0771-4bb4-b90f-1e1bcc842967",
-        "3fa3c17a-a569-4a6a-a2b0-af427002396b",
         "buttons",
         "4b447ae6-3e83-4a71-ba59-00521189b9eb",
         "icon_2",

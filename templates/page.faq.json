@@ -298,7 +298,6 @@
     },
     "icons": {
       "type": "section-text-row",
-      "disabled": true,
       "blocks": {
         "icon-0": {
           "type": "icon",
@@ -342,6 +341,7 @@
         "icon-1",
         "icon-2"
       ],
+      "disabled": true,
       "settings": {
         "title": "",
         "heading_size": 5,

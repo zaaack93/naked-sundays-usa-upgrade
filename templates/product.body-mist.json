@@ -61,13 +61,6 @@
             "padding_bottom": 20
           }
         },
-        "3fa3c17a-a569-4a6a-a2b0-af427002396b": {
-          "type": "shopify:\/\/apps\/recharge-subscriptions\/blocks\/subscription-widget\/371eed76-0b44-4869-9813-730372ea378e",
-          "disabled": true,
-          "settings": {
-            "product": "{{product}}"
-          }
-        },
         "4b447ae6-3e83-4a71-ba59-00521189b9eb": {
           "type": "buttons-v2",
           "disabled": true,
@@ -196,7 +189,6 @@
         "variants",
         "304f09b5-0771-4bb4-b90f-1e1bcc842967",
         "buttons",
-        "3fa3c17a-a569-4a6a-a2b0-af427002396b",
         "4b447ae6-3e83-4a71-ba59-00521189b9eb",
         "icon_2",
         "icon_1",
@@ -317,12 +309,12 @@
         "bc7c2616-c811-487b-9cdf-b72052ef9349": {
           "type": "video",
           "settings": {
-            "video": "",
+            "video": "shopify:\/\/files\/videos\/529a1e47aeb74ec8850a23df73988000 (1).mov",
             "external_video_url_metafield": "",
             "show_video_popup": false,
             "video_popup_social": "",
             "overlay_opacity": 0,
-            "overlay_color": "#000",
+            "overlay_color": "#000000",
             "show_overlay_text": false,
             "title": "",
             "heading_size": 7,
@@ -336,7 +328,7 @@
             "button_style": "btn--solid",
             "show_arrow": false,
             "bg_color": "",
-            "color": "#FFFFFF"
+            "color": "#ffffff"
           }
         }
       },
@@ -360,9 +352,8 @@
         "80d94a64-c6bb-4e8e-87a6-5ae3cd2f58aa": {
           "type": "image",
           "settings": {
-            "image": "shopify:\/\/shop_images\/WhatsApp_Image_2022-11-18_at_10.20.26_AM_3.jpg",
             "overlay_opacity": 0,
-            "overlay_color": "#000",
+            "overlay_color": "#000000",
             "show_overlay_text": false,
             "title": "",
             "heading_size": 7,
@@ -370,7 +361,7 @@
             "text_size": 3,
             "flex_align": "align--middle-center",
             "bg_color": "",
-            "color": "#FFFFFF",
+            "color": "#ffffff",
             "link_text": "",
             "link": "",
             "button_type": "btn--primary",

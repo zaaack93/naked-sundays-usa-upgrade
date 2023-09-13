@@ -45,7 +45,6 @@
     },
     "team-1": {
       "type": "section-multicolumn",
-      "disabled": true,
       "blocks": {
         "person-0": {
           "type": "text",
@@ -77,13 +76,13 @@
         "person-1",
         "person-2"
       ],
+      "disabled": true,
       "settings": {
         "title": "Vice Presidents"
       }
     },
     "team-2": {
       "type": "section-multicolumn",
-      "disabled": true,
       "blocks": {
         "person-0": {
           "type": "text",
@@ -115,6 +114,7 @@
         "person-1",
         "person-2"
       ],
+      "disabled": true,
       "settings": {
       }
     },

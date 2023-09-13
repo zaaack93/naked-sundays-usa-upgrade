@@ -220,7 +220,6 @@
     },
     "announcement": {
       "type": "section-announcement",
-      "disabled": true,
       "blocks": {
         "text": {
           "type": "text",
@@ -234,6 +233,7 @@
       "block_order": [
         "text"
       ],
+      "disabled": true,
       "settings": {
         "layout": "marquee",
         "slider_speed": 7,
@@ -247,7 +247,6 @@
     },
     "collections-list": {
       "type": "section-collections-list",
-      "disabled": true,
       "blocks": {
         "collection-1": {
           "type": "collection",
@@ -284,6 +283,7 @@
         "collection-3",
         "collection-4"
       ],
+      "disabled": true,
       "settings": {
         "title": "",
         "description": "",
@@ -299,7 +299,6 @@
     },
     "press-logos": {
       "type": "section-press-logos",
-      "disabled": true,
       "blocks": {
         "logo-item-1": {
           "type": "logo-item",
@@ -344,6 +343,7 @@
         "logo-item-3",
         "logo-item-4"
       ],
+      "disabled": true,
       "settings": {
         "title": "As seen in",
         "enable_heading_slider": false,

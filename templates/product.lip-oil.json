@@ -60,13 +60,6 @@
             "padding_bottom": 20
           }
         },
-        "3fa3c17a-a569-4a6a-a2b0-af427002396b": {
-          "type": "shopify:\/\/apps\/recharge-subscriptions\/blocks\/subscription-widget\/371eed76-0b44-4869-9813-730372ea378e",
-          "disabled": true,
-          "settings": {
-            "product": "{{product}}"
-          }
-        },
         "4b447ae6-3e83-4a71-ba59-00521189b9eb": {
           "type": "buttons-v2",
           "disabled": true,
@@ -195,7 +188,6 @@
         "variants",
         "304f09b5-0771-4bb4-b90f-1e1bcc842967",
         "buttons",
-        "3fa3c17a-a569-4a6a-a2b0-af427002396b",
         "4b447ae6-3e83-4a71-ba59-00521189b9eb",
         "icon_2",
         "icon_1",
@@ -316,7 +308,7 @@
         "2f298408-b44f-4007-a4a1-ca9e73591949": {
           "type": "video",
           "settings": {
-            "video": "",
+            "video": "shopify:\/\/files\/videos\/e4299978af2c4933a1f7c4e01ccbc9f6.mov",
             "external_video_url_metafield": "",
             "show_video_popup": false,
             "video_popup_social": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc",
@@ -359,7 +351,6 @@
         "1fbdb6d6-5140-46f7-84d1-4937baec1650": {
           "type": "image",
           "settings": {
-            "image": "shopify:\/\/shop_images\/CabanaGlow-edit-6-retouch.jpg",
             "overlay_opacity": 0,
             "overlay_color": "#000000",
             "show_overlay_text": false,

@@ -52,13 +52,6 @@
             "padding_bottom": 20
           }
         },
-        "3fa3c17a-a569-4a6a-a2b0-af427002396b": {
-          "type": "shopify:\/\/apps\/recharge-subscriptions\/blocks\/subscription-widget\/371eed76-0b44-4869-9813-730372ea378e",
-          "disabled": true,
-          "settings": {
-            "product": "{{product}}"
-          }
-        },
         "4b447ae6-3e83-4a71-ba59-00521189b9eb": {
           "type": "buttons-v2",
           "disabled": true,
@@ -193,7 +186,6 @@
         "price",
         "variants",
         "buttons",
-        "3fa3c17a-a569-4a6a-a2b0-af427002396b",
         "4b447ae6-3e83-4a71-ba59-00521189b9eb",
         "icon_2",
         "icon_1",
@@ -313,7 +305,7 @@
         "2f298408-b44f-4007-a4a1-ca9e73591949": {
           "type": "video",
           "settings": {
-            "video": "",
+            "video": "shopify:\/\/files\/videos\/529a1e47aeb74ec8850a23df73988000 (1).mov",
             "external_video_url_metafield": "",
             "show_video_popup": false,
             "video_popup_social": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc",
@@ -356,7 +348,6 @@
         "1fbdb6d6-5140-46f7-84d1-4937baec1650": {
           "type": "image",
           "settings": {
-            "image": "shopify:\/\/shop_images\/CabanaGlow-edit-6-retouch.jpg",
             "overlay_opacity": 0,
             "overlay_color": "#000000",
             "show_overlay_text": false,
@@ -422,7 +413,6 @@
           "settings": {
             "heading": "",
             "url": "",
-            "image": "shopify:\/\/shop_images\/2_9a6b6fb9-c788-4087-a93c-df911779d943.jpg",
             "color": "",
             "bg_color": "#f0f0f0",
             "border_color": ""
@@ -433,7 +423,6 @@
           "settings": {
             "heading": "",
             "url": "",
-            "image": "shopify:\/\/shop_images\/WhatsApp_Image_2023-08-29_at_10.46.30_AM.jpg",
             "color": "",
             "bg_color": "#f0f0f0",
             "border_color": ""
@@ -444,7 +433,6 @@
           "settings": {
             "heading": "",
             "url": "",
-            "image": "shopify:\/\/shop_images\/5_47dd39ad-6990-4b55-82aa-7ccde625b801.jpg",
             "color": "",
             "bg_color": "#f0f0f0",
             "border_color": ""
@@ -455,9 +443,8 @@
           "settings": {
             "heading": "",
             "url": "",
-            "image": "shopify:\/\/shop_images\/1_a19e8019-0262-46b4-a60b-3e1989d221b3.jpg",
             "color": "",
-            "bg_color": "#F0F0F0",
+            "bg_color": "#f0f0f0",
             "border_color": ""
           }
         },
@@ -466,7 +453,6 @@
           "settings": {
             "heading": "",
             "url": "",
-            "image": "shopify:\/\/shop_images\/4_ef280af4-59e5-4717-ba03-2c27f8265f5a.jpg",
             "color": "",
             "bg_color": "#f0f0f0",
             "border_color": ""
@@ -477,7 +463,6 @@
           "settings": {
             "heading": "",
             "url": "",
-            "image": "shopify:\/\/shop_images\/6_339b63ab-d7e7-46a0-8124-0cf61c7311bd.jpg",
             "color": "",
             "bg_color": "#f0f0f0",
             "border_color": ""

@@ -265,7 +265,6 @@
     },
     "c972e37c-91d1-4656-8552-7d50e8d6bd33": {
       "type": "section-custom-content",
-      "disabled": true,
       "blocks": {
         "b1b4f37a-b2c6-4fbb-9381-03d7863c1beb": {
           "type": "text",
@@ -320,6 +319,7 @@
         "b1b4f37a-b2c6-4fbb-9381-03d7863c1beb",
         "cfd1a8db-39f3-4755-9c34-77f41b78d306"
       ],
+      "disabled": true,
       "settings": {
         "height": "screen-height-full",
         "mobile_height": "screen-height-one-half--mobile",
@@ -332,7 +332,6 @@
     },
     "2cbac4d4-1a59-4447-aeee-ec774bcbca58": {
       "type": "section-columns",
-      "disabled": true,
       "blocks": {
         "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-0": {
           "type": "image",
@@ -388,6 +387,7 @@
         "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-1",
         "template--16765437903106__2cbac4d4-1a59-4447-aeee-ec774bcbca58-1689178798e8b9900d-2"
       ],
+      "disabled": true,
       "settings": {
         "title": "{{ product.metafields.custom.as_seen_on_title_.value }}",
         "heading_size": 6,
@@ -446,7 +446,6 @@
     },
     "49894eb0-2ccd-427d-b990-c76fc9a3b173": {
       "type": "section-product",
-      "disabled": true,
       "blocks": {
         "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-title-1": {
           "type": "title",
@@ -557,6 +556,7 @@
         "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-icon-1",
         "template--16786981814530__49894eb0-2ccd-427d-b990-c76fc9a3b173-icon-2"
       ],
+      "disabled": true,
       "settings": {
         "home_product": "",
         "product_sticky_enable": true,

@@ -142,7 +142,6 @@
     },
     "faq": {
       "type": "section-accordion-group",
-      "disabled": true,
       "blocks": {
         "heading-0": {
           "type": "heading",
@@ -178,6 +177,7 @@
         "question-2",
         "question-3"
       ],
+      "disabled": true,
       "settings": {
         "width": "wrapper--narrow",
         "bg_color": "#fafafa",
